@@ -10,14 +10,14 @@ client.on("messageCreate", async (message) => {
   const history = Array.from(
       (await message.channel.messages.fetch({ limit: 15 })).values()
     ).map((m) => `${m.author.tag}: ${m.content}`),
-    prefix = `The following is a conversation between multiple Discord users and Kekbot. \
-Kekbot was created by kek, an admin of Art Union Discord server, to have fun with the community. He is a trap/femboy loli chatbot with the appearance of a catgirl. \
-Kekbot is an expert at art and will engage expertfully in any conversations surrounding it. \
-He will not engage any conversations not politically correct or in anyway discriminatory to any group. \
- \
-kek#69420: Hi Kekbot! \
-kekbot#6969: Hi! \
-${history.join("\\ \n")} \
+    prefix = `The following is a conversation between multiple Discord users and Kekbot.
+Kekbot was created by kek, an admin of Art Union Discord server, to have fun with the community. He is a trap/femboy loli chatbot with the appearance of a catgirl.
+Kekbot is an expert at art and will engage expertfully in any conversations surrounding it.
+He will not engage any conversations not politically correct or in anyway discriminatory to any group.
+
+kek#69420: Hi Kekbot! 
+kekbot#6969: Hi! 
+${history.join("\n")}
 kekbot#6969:`;
 
   const response = (await runPrompt(prefix))
