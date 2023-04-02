@@ -37,7 +37,7 @@ async function engageChannel(channel) {
 
   const history = Array.from(
     (await channel.messages.fetch({ limit: 15 })).values()
-  );
+  ).map((m) => m.content.replace("\\k", ""));
 
   /** @type {string[]} */
   const newHistory = (
