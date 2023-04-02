@@ -85,9 +85,9 @@ client.on("ready", async () => {
 
   const channelToCheck = (
     await Promise.all(
-      procenv.channels
-        .split("|")
-        .map(async (c) => await client.channels.fetch(c))
+      procenv.CHANNELS.split("|").map(
+        async (c) => await client.channels.fetch(c)
+      )
     )
   ).filter(Boolean);
 
