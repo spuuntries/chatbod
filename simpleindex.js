@@ -31,6 +31,7 @@ kekbot#6969: Hi!
 ${history.join("\n")}
 kekbot#6969:`;
 
+  logger(prefix);
   await message.channel.sendTyping();
 
   const response = (await runPrompt(prefix))
