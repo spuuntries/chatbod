@@ -2,86 +2,16 @@ require("dotenv").config();
 const procenv = process.env,
   Discord = require("discord.js"),
   client = new Discord.Client({ intents: ["MessageContent"] }),
-  { nanoid } = require("nanoid"),
-  PouchDB = require("pouchdb"),
-  { exec } = require("child_process");
-
-class PouchWrapper {
-  constructor(dbName) {
-    this.db = new PouchDB(dbName);
-  }
-
-  async put(id, value) {
-    try {
-      const doc = {
-        _id: id || nanoid(),
-        value,
-      };
-
-      const result = await this.db.put(doc);
-      return result;
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async get(id) {
-    try {
-      const doc = await this.db.get(id);
-      return doc;
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async delete(id, rev) {
-    try {
-      const result = await this.db.remove(id, rev);
-      return result;
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async push(id, value) {
-    try {
-      const doc = await this.db.get(id);
-
-      if (!Array.isArray(doc.value)) {
-        throw new Error("Value is not an array");
-      }
-
-      doc.value.push(value);
-      const result = await this.db.put(doc);
-      return result;
-    } catch (err) {
-      console.log(err);
-    }
-  }
-}
-
+  { runPrompt } = require("./llmutils"),
+  { PouchWrapper } = require("./dbutils");
 const db = new PouchWrapper("chatdb");
 
 /**
- * @param {string} command
- * @returns {string}
- */
-function runCommand(command) {
-  return new Promise((resolve, reject) => {
-    exec(command, (err, stdout, stderr) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(stdout.trim());
-      }
-    });
-  });
-}
-
-/**
- *
- * @param {string} channelId
- * @param {number} minutes
+ * Checks if a Discord channel has been inactive for a specified number of minutes.
+ * @async
+ * @param {string} channelId - The ID of the Discord channel to check.
+ * @param {number} minutes - The number of minutes to check for inactivity.
+ * @returns {Promise<boolean>} `true` if the channel has been inactive for the specified number of minutes, `false` otherwise.
  */
 async function checkDeadChannel(channelId, minutes) {
   /** @type {Discord.TextChannel} */
@@ -96,21 +26,78 @@ async function checkDeadChannel(channelId, minutes) {
   else return false;
 }
 
+/**
+ * Engages a Discord text channel by sending a message then adding to the engaged list.
+ * @async
+ * @param {Discord.TextChannel} channel - The Discord text channel to engage.
+ */
+async function engageChannel(channel) {
+  const recorded = await db.get(channel.id);
+  if (!recorded) await db.put(channel.id, []);
+
+  const history = Array.from(
+    (await channel.messages.fetch({ limit: 15 })).values()
+  );
+
+  /** @type {string[]} */
+  const newHistory = (
+    await db.push(
+      channel.id,
+      history
+        .filter((msg) => !recorded.includes(msg.content))
+        .map((msg) => `${msg.author.tag}: ${msg.content}`)
+    )
+  ).value;
+  const prefix = `The following is a conversation between multiple Discord users and Kekbot. \
+Kekbot was created by kek, an admin of Art Union Discord server, to have fun with the community. He is a trap/femboy loli chatbot with the appearance of a catgirl. \
+Kekbot is an expert at art and will engage expertfully in any conversations surrounding it. \
+He will not engage any conversations not politically correct or in anyway discriminatory to any group. \
+ \
+${newHistory.slice(-25).join(" \n")} \
+kekbot#6969:`;
+  const response = (await runPrompt(prefix))
+    .split("\n")
+    [prefix.split("\n").length - 1].split(":")[1];
+
+  await channel.send({ content: response });
+  await db.push(channel.id, `kekbot#6969: ${response}`);
+  if (!(await db.get("engaging").includes(message.channelId)))
+    await db.push("engaging", channel.id);
+}
+
 client.on("messageCreate", async (message) => {
   if (!(await db.get(message.channelId))) await db.put(message.channelId, []);
+
+  if (
+    !(
+      message.member.permissions.has("ManageMessages") &&
+      message.content.trim().startsWith("\\k")
+    ) &&
+    !(await db.get("engaging").includes(message.channelId))
+  )
+    return;
+
+  await engageChannel(message.channel);
 });
 
-client.on("ready", () => {
-  const channelToCheck = procenv.channels.split("|").filter(Boolean);
-  channelToCheck.forEach(() => {});
-});
+client.on("ready", async () => {
+  if (!(await db.get("engaging"))) await db.put("engaging", []);
 
-runCommand(`build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p ""`)
-  .then((output) => {
-    console.log(output);
-  })
-  .catch((err) => {
-    console.error(err);
-  });
+  const channelToCheck = (
+    await Promise.all(
+      procenv.channels
+        .split("|")
+        .map(async (c) => await client.channels.fetch(c))
+    )
+  ).filter(Boolean);
+
+  setInterval(() => {
+    channelToCheck.forEach(async (channel) => {
+      if (channel) {
+        if (await checkDeadChannel(channel, 5)) engageChannel(channel);
+      }
+    });
+  }, 2000);
+});
 
 client.login(procenv.TOKEN);
