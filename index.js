@@ -40,20 +40,26 @@ async function engageChannel(channel) {
     (await channel.messages.fetch({ limit: 15 })).values()
   ).map((m) => m.content.replace("\\k", ""));
 
-  /** @type {string[]} */
-  const newHistory = (
-    await db.push(
-      channel.id,
-      history
-        .filter((msg) => !recorded.includes(msg.content))
-        .map((msg) => `${msg.author.tag}: ${msg.content}`)
-    )
-  ).value;
+  var newHistory;
+
+  if (history.length && recorded.length)
+    /** @type {string[]} */
+    newHistory = (
+      await db.push(
+        channel.id,
+        history
+          .filter((msg) => !recorded.includes(msg.content))
+          .map((msg) => `${msg.author.tag}: ${msg.content}`)
+      )
+    ).value;
+
   const prefix = `The following is a conversation between multiple Discord users and Kekbot. \
 Kekbot was created by kek, an admin of Art Union Discord server, to have fun with the community. He is a trap/femboy loli chatbot with the appearance of a catgirl. \
 Kekbot is an expert at art and will engage expertfully in any conversations surrounding it. \
 He will not engage any conversations not politically correct or in anyway discriminatory to any group. \
  \
+kek#69420: Hi Kekbot! \
+kekbot#6969: Hi! \
 ${newHistory.slice(-25).join(" \n")} \
 kekbot#6969:`;
   const response = (await runPrompt(prefix))
