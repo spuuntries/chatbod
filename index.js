@@ -99,7 +99,7 @@ client.on("ready", async () => {
     logger(`Checked ${countc}`);
     channelToCheck.forEach(async (channel) => {
       if (channel) {
-        if (await checkDeadChannel(channel, 5)) engageChannel(channel);
+        if (await checkDeadChannel(channel.id, 5)) engageChannel(channel);
       }
     });
   }, 2000);
