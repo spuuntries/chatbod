@@ -34,10 +34,7 @@ async function checkDeadChannel(channelId, minutes) {
  */
 async function engageChannel(channel) {
   let recorded = await db.get(channel.id);
-  if (!recorded) {
-    await db.put(channel.id, []);
-    recorded = await db.get(channel.id);
-  }
+  if (!recorded) recorded = await db.put(channel.id, []).value;
 
   const history = Array.from(
     (await channel.messages.fetch({ limit: 15 })).values()

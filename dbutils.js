@@ -45,7 +45,7 @@ class PouchWrapper {
       const doc = await this.db.get(id);
       return doc;
     } catch (err) {
-      console.log(err);
+      return undefined;
     }
   }
 
