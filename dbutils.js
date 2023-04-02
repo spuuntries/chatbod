@@ -28,7 +28,7 @@ class PouchWrapper {
       };
 
       const result = await this.db.put(doc);
-      return result;
+      return await this.get(result.id);
     } catch (err) {
       console.log(err);
     }
@@ -82,7 +82,7 @@ class PouchWrapper {
 
       doc.value.push(value);
       const result = await this.db.put(doc);
-      return result;
+      return await this.get(result.id);
     } catch (err) {
       console.log(err);
     }
