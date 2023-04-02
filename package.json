@@ -1,0 +1,12 @@
+{
+  "name": "chatbod",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "spuun <kek@spuun.art>",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.8.0",
+    "dotenv": "^16.0.3",
+    "pouchdb": "^8.0.1"
+  }
+}
