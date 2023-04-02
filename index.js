@@ -2,6 +2,7 @@ require("dotenv").config();
 const procenv = process.env,
   Discord = require("discord.js"),
   client = new Discord.Client({ intents: ["MessageContent"] }),
+  { nanoid } = require("nanoid"),
   PouchDB = require("pouchdb"),
   { exec } = require("child_process");
 
@@ -13,7 +14,7 @@ class PouchWrapper {
   async put(id, value) {
     try {
       const doc = {
-        _id: id || uuidv4(),
+        _id: id || nanoid(),
         value,
       };
 
@@ -99,7 +100,10 @@ client.on("messageCreate", async (message) => {
   if (!(await db.get(message.channelId))) await db.put(message.channelId, []);
 });
 
-client.on("ready", () => {});
+client.on("ready", () => {
+  const channelToCheck = procenv.channels.split("|").filter(Boolean);
+  channelToCheck.forEach(() => {});
+});
 
 runCommand(`build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p ""`)
   .then((output) => {
