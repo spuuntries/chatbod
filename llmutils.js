@@ -24,7 +24,7 @@ function runCommand(command) {
  */
 function runPrompt(prompt) {
   return runCommand(
-    `llama.cpp/build/bin/main -m llama.cpp/models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -n 64 -t 8`
+    `llama.cpp/build/bin/main -m llama.cpp/models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -n 32`
   );
 }
 

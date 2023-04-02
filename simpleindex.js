@@ -31,6 +31,8 @@ kekbot#6969: Hi!
 ${history.join("\n")}
 kekbot#6969:`;
 
+  await message.channel.sendTyping();
+
   const response = (await runPrompt(prefix))
     .split("\n")
     [prefix.split("\n").length - 1].split(":")[1];
