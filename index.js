@@ -52,6 +52,7 @@ async function engageChannel(channel) {
           .map((msg) => `${msg.author.tag}: ${msg.content}`)
       )
     ).value;
+  else newHistory = [];
 
   const prefix = `The following is a conversation between multiple Discord users and Kekbot. \
 Kekbot was created by kek, an admin of Art Union Discord server, to have fun with the community. He is a trap/femboy loli chatbot with the appearance of a catgirl. \
