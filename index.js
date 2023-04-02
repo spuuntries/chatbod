@@ -2,8 +2,8 @@ require("dotenv").config();
 const procenv = process.env,
   Discord = require("discord.js"),
   client = new Discord.Client({ intents: ["MessageContent"] }),
-  { runPrompt } = require("./llmutils"),
-  { PouchWrapper } = require("./dbutils"),
+  { runPrompt } = require("./llmUtils"),
+  { PouchWrapper } = require("./dbUtils"),
   logger = (m) => console.log(`[${new Date()}] ${m}`);
 const db = new PouchWrapper("chatdb");
 
@@ -103,11 +103,11 @@ client.on("ready", async () => {
   let countc = 0;
   setInterval(async () => {
     countc++;
-    logger(`Checked ${countc}`);
-    for (let channel of channelToCheck) {
-      if (channel) {
-        if (await checkDeadChannel(channel.id, 5)) engageChannel(channel);
-      }
+    countc %= channelToCheck.length - 1;
+
+    if (channelToCheck[countc]) {
+      if (await checkDeadChannel(channelToCheck[countc].id, 5))
+        engageChannel(channel);
     }
   }, 2000);
 });
