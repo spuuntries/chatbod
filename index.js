@@ -101,14 +101,14 @@ client.on("ready", async () => {
   ).filter(Boolean);
 
   let countc = 0;
-  setInterval(() => {
+  setInterval(async () => {
     countc++;
     logger(`Checked ${countc}`);
     for (let channel of channelToCheck) {
       if (channel) {
         if (await checkDeadChannel(channel.id, 5)) engageChannel(channel);
       }
-    };
+    }
   }, 2000);
 });
 
