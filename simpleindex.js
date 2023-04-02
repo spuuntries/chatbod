@@ -7,6 +7,8 @@ const procenv = process.env,
   { runPrompt } = require("./llmUtils"),
   logger = (m) => console.log(`[${new Date()}] ${m}`);
 
+var placeholder;
+
 client.on("messageCreate", async (message) => {
   if (!message.content || message.author.id == client.user.id) return;
   const history = Array.from(
@@ -37,5 +39,7 @@ kekbot#6969:`;
 
   message.reply({ content: response, allowedMentions: { repliedUser: false } });
 });
+
+client.on("ready", () => logger("ready"));
 
 client.login(procenv.TOKEN);
