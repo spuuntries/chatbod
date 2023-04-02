@@ -3,7 +3,8 @@ const procenv = process.env,
   Discord = require("discord.js"),
   client = new Discord.Client({ intents: ["MessageContent"] }),
   { runPrompt } = require("./llmutils"),
-  { PouchWrapper } = require("./dbutils");
+  { PouchWrapper } = require("./dbutils"),
+  logger = (m) => console.log(`[${new Date()}] ${m}`);
 const db = new PouchWrapper("chatdb");
 
 /**
@@ -81,6 +82,7 @@ client.on("messageCreate", async (message) => {
 });
 
 client.on("ready", async () => {
+  logger(`${client.user.tag} ready.`);
   if (!(await db.get("engaging"))) await db.put("engaging", []);
 
   const channelToCheck = (
@@ -91,7 +93,10 @@ client.on("ready", async () => {
     )
   ).filter(Boolean);
 
+  let countc = 0;
   setInterval(() => {
+    countc++;
+    logger(`Checked ${countc}`);
     channelToCheck.forEach(async (channel) => {
       if (channel) {
         if (await checkDeadChannel(channel, 5)) engageChannel(channel);
