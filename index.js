@@ -33,8 +33,11 @@ async function checkDeadChannel(channelId, minutes) {
  * @param {Discord.TextChannel} channel - The Discord text channel to engage.
  */
 async function engageChannel(channel) {
-  const recorded = await db.get(channel.id);
-  if (!recorded) await db.put(channel.id, []);
+  let recorded = await db.get(channel.id);
+  if (!recorded) {
+    await db.put(channel.id, []);
+    recorded = await db.get(channel.id);
+  }
 
   const history = Array.from(
     (await channel.messages.fetch({ limit: 15 })).values()
