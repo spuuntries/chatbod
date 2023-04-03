@@ -37,11 +37,11 @@ function runSingle(prompt) {
  * @returns {Promise<string>} The output of the command.
  */
 async function runPrompt(prompt, channel) {
-  let result = "";
+  let result = prompt;
   const _ = async () => {
-    while (result.split(" ").length < 128) {
+    while (result.slice(prompt.length - 1).split(" ").length < 128) {
       if (channel) channel.sendTyping();
-      result += await runSingle(prompt);
+      result = await runSingle(result);
     }
   };
   await _();
