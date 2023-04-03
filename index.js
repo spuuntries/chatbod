@@ -2,8 +2,8 @@ require("dotenv").config();
 const procenv = process.env,
   Discord = require("discord.js"),
   client = new Discord.Client({ intents: ["MessageContent"] }),
-  { runPrompt } = require("./llmUtils"),
-  { PouchWrapper } = require("./dbUtils"),
+  { runPrompt } = require("./llmutils"),
+  { PouchWrapper } = require("./dbutils"),
   logger = (m) => console.log(`[${new Date()}] ${m}`);
 const db = new PouchWrapper("chatdb");
 

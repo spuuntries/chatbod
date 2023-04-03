@@ -4,7 +4,7 @@ const procenv = process.env,
   client = new Discord.Client({
     intents: ["Guilds", "GuildMessages", "MessageContent"],
   }),
-  { runPrompt } = require("./llmUtils"),
+  { runPrompt } = require("./llmutils"),
   logger = (m) => console.log(`[${new Date()}] ${m}`),
   placeholder = procenv.PLACEHOLDER;
 
