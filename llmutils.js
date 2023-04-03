@@ -25,7 +25,7 @@ function runCommand(command) {
  */
 function runSingle(prompt) {
   return runCommand(
-    `llama.cpp/build/bin/main -m llama.cpp/models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -c 2048 --top_p 0.7 --repeat_penalty 1.1 -n 1 -b 128`
+    `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -c 2048 --top_p 0.7 --repeat_penalty 1.1 -n 1 -b 128`
   );
 }
 
