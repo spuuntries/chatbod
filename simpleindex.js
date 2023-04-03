@@ -29,7 +29,7 @@ client.on("messageCreate", async (message) => {
 
   logger(prefix);
 
-  const response = (await runPrompt(prefix))
+  const response = (await runPrompt(prefix, message.channel))
     .split("\n")
     [prefix.split("\n").length - 1].split(":")[1];
 
