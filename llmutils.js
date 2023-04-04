@@ -6,15 +6,26 @@ const { exec } = require("child_process"),
  * @async
  * @param {string} prompt - The prompt to run.
  * @param {Discord.Message} reply - To do token-by-token
- * @returns
  */
 async function runPrompt(prompt, reply) {
-  const runner = exec(
-    `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -c 2048 --top_p 0.7 --repeat_penalty 1.1 -n 128 -b 128`
-  );
-  runner.stdout.on("data", (data) => {
-    if (data.includes("\n")) runner.kill();
-    reply.edit({ content: reply.content + data });
+  return new Promise((resolve, reject) => {
+    const runner = exec(
+      `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -c 2048 --top_p 0.7 --repeat_penalty 1.1 -n 128 -b 128`
+    );
+    let res = "";
+
+    runner.stdout.on("data", (data) => {
+      if (data.includes("\n")) {
+        runner.kill();
+        resolve(res);
+      }
+      res += data;
+      reply.edit({ content: res });
+    });
+
+    runner.on("exit", () => {
+      resolve(res);
+    });
   });
 }
 

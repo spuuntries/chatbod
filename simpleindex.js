@@ -29,13 +29,11 @@ client.on("messageCreate", async (message) => {
 
   logger(prefix);
 
-  const response = (await runPrompt(prefix, message.channel))
-    .split("\n")
-    [prefix.split("\n").length - 1].split(":")[1];
+  message.reply({ content: ".", allowedMentions: { repliedUser: false } });
+
+  const response = await runPrompt(prefix);
 
   logger(response);
-
-  message.reply({ content: response, allowedMentions: { repliedUser: false } });
 });
 
 client.on("ready", () => logger("ready"));
