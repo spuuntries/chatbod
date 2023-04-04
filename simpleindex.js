@@ -29,9 +29,11 @@ client.on("messageCreate", async (message) => {
 
   logger(prefix);
 
-  message.reply({ content: ".", allowedMentions: { repliedUser: false } });
-
-  const response = await runPrompt(prefix);
+  const reply = message.reply({
+      content: ".",
+      allowedMentions: { repliedUser: false },
+    }),
+    response = await runPrompt(prefix, reply);
 
   logger(response);
 });
