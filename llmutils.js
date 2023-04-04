@@ -9,7 +9,7 @@ const { exec } = require("child_process"),
 function runPrompt(prompt, message) {
   return new Promise(async (resolve, reject) => {
     const runner = exec(
-      `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -c 2048 --top_p 0.7 --repeat_penalty 1.1 -n 128 -b 128`
+      `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -c 2048 --top_p 0.7 --repeat_penalty 1.1 -n 128 -b 128 -t 2`
     );
     var res = "";
 
