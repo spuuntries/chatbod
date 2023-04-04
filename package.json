@@ -8,6 +8,7 @@
     "discord.js": "^14.8.0",
     "dotenv": "^16.0.3",
     "nanoid": "3",
-    "pouchdb": "^8.0.1"
+    "pouchdb": "^8.0.1",
+    "ps-tree": "^1.2.0"
   }
 }

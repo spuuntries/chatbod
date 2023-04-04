@@ -1,5 +1,7 @@
 require("dotenv").config();
 const procenv = process.env,
+  psTree = require("ps-tree"),
+  cp = require("child_process"),
   Discord = require("discord.js"),
   client = new Discord.Client({
     intents: ["Guilds", "GuildMessages", "MessageContent"],
@@ -30,7 +32,17 @@ client.on("messageCreate", async (message) => {
   logger(prefix);
 
   const response = await runPrompt(prefix, message);
-  process.kill(-response[1]);
+  psTree(response[1], function (err, children) {
+    cp.spawn(
+      "kill",
+      ["-9"].concat(
+        children.map(function (p) {
+          return p.PID;
+        })
+      )
+    );
+  });
+
   await message.reply({
     content: response[0],
     allowedMentions: { repliedUser: false },
