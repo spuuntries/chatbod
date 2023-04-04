@@ -16,7 +16,7 @@ client.on("messageCreate", async (message) => {
       .map(
         (m) =>
           `${
-            m.author.tag != placeholder
+            m.author.id != placeholder
               ? `${m.member.displayName} (${m.author.tag})`
               : "kekbot (kekbot#6969)"
           }: ${m.content}`
