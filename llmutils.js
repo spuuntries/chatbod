@@ -15,7 +15,7 @@ async function runPrompt(prompt, reply) {
     let res = "";
 
     runner.stdout.on("data", async (data) => {
-      if (data != prompt) {
+      if (data.split(" ").length > 2) {
         if (data.includes("\n")) {
           runner.kill();
           resolve(res);
