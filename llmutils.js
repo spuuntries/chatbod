@@ -8,7 +8,7 @@ const { exec } = require("child_process"),
  */
 function runCommand(command) {
   return new Promise((resolve, reject) => {
-    exec(command, (err, stdout, stderr) => {
+    spawn(command, (err, stdout, stderr) => {
       if (err) {
         reject(err);
       } else {
@@ -40,8 +40,10 @@ async function runPrompt(prompt, channel) {
   let result = prompt;
   const _ = async () => {
     while (
-      result.split("\n")[prompt.split("\n").length - 1].split(":")[1].length <
-      128
+      !result
+        .split("\n")
+        [prompt.split("\n").length - 1].split(":")[1]
+        .endsWith("\n")
     ) {
       if (channel) await channel.sendTyping();
       result = await runSingle(result);
