@@ -1,4 +1,4 @@
-const { spawn } = require("child_process"),
+const { spawn, exec } = require("child_process"),
   Discord = require("discord.js");
 
 /**
@@ -8,7 +8,7 @@ const { spawn } = require("child_process"),
  */
 function runPrompt(prompt, message) {
   return new Promise(async (resolve, reject) => {
-    const runner = spawn(
+    const runner = exec(
       `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -c 2048 --top_p 0.7 --repeat_penalty 1.1 -n 128 -b 128`
     );
     var res = "";
@@ -17,8 +17,7 @@ function runPrompt(prompt, message) {
       await message.channel.sendTyping();
       if (!(data.split(" ").length > 2)) {
         if (res.includes("\n")) {
-          runner.kill();
-          resolve(res);
+          resolve(res, runner);
         }
         res += data;
       }
