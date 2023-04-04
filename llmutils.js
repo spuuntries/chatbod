@@ -17,7 +17,7 @@ function runPrompt(prompt, message) {
       await message.channel.sendTyping();
       if (!(data.split(" ").length > 2)) {
         if (res.includes("\n")) {
-          resolve(res, runner);
+          resolve([res, runner]);
         }
         res += data;
       }
