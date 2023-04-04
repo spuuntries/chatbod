@@ -30,7 +30,7 @@ client.on("messageCreate", async (message) => {
   logger(prefix);
 
   const response = await runPrompt(prefix, message);
-  process.kill(response[1], "SIGKILL");
+  process.kill(-response[1]);
   await message.reply({
     content: response[0],
     allowedMentions: { repliedUser: false },
