@@ -11,27 +11,15 @@ function runPrompt(prompt, message) {
     const runner = exec(
       `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -c 2048 --top_p 0.7 --repeat_penalty 1.1 -n 128 -b 128`
     );
-    var reply,
-      res = "";
+    var res = "";
 
     runner.stdout.on("data", async (data) => {
       if (!(data.split(" ").length > 2)) {
         if (res.includes("\n")) {
-          runner.kill("SIGINT");
+          runner.kill("SIGKILL");
           resolve(res);
         }
-        res += data;
-        if (!reply)
-          reply = await message.reply({
-            content: res,
-            allowedMentions: { repliedUser: false },
-          });
-        else await reply.edit({ content: res });
       }
-    });
-
-    runner.on("exit", () => {
-      resolve(res);
     });
   });
 }
