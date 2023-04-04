@@ -30,13 +30,12 @@ client.on("messageCreate", async (message) => {
   logger(prefix);
 
   const response = await runPrompt(prefix, message);
-  response[1].kill();
   await message.reply({
-    content: response[0],
+    content: response,
     allowedMentions: { repliedUser: false },
   });
 
-  logger(response[0]);
+  logger(response);
 });
 
 client.on("ready", () => logger("ready"));
