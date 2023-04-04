@@ -43,6 +43,7 @@ client.on("messageCreate", async (message) => {
     );
   });
 
+  response[0] = response[0].split("\n")[0];
   await message.reply({
     content: response[0],
     allowedMentions: { repliedUser: false },
