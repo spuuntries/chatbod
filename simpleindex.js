@@ -30,12 +30,13 @@ client.on("messageCreate", async (message) => {
   logger(prefix);
 
   const response = await runPrompt(prefix, message);
+  process.kill(response[1], "SIGKILL");
   await message.reply({
-    content: response,
+    content: response[0],
     allowedMentions: { repliedUser: false },
   });
 
-  logger(response);
+  logger(response[0]);
 });
 
 client.on("ready", () => logger("ready"));
