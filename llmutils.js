@@ -11,13 +11,13 @@ function runPrompt(prompt, message) {
     const runner = exec(
       `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -c 2048 --top_p 0.7 --repeat_penalty 1.1 -n 128 -b 128`
     );
-    let reply,
+    var reply,
       res = "";
 
     runner.stdout.on("data", async (data) => {
       if (!(data.split(" ").length > 2)) {
         if (res.includes("\n")) {
-          runner.kill(9);
+          runner.kill("SIGINT");
           resolve(res);
         }
         res += data;
