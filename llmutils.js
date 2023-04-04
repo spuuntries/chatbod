@@ -19,6 +19,7 @@ function runPrompt(prompt, message) {
           runner.kill("SIGKILL");
           resolve(res);
         }
+        res += data;
       }
     });
   });
