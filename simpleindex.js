@@ -29,7 +29,7 @@ client.on("messageCreate", async (message) => {
 
   logger(prefix);
 
-  const reply = message.reply({
+  const reply = await message.reply({
       content: ".",
       allowedMentions: { repliedUser: false },
     }),
