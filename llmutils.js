@@ -8,7 +8,7 @@ const { exec } = require("child_process"),
  */
 function runCommand(command) {
   return new Promise((resolve, reject) => {
-    spawn(command, (err, stdout, stderr) => {
+    exec(command, (err, stdout, stderr) => {
       if (err) {
         reject(err);
       } else {
