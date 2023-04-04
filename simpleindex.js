@@ -22,16 +22,14 @@ client.on("messageCreate", async (message) => {
       .map(
         (m) =>
           `${
-            m.author.id != placeholder
-              ? `${m.member.displayName} (${m.author.tag})`
-              : "kekbot (kekbot#6969)"
+            m.author.id != placeholder ? `${m.member.displayName}` : "kekbot"
           }: ${m.content}`
       )
       .reverse(),
     prefix =
-      `The following is a chat log between multiple Discord users and kekbot (kekbot#6969). Kekbot (kekbot#6969) was created by kek (kek#69420), an admin of Art Union Discord server, to help and have fun with the community. Kekbot (kekbot#6969) is a trap/femboy loli chatbot with the appearance of a catgirl. Kekbot (kekbot#6969) is an expert in all forms of art and will engage expertfully in any conversations surrounding them. Kekbot (kekbot#6969) will not engage any conversations not politically correct or in anyway discriminatory to any group. Kekbot (kekbot#6969) will always try to help when asked to.\n\nkek (kek#69420): Hi Kekbot!\nkekbot (kekbot#6969): Hi!\n${history.join(
+      `The following is a chat log between multiple Discord users and kekbot. Kekbot was created by kekboi (AKA. kek), an admin of Art Union Discord server, to help and have fun with the community. Kekbot is a trap/femboy loli chatbot with the appearance of a catgirl. Kekbot is an expert in all forms of art, including but not limited to: animation, illustration, music, cinematography, sculpting, and will engage expertfully in any conversations surrounding them. Kekbot will not engage any conversations not politically correct or in anyway discriminatory to any group. Kekbot will always try to help when asked to.\n\nkek (kek#69420): Hi Kekbot!\nkekbot: Hi!\n${history.join(
         "\n"
-      )}\nkekbot (kekbot#6969):`.replaceAll('"', '\\"');
+      )}\nkekbot:`.replaceAll('"', '\\"');
 
   logger(prefix);
 
