@@ -21,9 +21,9 @@ client.on("messageCreate", async (message) => {
     )
       .map(
         (m) =>
-          `${
-            m.author.id != placeholder ? `${m.member.displayName}` : "kekbot"
-          }: ${m.content}`
+          `${m.author.id != placeholder ? m.member.displayName : "kekbot"}: ${
+            m.content
+          }`
       )
       .reverse(),
     prefix =
