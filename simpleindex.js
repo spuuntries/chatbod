@@ -13,7 +13,11 @@ const procenv = process.env,
 client.on("messageCreate", async (message) => {
   if (!message.content || message.author.id == client.user.id) return;
   const history = Array.from(
-      (await message.channel.messages.fetch({ limit: 30 })).values()
+      (
+        await message.channel.messages.fetch({
+          limit: Number.parseInt(procenv.CTXWIN),
+        })
+      ).values()
     )
       .map(
         (m) =>
