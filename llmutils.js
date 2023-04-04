@@ -40,7 +40,7 @@ async function runPrompt(prompt, channel) {
   let result = prompt;
   const _ = async () => {
     while (
-      result.split("\n")[prefix.split("\n").length - 1].split(":")[1].length <
+      result.split("\n")[prompt.split("\n").length - 1].split(":")[1].length <
       128
     ) {
       if (channel) await channel.sendTyping();
