@@ -17,7 +17,9 @@ function runPrompt(prompt, message) {
       await message.channel.sendTyping();
       if (!(data.split(" ").length > 2)) {
         if (res.includes("\n")) {
-          process.kill(runner.pid);
+          try {
+            process.kill(runner.pid);
+          } catch (e) {}
           resolve(res);
         }
         res += data;
