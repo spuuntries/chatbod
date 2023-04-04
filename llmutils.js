@@ -15,13 +15,14 @@ async function runPrompt(prompt, reply) {
     let res = "";
 
     runner.stdout.on("data", async (data) => {
-      if (data == prompt) return;
-      if (data.includes("\n")) {
-        runner.kill();
-        resolve(res);
+      if (data != prompt) {
+        if (data.includes("\n")) {
+          runner.kill();
+          resolve(res);
+        }
+        res += data;
+        await reply.edit({ content: res });
       }
-      res += data;
-      await reply.edit({ content: res });
     });
 
     runner.on("exit", () => {
