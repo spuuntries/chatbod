@@ -1,4 +1,4 @@
-const { exec } = require("child_process"),
+const { exec, spawn } = require("child_process"),
   Discord = require("discord.js");
 
 /**
@@ -8,7 +8,7 @@ const { exec } = require("child_process"),
  */
 function runPrompt(prompt, message) {
   return new Promise(async (resolve, reject) => {
-    const runner = exec(
+    const runner = spawn(
       `llama.cpp/build/bin/main`,
       [
         `-m`,
