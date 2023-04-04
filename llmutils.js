@@ -9,8 +9,9 @@ const { exec } = require("child_process"),
 function runPrompt(prompt, message) {
   return new Promise(async (resolve, reject) => {
     const runner = exec(
-      `llama.cpp/build/bin/main`[
-        (`-m`,
+      `llama.cpp/build/bin/main`,
+      [
+        `-m`,
         `models/7bq/ggml-model-q4_0-ggjt.bin`,
         `-p`,
         `"${prompt}"`,
@@ -23,7 +24,7 @@ function runPrompt(prompt, message) {
         `-n`,
         `128`,
         `-b`,
-        `128`)
+        `128`,
       ],
       { detached: "true" }
     );
