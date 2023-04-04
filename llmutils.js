@@ -26,7 +26,7 @@ function runPrompt(prompt, message) {
         `-b`,
         `128`,
       ],
-      { detached: "true" }
+      { detached: true }
     );
     var res = "";
 
