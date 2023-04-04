@@ -39,7 +39,10 @@ function runSingle(prompt) {
 async function runPrompt(prompt, channel) {
   let result = prompt;
   const _ = async () => {
-    while (result.slice(prompt.length - 1).split(" ").length < 128) {
+    while (
+      result.split("\n")[prefix.split("\n").length - 1].split(":")[1].length <
+      128
+    ) {
       if (channel) await channel.sendTyping();
       result = await runSingle(result);
     }
