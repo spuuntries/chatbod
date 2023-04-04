@@ -2,23 +2,6 @@ const { exec } = require("child_process"),
   Discord = require("discord.js");
 
 /**
- * Runs a command and returns its output.
- * @param {string} command - The command to run.
- * @returns {Promise<string>} The output of the command.
- */
-function runCommand(command) {
-  return new Promise((resolve, reject) => {
-    exec(command, (err, stdout, stderr) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(stdout.trim());
-      }
-    });
-  });
-}
-
-/**
  * Runs a prompt using the binary.
  * @async
  * @param {string} prompt - The prompt to run.
@@ -30,8 +13,9 @@ async function runPrompt(prompt, reply) {
     `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -c 2048 --top_p 0.7 --repeat_penalty 1.1 -n 128 -b 128`
   );
   runner.stdout.on("data", (data) => {
-    console.log(data);
+    if (data.includes("\n")) runner.kill();
+    reply.edit({ content: reply.content + data });
   });
 }
 
-module.exports = { runCommand, runPrompt };
+module.exports = { runPrompt };
