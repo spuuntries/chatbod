@@ -33,17 +33,33 @@ client.on("messageCreate", async (message) => {
 
   logger(prefix);
 
-  const response = await runPrompt(prefix, message);
-  psTree(response[1], function (err, children) {
-    cp.spawn(
-      "kill",
-      ["-9"].concat(
-        children.map(function (p) {
-          return p.PID;
-        })
-      )
-    );
-  });
+  var response;
+  await (async () => {
+    response = await runPrompt(prefix, message);
+    while (response.split("\n")[0].length < 1) {
+      psTree(response[1], function (err, children) {
+        cp.spawn(
+          "kill",
+          ["-9"].concat(
+            children.map(function (p) {
+              return p.PID;
+            })
+          )
+        );
+      });
+      response = await runPrompt(prefix, message);
+    }
+    psTree(response[1], function (err, children) {
+      cp.spawn(
+        "kill",
+        ["-9"].concat(
+          children.map(function (p) {
+            return p.PID;
+          })
+        )
+      );
+    });
+  })();
 
   response[0] = response[0].split("\n")[0];
   await message.reply({
