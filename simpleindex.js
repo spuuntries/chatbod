@@ -34,9 +34,9 @@ client.on("messageCreate", async (message) => {
   logger(prefix);
 
   var response;
-  await (async () => {
+  async function genResp() {
     response = await runPrompt(prefix, message);
-    while (response[0].split("\n")[0].length < 1) {
+    if (response[0].split("\n")[0].length < 1) {
       psTree(response[1], function (err, children) {
         cp.spawn(
           "kill",
@@ -47,7 +47,7 @@ client.on("messageCreate", async (message) => {
           )
         );
       });
-      response = await runPrompt(prefix, message);
+      await genResp();
     }
     psTree(response[1], function (err, children) {
       cp.spawn(
@@ -59,7 +59,8 @@ client.on("messageCreate", async (message) => {
         )
       );
     });
-  })();
+  }
+  await genResp();
 
   response[0] = response[0].split("\n")[0];
   await message.reply({
