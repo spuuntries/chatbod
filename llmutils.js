@@ -15,7 +15,7 @@ function runPrompt(prompt, message) {
 
     runner.stdout.on("data", async (data) => {
       await message.channel.sendTyping();
-      if (!(data.split(" ").length > 2)) {
+      if (!(data.split(" ").length > 3)) {
         if (res.includes("\n")) {
           resolve([res, runner.pid]);
         }
