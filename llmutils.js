@@ -30,7 +30,8 @@ function runCommand(command, message) {
  */
 function runPrompt(prompt, message) {
   return runCommand(
-    `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -t 3 -c 2048 -n 128 -b 512`
+    `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -t 3 -c 2048 -n 128 -b 512`,
+    message
   );
 }
 
