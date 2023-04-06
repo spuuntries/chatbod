@@ -4,16 +4,20 @@ const { exec } = require("child_process"),
 /**
  * Runs a command and returns its output.
  * @param {string} command - The command to run.
+ * @param {Discord.Message} message - To do typing.
  * @returns {Promise<string>} The output of the command.
  */
-function runCommand(command) {
+function runCommand(command, message) {
   return new Promise((resolve, reject) => {
-    exec(command, (err, stdout, stderr) => {
+    const runner = exec(command, (err, stdout, stderr) => {
       if (err) {
         reject(err);
       } else {
         resolve(stdout.trim());
       }
+    });
+    runner.stdout.on("data", () => {
+      message.channel.sendTyping();
     });
   });
 }
