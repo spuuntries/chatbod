@@ -1,6 +1,5 @@
 require("dotenv").config();
 const procenv = process.env,
-  psTree = require("ps-tree"),
   cp = require("child_process"),
   Discord = require("discord.js"),
   client = new Discord.Client({
@@ -33,42 +32,15 @@ client.on("messageCreate", async (message) => {
 
   logger(prefix);
 
-  var response;
-  async function genResp() {
-    response = await runPrompt(prefix, message);
-    if (!response[0].split("\n")[0].length) {
-      psTree(response[1], function (err, children) {
-        cp.spawn(
-          "kill",
-          ["-9"].concat(
-            children.map(function (p) {
-              return p.PID;
-            })
-          )
-        );
-      });
-      await genResp();
-    }
-    psTree(response[1], function (err, children) {
-      cp.spawn(
-        "kill",
-        ["-9"].concat(
-          children.map(function (p) {
-            return p.PID;
-          })
-        )
-      );
-    });
-  }
-  await genResp();
+  var response = (await runPrompt(prefix, message))
+    .split("\n")
+    [prefix.split("\n").length - 1].split(":")[1];
 
-  response[0] = response[0].split("\n")[0];
-  await message.reply({
-    content: response[0],
-    allowedMentions: { repliedUser: false },
+  await message.channel.send({
+    content: response,
   });
 
-  logger(response[0]);
+  logger(response);
 });
 
 client.on("ready", () => logger("ready"));
