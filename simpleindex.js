@@ -20,7 +20,7 @@ client.on("messageCreate", async (message) => {
     )
       .map(
         (m) =>
-          `${m.author.id != placeholder ? m.member.displayName : "kekbot"}: ${
+          `${m.author.id != placeholder ? m.author.username : "kekbot"}: ${
             m.content
           }`
       )
