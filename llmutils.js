@@ -16,8 +16,8 @@ function runCommand(command, message) {
         resolve(stdout.trim());
       }
     });
-    runner.stdout.on("data", () => {
-      message.channel.sendTyping();
+    runner.stdout.on("data", async () => {
+      await message.channel.sendTyping();
     });
   });
 }
