@@ -26,13 +26,19 @@ function runCommand(command) {
  * @returns {Promise<string>} The output of the command.
  */
 async function runPrompt(prompt, message) {
-  const typing = setInterval(async () => {
-      await message.channel.sendTyping();
-    }, 10000),
-    res = await runCommand(
-      `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -t 3 -c 2048 -n 128 -b 512`,
-      message
-    );
+  function type() {
+    message.channel.sendTyping().then(() => {
+      setTimeout(() => {
+        type();
+      }, 10000);
+    });
+  }
+  type();
+
+  const res = await runCommand(
+    `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -n 72`,
+    message
+  );
   clearInterval(typing);
   return res;
 }

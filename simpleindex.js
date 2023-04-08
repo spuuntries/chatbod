@@ -9,6 +9,33 @@ const procenv = process.env,
   logger = (m) => console.log(`[${new Date()}] ${m}`),
   placeholder = procenv.PLACEHOLDER;
 
+/**
+ * Finds the string between the specified start delimiter and the next prefix in the array.
+ * @param {string[]} messages - The array of strings to search.
+ * @param {string} startDelimiter - The start delimiter to search for.
+ * @returns {string|null} The concatenated string or null if the start delimiter was not found.
+ */
+function concatUntilNextPrefix(messages, startDelimiter) {
+  const startIndex = messages.indexOf(startDelimiter);
+
+  if (startIndex !== -1) {
+    let endIndex = messages.length;
+
+    // Find the index of the next prefix
+    for (let i = startIndex + 1; i < messages.length; i++) {
+      if (/^[\w-]+:/.test(messages[i])) {
+        endIndex = i;
+        break;
+      }
+    }
+
+    const inBetween = messages.slice(startIndex + 1, endIndex).join("");
+    return messages[startIndex] + inBetween;
+  } else {
+    return null;
+  }
+}
+
 client.on("messageCreate", async (message) => {
   if (!message.content || message.author.id == client.user.id) return;
   const history = Array.from(
@@ -18,6 +45,9 @@ client.on("messageCreate", async (message) => {
         })
       ).values()
     )
+      .filter(
+        (m) => m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000
+      )
       .map(
         (m) =>
           `${m.author.id != placeholder ? m.author.username : "kekbot"}: ${
@@ -26,15 +56,17 @@ client.on("messageCreate", async (message) => {
       )
       .reverse(),
     prefix =
-      `The following is a chat log between multiple Discord users and kekbot. Kekbot was created by kek, an admin of Art Union Discord server, kekbot is not kek. Kekbot was created to help and have fun with the community. Kekbot is a trap/femboy loli chatbot with the appearance of a catgirl. Kekbot is an expert in all forms of art will always try to help when asked to. Kekbot is friendly to everyone.\n\nRed: Hi Kekbot!\nkekbot: Enlo!\nBlue: How u doin?\nkekbot: I'm gud, ty for asking!\n${history.join(
-        "\n"
-      )}\nkekbot:`.replaceAll('"', '\\"');
+      `The following is a chat log between multiple Discord users and "kekbot". "Kekbot" was created by kek, an admin of Art Union Discord server, "kekbot" is not kek. "Kekbot" was created to help and have fun with the community. "Kekbot" is a trap/femboy loli chatbot with the appearance of a catgirl. "Kekbot" is an expert in all forms of art will always try to help when asked to. "Kekbot" is friendly to everyone.\n\nRed: Hi Kekbot!\nkekbot: Enlo!\nBlue: How u doin?\nkekbot: I'm gud, ty for asking!${
+        history.length ? "\n" + history.join("\n") : ""
+      }\nkekbot:`.replaceAll('"', '\\"');
 
   logger(prefix);
 
-  var response = (await runPrompt(prefix, message))
-    .split("\n")
-    [prefix.split("\n").length - 1].split(":")[1];
+  var responses = (await runPrompt(prefix, message)).split("\n"),
+    response = concatUntilNextPrefix(
+      responses,
+      responses[prefix.split("\n").length - 1]
+    ).split(":")[1];
 
   await message.channel.send({
     content: response,
