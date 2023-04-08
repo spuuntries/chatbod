@@ -39,7 +39,6 @@ async function runPrompt(prompt, message) {
     `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -n 72`,
     message
   );
-  clearInterval(typing);
   return res;
 }
 
