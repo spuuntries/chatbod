@@ -26,9 +26,10 @@ function runCommand(command) {
  * @returns {Promise<string>} The output of the command.
  */
 async function runPrompt(prompt, message) {
+  var typing;
   function type() {
     message.channel.sendTyping().then(() => {
-      setTimeout(() => {
+      typing = setTimeout(() => {
         type();
       }, 10000);
     });
@@ -39,6 +40,7 @@ async function runPrompt(prompt, message) {
     `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -n 72`,
     message
   );
+  clearTimeout(typing);
   return res;
 }
 
