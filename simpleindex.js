@@ -76,6 +76,7 @@ client.on("messageCreate", async (message) => {
             .filter((e) => e.includes("<turn>"))[0]
         ) - 1
       )
+      .join("")
       .split(":")[1];
 
   // NOTE: Same with above
