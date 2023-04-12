@@ -64,13 +64,19 @@ client.on("messageCreate", async (message) => {
   //  history.length ? "\n" + history.join("\n") : ""
   //}\nkekbot:`.replaceAll('"', '\\"');
 
-  logger(prefix.replaceAll("<turn>", "\n"));
+  logger(prefix);
 
   var responses = (await runPrompt(prefix, message)).split("<turn>"),
-    response = concatUntilNextPrefix(
-      responses,
-      responses[prefix.split("<turn>").length - 1]
-    ).split(":")[1];
+    response = responses
+      .slice(
+        prefix.split("<turn>").length - 1,
+        responses.indexOf(
+          responses
+            .slice(prefix.split("<turn>").length)
+            .filter((e) => e.includes("<turn>"))[0]
+        ) - 1
+      )
+      .split(":")[1];
 
   // NOTE: Same with above
   //  var responses = (await runPrompt(prefix, message)).split("\n"),
