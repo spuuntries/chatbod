@@ -56,17 +56,28 @@ client.on("messageCreate", async (message) => {
       )
       .reverse(),
     prefix =
-      `The following is a chat log between multiple Discord users and "kekbot". "Kekbot" was created by kek, an admin of Art Union Discord server, "kekbot" is not kek. "Kekbot" was created to help and have fun with the community. "Kekbot" is a trap/femboy loli chatbot with the appearance of a catgirl. "Kekbot" is an expert in all forms of art will always try to help when asked to. "Kekbot" is friendly to everyone.\n\nRed: Hi Kekbot!\nkekbot: Enlo!\nBlue: How u doin?\nkekbot: I'm gud, ty for asking!${
-        history.length ? "\n" + history.join("\n") : ""
-      }\nkekbot:`.replaceAll('"', '\\"');
+      `The following is a chat log between multiple Discord users and kekbot, each dialog turn is delimited by <turn>. Kekbot was created by kek, an admin of Art Union Discord server, kekbot is not kek. Kekbot was created to help and have fun with the community. Kekbot is a trap/femboy loli chatbot with the appearance of a catgirl. Kekbot is an expert in all forms of art will always try to help when asked to. Kekbot is friendly to everyone.\n\nRed: Hi Kekbot!<turn>kekbot: Enlo!<turn>Blue: How u doin?<turn>kekbot: I'm gud, ty for asking!${
+        history.length ? "<turn>" + history.join("<turn>") : ""
+      }<turn>kekbot:`.replaceAll('"', '\\"');
+  // NOTE: Scrapped for experimental prompt
+  // `The following is a chat log between multiple Discord users and "kekbot". "Kekbot" was created by kek, an admin of Art Union Discord server, "kekbot" is not kek. "Kekbot" was created to help and have fun with the community. "Kekbot" is a trap/femboy loli chatbot with the appearance of a catgirl. "Kekbot" is an expert in all forms of art will always try to help when asked to. "Kekbot" is friendly to everyone.\n\nRed: Hi Kekbot!\nkekbot: Enlo!\nBlue: How u doin?\nkekbot: I'm gud, ty for asking!${
+  //  history.length ? "\n" + history.join("\n") : ""
+  //}\nkekbot:`.replaceAll('"', '\\"');
 
-  logger(prefix);
+  logger(prefix.replaceAll("<turn>", "\n"));
 
-  var responses = (await runPrompt(prefix, message)).split("\n"),
+  var responses = (await runPrompt(prefix, message)).split("<turn>"),
     response = concatUntilNextPrefix(
       responses,
-      responses[prefix.split("\n").length - 1]
+      responses[prefix.split("<turn>").length - 1]
     ).split(":")[1];
+
+  // NOTE: Same with above
+  //  var responses = (await runPrompt(prefix, message)).split("\n"),
+  //    response = concatUntilNextPrefix(
+  //      responses,
+  //      responses[prefix.split("\n").length - 1]
+  //    ).split(":")[1];
 
   await message.channel.send({
     content: response,

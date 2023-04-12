@@ -37,8 +37,7 @@ async function runPrompt(prompt, message) {
   type();
 
   const res = await runCommand(
-    `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -n 64 --top_p 0.7 --temp 0.75`,
-    message
+    `llama.cpp-fork/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -n 64 --top_p 0.7 --temp 0.75 --stop "<turn>"`
   );
   clearTimeout(typing);
   return res;
