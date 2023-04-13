@@ -5,6 +5,8 @@ const procenv = process.env,
   client = new Discord.Client({
     intents: ["Guilds", "GuildMessages", "MessageContent"],
   }),
+  { python } = require("pythonia"),
+  llm = await python("./infer.py"),
   { runPrompt } = require("./llmutils"),
   logger = (m) => console.log(`[${new Date()}] ${m}`),
   placeholder = procenv.PLACEHOLDER;
@@ -56,28 +58,26 @@ client.on("messageCreate", async (message) => {
       )
       .reverse(),
     prefix =
-      `The following is a chat log between multiple Discord users and kekbot, each dialog turn is delimited by <turn>. Kekbot was created by kek, an admin of Art Union Discord server, kekbot is not kek. Kekbot was created to help and have fun with the community. Kekbot is a trap/femboy loli chatbot with the appearance of a catgirl. Kekbot is an expert in all forms of art will always try to help when asked to. Kekbot is friendly to everyone.\n\nRed: Hi Kekbot!<turn>kekbot: Enlo!<turn>Blue: How u doin?<turn>kekbot: I'm gud, ty for asking!${
-        history.length ? "<turn>" + history.join("<turn>") : ""
-      }<turn>kekbot:`.replaceAll('"', '\\"');
-  // NOTE: Scrapped for experimental prompt
-  // `The following is a chat log between multiple Discord users and "kekbot". "Kekbot" was created by kek, an admin of Art Union Discord server, "kekbot" is not kek. "Kekbot" was created to help and have fun with the community. "Kekbot" is a trap/femboy loli chatbot with the appearance of a catgirl. "Kekbot" is an expert in all forms of art will always try to help when asked to. "Kekbot" is friendly to everyone.\n\nRed: Hi Kekbot!\nkekbot: Enlo!\nBlue: How u doin?\nkekbot: I'm gud, ty for asking!${
-  //  history.length ? "\n" + history.join("\n") : ""
-  //}\nkekbot:`.replaceAll('"', '\\"');
+      `The following is a chat log between multiple Discord users and "kekbot". "Kekbot" was created by kek, an admin of Art Union Discord server, "kekbot" is not kek. "Kekbot" was created to help and have fun with the community. "Kekbot" is a trap/femboy loli chatbot with the appearance of a catgirl. "Kekbot" is an expert in all forms of art will always try to help when asked to. "Kekbot" is friendly to everyone.\n\nRed: Hi Kekbot!\nkekbot: Enlo!\nBlue: How u doin?\nkekbot: I'm gud, ty for asking!${
+        history.length ? "\n" + history.join("\n") : ""
+      }\nkekbot:`.replaceAll('"', '\\"');
 
   logger(prefix);
 
-  var responses = (await runPrompt(prefix, message)).split("<turn>"),
-    response = responses
-      .slice(
-        prefix.split("<turn>").length - 1,
-        responses.indexOf(
-          responses
-            .slice(prefix.split("<turn>").length)
-            .filter((e) => e.includes("<turn>"))[0]
-        ) - 1
-      )
-      .join("")
-      .split(":")[1];
+  var response = await llm.generate();
+
+  // NOTE: Scrapped for bindings wrapper.
+  //var responses = (await runPrompt(prefix, message)).split("<turn>"),
+  //  response = responses
+  //    .slice(
+  //      prefix.split("<turn>").length - 1,
+  //      responses.indexOf(
+  //        responses
+  //          .slice(prefix.split("<turn>").length)
+  //          .filter((e) => e.includes("<turn>"))[0]
+  //      ) - 1
+  //    )
+  //    .join("");
 
   // NOTE: Same with above
   //  var responses = (await runPrompt(prefix, message)).split("\n"),

@@ -7,6 +7,8 @@
   "dependencies": {
     "discord.js": "^14.8.0",
     "dotenv": "^16.0.3",
-    "nanoid": "3"
+    "faiss-node": "^0.1.1",
+    "nanoid": "3",
+    "pythonia": "^1.0.1"
   }
 }
