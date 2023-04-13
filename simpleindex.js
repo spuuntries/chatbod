@@ -65,10 +65,11 @@ client.on("messageCreate", async (message) => {
 
   logger(prefix);
 
-  var typing;
   function type() {
     message.channel.sendTyping().then(() => {
-      typing = setTimeout(() => type(), 5000);
+      typing = setTimeout(() => {
+        type();
+      }, 10000);
     });
   }
   type();
