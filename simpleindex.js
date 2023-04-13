@@ -74,7 +74,7 @@ client.on("messageCreate", async (message) => {
   }
   type();
 
-  var response = await llm.generate(prefix);
+  var response = await llm.generate$(prefix, { timeout: 125000 });
   clearTimeout(typing);
 
   // NOTE: Scrapped for bindings wrapper.
