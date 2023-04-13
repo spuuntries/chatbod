@@ -11,5 +11,5 @@ llm = Llama(
 
 
 def generate(prompt):
-    output = llm(prompt, max_tokens=64, stop=["\n"])
+    output = llm(prompt, max_tokens=42, stop=["\n"])
     return output["choices"][0]["text"]
