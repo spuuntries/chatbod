@@ -65,7 +65,7 @@ client.on("messageCreate", async (message) => {
 
   logger(prefix);
 
-  var response = await llm.generate();
+  var response = await llm.generate(prefix);
 
   // NOTE: Scrapped for bindings wrapper.
   //var responses = (await runPrompt(prefix, message)).split("<turn>"),
