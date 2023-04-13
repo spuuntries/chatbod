@@ -65,7 +65,16 @@ client.on("messageCreate", async (message) => {
 
   logger(prefix);
 
+  var typing;
+  function type() {
+    message.channel.sendTyping().then(() => {
+      typing = setTimeout(() => type(), 5000);
+    });
+  }
+  type();
+
   var response = await llm.generate(prefix);
+  clearTimeout(typing);
 
   // NOTE: Scrapped for bindings wrapper.
   //var responses = (await runPrompt(prefix, message)).split("<turn>"),

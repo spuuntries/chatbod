@@ -8,4 +8,4 @@ llm = Llama(
 
 def generate(prompt):
     output = llm(prompt, max_tokens=64, stop=["\n"])
-    print(repr(output["choices"][0]["text"]))
+    return output["choices"][0]["text"]
