@@ -6,10 +6,11 @@ const procenv = process.env,
     intents: ["Guilds", "GuildMessages", "MessageContent"],
   }),
   { python } = require("pythonia"),
-  llm = await python("./infer.py"),
   { runPrompt } = require("./llmutils"),
   logger = (m) => console.log(`[${new Date()}] ${m}`),
   placeholder = procenv.PLACEHOLDER;
+
+var llm;
 
 /**
  * Finds the string between the specified start delimiter and the next prefix in the array.
@@ -93,6 +94,9 @@ client.on("messageCreate", async (message) => {
   logger(response);
 });
 
-client.on("ready", () => logger("ready"));
+client.on("ready", async () => {
+  llm = await python("./infer.py");
+  logger("ready");
+});
 
 client.login(procenv.TOKEN);
