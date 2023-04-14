@@ -43,7 +43,9 @@ client.on("messageCreate", async (message) => {
   if (!message.content || message.author.id == client.user.id) return;
   client.user.setPresence({
     status: "dnd",
-    activities: [{ name: `response to ${message.id}`, type: "PLAYING" }],
+    activities: [
+      { name: `response to ${message.id}`, type: Discord.ActivityType.Playing },
+    ],
   });
   const history = Array.from(
       (
@@ -114,7 +116,12 @@ client.on("messageCreate", async (message) => {
 
   client.user.setPresence({
     status: "idle",
-    activities: [{ name: "waiting for a dead channel...", type: "WATCHING" }],
+    activities: [
+      {
+        name: "waiting for a dead channel...",
+        type: Discord.ActivityType.Watching,
+      },
+    ],
   });
 });
 
@@ -122,7 +129,12 @@ client.on("ready", async () => {
   llm = await python("./infer-bindings.py");
   client.user.setPresence({
     status: "idle",
-    activities: [{ name: "waiting for a dead channel...", type: "WATCHING" }],
+    activities: [
+      {
+        name: "waiting for a dead channel...",
+        type: Discord.ActivityType.Watching,
+      },
+    ],
   });
   logger("ready");
 });
