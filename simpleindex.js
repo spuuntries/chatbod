@@ -41,7 +41,12 @@ function concatUntilNextPrefix(messages, startDelimiter) {
 }
 
 client.on("messageCreate", async (message) => {
-  if (!message.content || message.author.id == client.user.id || responding)
+  if (
+    !message.content ||
+    message.author.id == client.user.id ||
+    responding ||
+    message.channel.type == Discord.ChannelType.DM
+  )
     return;
   client.user.setPresence({
     status: "dnd",
