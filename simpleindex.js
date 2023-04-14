@@ -10,7 +10,8 @@ const procenv = process.env,
   logger = (m) => console.log(`[${new Date()}] ${m}`),
   placeholder = procenv.PLACEHOLDER;
 
-var llm;
+var llm,
+  responding = false;
 
 /**
  * Finds the string between the specified start delimiter and the next prefix in the array.
@@ -40,13 +41,16 @@ function concatUntilNextPrefix(messages, startDelimiter) {
 }
 
 client.on("messageCreate", async (message) => {
-  if (!message.content || message.author.id == client.user.id) return;
+  if (!message.content || message.author.id == client.user.id || responding)
+    return;
   client.user.setPresence({
     status: "dnd",
     activities: [
       { name: `response to ${message.id}`, type: Discord.ActivityType.Playing },
     ],
   });
+
+  responding = true;
   const history = Array.from(
       (
         await message.channel.messages.fetch({
@@ -121,6 +125,8 @@ client.on("messageCreate", async (message) => {
       },
     ],
   });
+
+  responding = false;
 });
 
 client.on("ready", async () => {
