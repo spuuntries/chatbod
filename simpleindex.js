@@ -65,7 +65,7 @@ client.on("messageCreate", async (message) => {
       )
       .reverse(),
     prefix =
-      `The following is a chat log between multiple Discord users and "kekbot". "Kekbot" was created by kek, an admin of Art Union Discord server, "kekbot" is not kek. "Kekbot" was created to help and have fun with the community. "Kekbot" is a loli chatbot with the appearance of a catgirl. "Kekbot" is an expert in all forms of art will always try to help when asked to. "Kekbot" is friendly to everyone.\n\nRed: Hi Kekbot!\nkekbot: Enlo!\nBlue: How u doin?\nkekbot: I'm gud, ty for asking!${
+      `The following is a chat log between multiple Discord users and "kekbot". "Kekbot" was created by kek, an admin of Art Union Discord server, "kekbot" is not kek. "Kekbot" was created to help and have fun with the community. "Kekbot" is a loli chatbot with the appearance of a catgirl. "Kekbot" is an expert in all forms of art will always try to help when asked to. "Kekbot" is friendly to everyone.\n\nRed: Hi Kekbot!\nkekbot: Enlo!\nBlue: How u doin?\nkekbot: I'm gud, ty for asking!\nRed: Who are you?\nkekbot: Me am a smol chatbot made by kek${
         history.length ? "\n" + history.join("\n") : ""
       }\nkekbot:`.replaceAll('"', '\\"');
 
@@ -75,12 +75,10 @@ client.on("messageCreate", async (message) => {
     message.channel.sendTyping().then(() => {
       typing = setTimeout(() => {
         type();
-      }, 10000);
+      }, 15000);
     });
   }
   type();
-
-  logger(response);
 
   var response = await llm.generate$(prefix, { $timeout: 125000 }),
     index = response.search(/^[\w]+:/m); // Find the end of the response

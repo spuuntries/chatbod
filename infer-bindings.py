@@ -7,6 +7,7 @@ llm = Llama(
     f16_kv=True,
     n_threads=3,
     last_n_tokens_size=32,
+    n_ctx=1024,
 )
 
 
