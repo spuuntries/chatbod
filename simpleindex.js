@@ -74,7 +74,10 @@ client.on("messageCreate", async (message) => {
   }
   type();
 
-  var response = await llm.generate$(prefix, { $timeout: 125000 });
+  var response = await llm.generate$(prefix, { $timeout: 125000 }),
+    index = response.search(/^[\w]+:/m); // Find the end of the response
+  response = response.substring(0, index).replace(/\n$/, ""); // Gets the response and removes newline if found at the end.
+
   clearTimeout(typing);
 
   // NOTE: Scrapped for bindings wrapper.
@@ -106,6 +109,7 @@ client.on("messageCreate", async (message) => {
 
 client.on("ready", async () => {
   llm = await python("./infer-ct2.py");
+  client.user.setStatus("idle");
   logger("ready");
 });
 
