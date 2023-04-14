@@ -41,6 +41,10 @@ function concatUntilNextPrefix(messages, startDelimiter) {
 
 client.on("messageCreate", async (message) => {
   if (!message.content || message.author.id == client.user.id) return;
+  client.user.setPresence({
+    status: "dnd",
+    activities: [{ name: `Responding to ${message.id}` }],
+  });
   const history = Array.from(
       (
         await message.channel.messages.fetch({
@@ -100,16 +104,20 @@ client.on("messageCreate", async (message) => {
   //      responses[prefix.split("\n").length - 1]
   //    ).split(":")[1];
 
-  await message.channel.send({
+  await message.reply({
     content: response,
+    allowedMentions: { repliedUser: false },
   });
 
   logger(response);
 });
 
 client.on("ready", async () => {
-  llm = await python("./infer-ct2.py");
-  client.user.setStatus("idle");
+  llm = await python("./infer-bindings.py");
+  client.user.setPresence({
+    status: "idle",
+    activities: [{ name: "Waiting for a dead channel..." }],
+  });
   logger("ready");
 });
 
