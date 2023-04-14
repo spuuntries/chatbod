@@ -14,7 +14,7 @@ def generate(prompt):
         [tokens],
         beam_size=1,
         sampling_temperature=0.8,
-        sampling_topk=10,
+        sampling_topk=30,
         num_hypotheses=1,
         max_length=64,
         include_prompt_in_result=False,
