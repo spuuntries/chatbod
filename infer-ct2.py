@@ -2,7 +2,7 @@ import ctranslate2
 import os
 import sentencepiece as spm
 
-model_dir = "./models/converted"
+model_dir = "./models/o7bq/converted"
 
 generator = ctranslate2.Generator(model_dir, device="auto", compute_type="auto")
 sp = spm.SentencePieceProcessor(os.path.join(model_dir, "tokenizer.model"))
