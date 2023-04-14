@@ -12,7 +12,7 @@ def generate(prompt):
     tokens = ["<s>"] + sp.encode(prompt, out_type=str)
     results = generator.generate_batch(
         [tokens],
-        beam_size=1,
+        beam_size=4,
         sampling_temperature=0.8,
         sampling_topk=30,
         num_hypotheses=1,
