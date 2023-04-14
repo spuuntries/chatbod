@@ -78,9 +78,11 @@ client.on("messageCreate", async (message) => {
   }
   type();
 
+  logger(response);
+
   var response = await llm.generate$(prefix, { $timeout: 125000 }),
     index = response.search(/^[\w]+:/m); // Find the end of the response
-  response = response.substring(0, index).replace(/\n$/, ""); // Gets the response and removes newline if found at the end.
+  if (index >= 0) response = response.substring(0, index).replace(/\n$/, ""); // Gets the response and removes newline if found at the end.
 
   clearTimeout(typing);
 
@@ -104,12 +106,11 @@ client.on("messageCreate", async (message) => {
   //      responses[prefix.split("\n").length - 1]
   //    ).split(":")[1];
 
+  logger(response);
   await message.reply({
     content: response,
     allowedMentions: { repliedUser: false },
   });
-
-  logger(response);
 });
 
 client.on("ready", async () => {
