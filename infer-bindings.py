@@ -5,7 +5,7 @@ llm = Llama(
     model_path="./models/7bq/ggml-model-q4_0-ggjt.bin",
     seed=random.randint(1, 9999),
     n_ctx=1024,
-    n_batch=24,
+    n_batch=64,
     use_mlock=True,
 )
 

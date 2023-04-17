@@ -80,37 +80,37 @@ client.on("messageCreate", async (message) => {
 
   logger(prefix);
 
-  function type() {
-    message.channel.sendTyping().then(() => {
-      typing = setTimeout(() => {
-        type();
-      }, 15000);
-    });
-  }
-  type();
+  // NOTE: Scrapped for the moment to see if native is faster.
+  //function type() {
+  //  message.channel.sendTyping().then(() => {
+  //    typing = setTimeout(() => {
+  //      type();
+  //    }, 15000);
+  //  });
+  //}
+  //type();
+  //
+  //var response = await llm.generate$(prefix, { $timeout: 125000 }),
+  //  index = response.search(/^[\w]+:/m); // Find the end of the response
+  //if (index >= 0)
+  //  response = response
+  //    .substring(0, index)
+  //    .replaceAll("<turn>", "")
+  //    .replace(/\n$/, ""); // Gets the response and removes newline if found at the end.
+  //
+  //clearTimeout(typing);
 
-  var response = await llm.generate$(prefix, { $timeout: 125000 }),
-    index = response.search(/^[\w]+:/m); // Find the end of the response
-  if (index >= 0)
-    response = response
-      .substring(0, index)
-      .replaceAll("<turn>", "")
-      .replace(/\n$/, ""); // Gets the response and removes newline if found at the end.
-
-  clearTimeout(typing);
-
-  // NOTE: Scrapped for bindings wrapper.
-  //var responses = (await runPrompt(prefix, message)).split("<turn>"),
-  //  response = responses
-  //    .slice(
-  //      prefix.split("<turn>").length - 1,
-  //      responses.indexOf(
-  //        responses
-  //          .slice(prefix.split("<turn>").length)
-  //          .filter((e) => e.includes("<turn>"))[0]
-  //      ) - 1
-  //    )
-  //    .join("");
+  var responses = (await runPrompt(prefix, message)).split("<turn>"),
+    response = responses
+      .slice(
+        prefix.split("<turn>").length - 1,
+        responses.indexOf(
+          responses
+            .slice(prefix.split("<turn>").length)
+            .filter((e) => e.includes("<turn>"))[0]
+        ) - 1
+      )
+      .join("");
 
   // NOTE: Same with above
   //  var responses = (await runPrompt(prefix, message)).split("\n"),
@@ -139,7 +139,7 @@ client.on("messageCreate", async (message) => {
 });
 
 client.on("ready", async () => {
-  llm = await python("./infer-bindings.py");
+  //llm = await python("./infer-bindings.py");
   client.user.setPresence({
     status: "idle",
     activities: [
