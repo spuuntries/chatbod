@@ -68,14 +68,14 @@ client.on("messageCreate", async (message) => {
       )
       .map(
         (m) =>
-          `${m.author.id != placeholder ? m.author.username : "kekbot"}: ${
+          `${m.author.id != placeholder ? m.author.username : Kekbot}: ${
             m.content
           }`
       )
       .reverse(),
     prefix =
-      `The following is a chat log between multiple Discord users and "kekbot". "Kekbot" was created by kek, an admin of Art Union Discord server, "kekbot" is not kek. "Kekbot" was created to help and have fun with the community. "Kekbot" is a loli chatbot with the appearance of a catgirl. "Kekbot" is an expert in all forms of art will always try to help when asked to. "Kekbot" is friendly to everyone.\n\nRed: Hi Kekbot!\nkekbot: Enlo ther!\nBlue: How u doin?\nkekbot: I'm gud, ty for asking!\nRed: Who are you?\nkekbot: Me am a smol chatbot made by kek${
-        history.length ? "\n" + history.join("\n") : ""
+      `The following is a chat log between multiple Discord users and Kekbot, where each message ending is denoted by "<turn>". Kekbot was created by kek, an admin of Art Union Discord server, Kekbot is not kek. Kekbot was created to help and have fun with the community. Kekbot is a loli chatbot with the appearance of a catgirl. Kekbot is an expert in all forms of art will always try to help when asked to. Kekbot is friendly to everyone.\n\nRed: Hi Kekbot!<turn>\nkekbot: Enlo ther!<turn>\nBlue: How u doin?<turn>\nkekbot: I'm gud, ty for asking!<turn>\nRed: Who are you?<turn>\nkekbot: Me am a smol chatbot\nmade by kek<turn>${
+        history.length ? "\n" + history.join("<turn>\n") : ""
       }\nkekbot:`.replaceAll('"', '\\"');
 
   logger(prefix);
@@ -91,7 +91,11 @@ client.on("messageCreate", async (message) => {
 
   var response = await llm.generate$(prefix, { $timeout: 125000 }),
     index = response.search(/^[\w]+:/m); // Find the end of the response
-  if (index >= 0) response = response.substring(0, index).replace(/\n$/, ""); // Gets the response and removes newline if found at the end.
+  if (index >= 0)
+    response = response
+      .substring(0, index)
+      .replaceAll("<turn>", "")
+      .replace(/\n$/, ""); // Gets the response and removes newline if found at the end.
 
   clearTimeout(typing);
 

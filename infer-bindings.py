@@ -3,14 +3,11 @@ import random
 
 llm = Llama(
     model_path="./models/7bq/ggml-model-q4_0-ggjt.bin",
-    seed=random.randint(1, 9999999),
-    f16_kv=True,
-    n_threads=3,
-    last_n_tokens_size=32,
+    seed=random.randint(1, 9999),
     n_ctx=1024,
 )
 
 
 def generate(prompt):
-    output = llm(prompt, max_tokens=32, temperature=0.75, top_p=0.7, stop=["\n"])
+    output = llm(prompt, max_tokens=64, temperature=0.75, stop=["<turn>"])
     return output["choices"][0]["text"]
