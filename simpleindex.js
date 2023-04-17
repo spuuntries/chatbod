@@ -100,7 +100,7 @@ client.on("messageCreate", async (message) => {
   //
   //clearTimeout(typing);
 
-  var responses = (await runPrompt(prefix, message)).split("<turn>"),
+  var responses = (await runPrompt(prefix, message)).split("<turn>\n"),
     response = responses
       .filter((msg) => msg.toLowerCase().startsWith("kekbot:"))
       .pop()
