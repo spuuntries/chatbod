@@ -102,8 +102,9 @@ client.on("messageCreate", async (message) => {
 
   var responses = (await runPrompt(prefix, message)).split("<turn>\n"),
     response = responses
+      .slice(responses.length - 1)
       .filter((msg) => msg.toLowerCase().startsWith("kekbot:"))
-      .pop()
+      .shift()
       .split(":")[1];
 
   // NOTE: Same with above
