@@ -119,7 +119,7 @@ client.on("messageCreate", async (message) => {
     response = response.replaceAll("[gif]", "");
   }
 
-  logger(response);
+  logger(response, gif);
   await message.reply({
     content: response,
     files: [gif] ? gif : undefined,
