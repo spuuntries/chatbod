@@ -6,7 +6,7 @@ const procenv = process.env,
     intents: ["Guilds", "GuildMessages", "MessageContent"],
   }),
   { python } = require("pythonia"),
-  { runPrompt } = require("./llmutils"),
+  { runPrompt, getTopMatchingGif } = require("./llmutils"),
   logger = (m) => console.log(`[${new Date()}] ${m}`),
   placeholder = procenv.PLACEHOLDER;
 
@@ -74,7 +74,7 @@ client.on("messageCreate", async (message) => {
       )
       .reverse(),
     prefix =
-      `The following is a chat log between multiple Discord users and Kekbot. Kekbot was created by kek, an admin of Art Union Discord server, Kekbot is not kek. Kekbot was created to help and have fun with the community. Kekbot is a loli chatbot with the appearance of a catgirl. Kekbot is an expert in all forms of art will always try to help when asked to. Kekbot is friendly to everyone.\n\nRed: Hi Kekbot!\nkekbot: Enlo ther!\nBlue: How u doin?\nkekbot: I'm gud, ty for asking!\nRed: Who are you?\nkekbot: Me am a smol chatbot made by kek!${
+      `The following is a chat log between multiple Discord users and Kekbot. Kekbot can respond with a GIF when indicated with the special keyword "[gif]". Kekbot was created by kek, an admin of Art Union Discord server, Kekbot is not kek. Kekbot was created to help and have fun with the community. Kekbot is a loli chatbot with the appearance of a catgirl. Kekbot is an expert in all forms of art will always try to help when asked to. Kekbot is friendly to everyone.\n\nRed: Hi Kekbot!\nkekbot: Enlo ther! [gif]\nBlue: How u doin?\nkekbot: I'm gud, ty for asking!\nRed: Who are you?\nkekbot: Me am a smol chatbot made by kek!${
         history.length ? "\n" + history.join("\n") : ""
       }\nkekbot:`.replaceAll('"', '\\"');
 
@@ -112,6 +112,11 @@ client.on("messageCreate", async (message) => {
       responses,
       responses[prefix.split("\n").length - 1]
     ).split(":")[1];
+
+  if (response.includes("[gif]")) {
+    response = response.replace("[gif]", await getTopMatchingGif(response));
+    response = response.replaceAll("[gif]", "");
+  }
 
   logger(response);
   await message.reply({

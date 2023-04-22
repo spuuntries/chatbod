@@ -1,4 +1,6 @@
+require('dotenv').config();
 const { exec } = require("child_process"),
+  axios = require('axios'),
   Discord = require("discord.js");
 
 /**
@@ -43,4 +45,26 @@ async function runPrompt(prompt, message) {
   return res;
 }
 
-module.exports = { runCommand, runPrompt };
+async function getTopMatchingGif(query) {
+  const url = `https://api.tenor.com/v1/search?q=\${query}&key=\${process.env.TENOR_API_KEY}&limit=1`;
+
+  try {
+    const response = await axios.get(url);
+
+    if (response.data.results.length > 0) {
+      const topResult = response.data.results[0];
+      const gifUrl = topResult.media[0].gif.url;
+      const gifResponse = await axios.get(gifUrl, {
+        responseType: 'arraybuffer'
+      });
+      return gifResponse.data;
+    } else {
+      throw new Error(`No GIFs found for query "\${query}"`);
+    }
+  } catch (error) {
+    console.error(`Error querying Tenor API: \${error}`);
+    throw error;
+  }
+}
+
+module.exports = { runCommand, runPrompt, getTopMatchingGif };
