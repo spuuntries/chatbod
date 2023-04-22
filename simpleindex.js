@@ -113,14 +113,16 @@ client.on("messageCreate", async (message) => {
       responses[prefix.split("\n").length - 1]
     ).split(":")[1];
 
+  var gif;
   if (response.includes("[gif]")) {
-    response = response.replace("[gif]", await getTopMatchingGif(response));
+    gif = await getTopMatchingGif(response);
     response = response.replaceAll("[gif]", "");
   }
 
   logger(response);
   await message.reply({
     content: response,
+    files: [gif] ? gif : undefined,
     allowedMentions: { repliedUser: false },
   });
 
