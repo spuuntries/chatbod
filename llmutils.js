@@ -31,7 +31,7 @@ async function runPrompt(prompt, message) {
     message.channel.sendTyping().then(() => {
       typing = setTimeout(() => {
         type();
-      }, 10000);
+      }, 5000);
     });
   }
   type();
