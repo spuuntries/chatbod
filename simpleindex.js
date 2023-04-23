@@ -116,11 +116,11 @@ client.on("messageCreate", async (message) => {
   var responses = await runPrompt(prefix, message),
     splitResponses = Array.from(
       responses.slice(prefix.length).matchAll(/^[\w]+:/gim)
-    ),
+    ).filter((e) => e == "kekbot:"),
     response = responses
       .slice(
-        splitResponses.at(0).index,
-        splitResponses.at(1) ? splitResponses.at(1).index : undefined
+        splitResponses[0].index,
+        splitResponses[1] ? splitResponses[1].index : undefined
       )
       .split(":")[1];
 
