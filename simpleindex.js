@@ -116,7 +116,7 @@ client.on("messageCreate", async (message) => {
   var responses = await runPrompt(prefix, message),
     splitResponses = Array.from(
       responses.slice(prefix.length).matchAll(/^[\w]+:/gim)
-    ),
+    ).slice(1),
     response = responses
       .slice(
         splitResponses[0].index,
