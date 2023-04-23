@@ -46,24 +46,22 @@ async function runPrompt(prompt, message) {
 }
 
 async function getTopMatchingGif(query) {
-  const url = `https://tenor.googleapis.com/v2/search?q=${query}&key=${process.env.TENOR_API_KEY}&client_key=kekbot&limit=1`;
+  const url = `https://tenor.googleapis.com/v2/search?q=${query}&key=${process.env.TENOR_API_KEY}&client_key=kekbot&limit=1&media_filter=gif`;
 
   try {
     const response = await axios.get(url);
 
     if (response.data.results.length > 0) {
       const topResult = response.data.results[0];
-      const gifUrl = topResult.itemurl;
+      const gifUrl = topResult.media_formats.gif.url;
       const gifResponse = await axios.get(gifUrl, {
         responseType: "arraybuffer",
       });
       return gifResponse.data;
-    } else {
-      throw new Error(`No GIFs found for query "${query}"`);
     }
+    console.log(`[${new Date()}] No GIFs found for query "${query}"`);
   } catch (error) {
-    console.error(`Error querying Tenor API: ${error}`);
-    throw error;
+    console.log(`[${new Date()}] Error querying Tenor API: ${error}`);
   }
 }
 
