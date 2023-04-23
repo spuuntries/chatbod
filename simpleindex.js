@@ -115,10 +115,12 @@ client.on("messageCreate", async (message) => {
 
   var responses = await runPrompt(prefix, message),
     splitResponses = Array.from(responses.matchAll(/^[\w]+:/gim)),
-    response = responses.slice(
-      splitResponses[0].index,
-      splitResponses[1].index ? splitResponses[1].index : undefined
-    );
+    response = responses
+      .slice(
+        splitResponses.at(-2).index,
+        splitResponses.at(-1).index ? splitResponses.at(-1) : undefined
+      )
+      .split(":")[1];
 
   var gif, responseRaw;
   if (response.includes("[gif]")) {
