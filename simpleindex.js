@@ -124,7 +124,7 @@ client.on("messageCreate", async (message) => {
       )
       .split(":")[1];
 
-  logger(response);
+  logger(splitResponses, response);
 
   var gif, responseRaw;
   if (response.includes("[gif]")) {
