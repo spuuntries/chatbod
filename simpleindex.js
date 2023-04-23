@@ -119,7 +119,7 @@ client.on("messageCreate", async (message) => {
     ),
     response = responses
       .slice(
-        splitPrefix.at(0).index,
+        splitResponses.at(0).index,
         splitResponses.at(1) ? splitResponses.at(1).index : undefined
       )
       .split(":")[1];
