@@ -114,11 +114,13 @@ client.on("messageCreate", async (message) => {
     */
 
   var responses = await runPrompt(prefix, message),
-    splitResponses = Array.from(responses.matchAll(/^[\w]+:/gim)),
+    splitResponses = Array.from(
+      responses.slice(prefix.length - 1).matchAll(/^[\w]+:/gim)
+    ),
     response = responses
       .slice(
-        splitResponses.at(-2).index,
-        splitResponses.at(-1) ? splitResponses.at(-1).index : undefined
+        splitPrefix.at(0).index,
+        splitResponses.at(1) ? splitResponses.at(1).index : undefined
       )
       .split(":")[1];
 
@@ -132,7 +134,7 @@ client.on("messageCreate", async (message) => {
   logger(response, responseRaw, gif);
   await message.reply({
     content: response,
-    files: [new Discord.AttachmentBuilder(gif)] ? gif : undefined,
+    files: gif ? [new Discord.AttachmentBuilder(gif)] : undefined,
     allowedMentions: { repliedUser: false },
   });
 
