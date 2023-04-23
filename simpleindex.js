@@ -123,7 +123,7 @@ client.on("messageCreate", async (message) => {
   logger(response, responseRaw, gif);
   await message.reply({
     content: response,
-    files: [{ attachment: gif, name: response }] ? gif : undefined,
+    files: [new Discord.AttachmentBuilder(gif)] ? gif : undefined,
     allowedMentions: { repliedUser: false },
   });
 
