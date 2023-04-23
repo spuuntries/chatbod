@@ -118,7 +118,7 @@ client.on("messageCreate", async (message) => {
     response = responses
       .slice(
         splitResponses.at(-2).index,
-        splitResponses.at(-1).index ? splitResponses.at(-1) : undefined
+        splitResponses.at(-1).index ? splitResponses.at(-1).index : undefined
       )
       .split(":")[1];
 
