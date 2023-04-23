@@ -122,7 +122,7 @@ client.on("messageCreate", async (message) => {
   logger(response, gif);
   await message.reply({
     content: response,
-    files: [gif] ? gif : undefined,
+    files: [{ attachment: gif, name: response }] ? gif : undefined,
     allowedMentions: { repliedUser: false },
   });
 
