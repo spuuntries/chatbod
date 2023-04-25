@@ -87,10 +87,14 @@ client.on("messageCreate", async (message) => {
           `${
             m.author.id != placeholder ? m.author.username : "kekbot"
           }: ${extractEmotes(m.content)}${
-            Array.from(m.attachments).length ? " [gif]" : ""
+            m.attachments.some((a) => a.contentType.includes("gif"))
+              ? " [gif]"
+              : ""
           }${
-            message.attachments.some((a) => a.contentType.includes("image"))
-              ? `(an image of ${await getCaption(
+            message.attachments.some((a) =>
+              ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
+            )
+              ? ` (an image of ${await getCaption(
                   (
                     await axios.get(message.attachments.at(0).url)
                   ).data
