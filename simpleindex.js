@@ -1,3 +1,5 @@
+const { default: axios } = require("axios");
+
 require("dotenv").config();
 const procenv = process.env,
   cp = require("child_process"),
@@ -6,7 +8,7 @@ const procenv = process.env,
     intents: ["Guilds", "GuildMessages", "MessageContent"],
   }),
   { python } = require("pythonia"),
-  { runPrompt, getTopMatchingGif } = require("./llmutils"),
+  { runPrompt, getTopMatchingGif, getCaption } = require("./llmutils"),
   logger = (m) => console.log(`[${new Date()}] ${m}`),
   placeholder = procenv.PLACEHOLDER;
 
@@ -40,6 +42,20 @@ function concatUntilNextPrefix(messages, startDelimiter) {
   }
 }
 
+/**
+ * @param {string} str To extract from
+ */
+function extractEmotes(str) {
+  const regex = /<.*:(.+?):\d+>/g;
+  return str.replace(regex, (match, p1, p2) => {
+    if (p1) {
+      return `:${p1}:`;
+    } else if (p2) {
+      return `:${p2}:`;
+    }
+  });
+}
+
 client.on("messageCreate", async (message) => {
   if (
     !message.content ||
@@ -67,14 +83,24 @@ client.on("messageCreate", async (message) => {
         (m) => m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000
       )
       .map(
-        (m) =>
-          `${m.author.id != placeholder ? m.author.username : "kekbot"}: ${
-            m.content
+        async (m) =>
+          `${
+            m.author.id != placeholder ? m.author.username : "kekbot"
+          }: ${extractEmotes(m.content)}${
+            Array.from(m.attachments).length ? " [gif]" : ""
+          }${
+            message.attachments.some((a) => a.contentType.includes("image"))
+              ? `(an image of ${await getCaption(
+                  (
+                    await axios.get(message.attachments.at(0).url)
+                  ).data
+                )})`
+              : ""
           }`
       )
       .reverse(),
     prefix =
-      `The following is a chat log between multiple Discord users and Kekbot. Kekbot can respond with a GIF when indicated with the special keyword "[gif]". Kekbot was created by kek, an admin of Art Union Discord server, Kekbot is not kek. Kekbot was created to help and have fun with the community. Kekbot is a loli chatbot with the appearance of a catgirl. Kekbot is an expert in all forms of art will always try to help when asked to. Kekbot will never send an empty reply. Kekbot is friendly to everyone.\n\nRed: Hi Kekbot!\nkekbot: Enlo ther! [gif]\nBlue: How u doin?\nkekbot: I'm gud, ty for asking!\nRed: Who are you?\nkekbot: Me am a smol chatbot made by kek!${
+      `The following is a chat log between multiple Discord users and Kekbot. Kekbot can respond with a GIF when indicated with the special keyword "[gif]". Emotes are indicated by colons, e.g. ":pepega:". Image attachments are indicated by parentheses with their captions in them, e.g. "(an image of bazinga)". Kekbot was created by kek, an admin of Art Union Discord server, Kekbot is not kek. Kekbot was created to help and have fun with the community. Kekbot is a loli chatbot with the appearance of a catgirl. Kekbot is an expert in all forms of art will always try to help when asked to. Kekbot will never send an empty reply. Kekbot is friendly to everyone.\n\nRed: Hi Kekbot!\nkekbot: Enlo ther! [gif]\nBlue: How u doin? :thinking:\nkekbot: I'm gud, ty for asking!\nRed: Who are you?\nkekbot: Me am a smol chatbot made by kek!${
         history.length ? "\n" + history.join("\n") : ""
       }\nkekbot:`.replaceAll('"', '\\"');
 
@@ -113,11 +139,22 @@ client.on("messageCreate", async (message) => {
     ).split(":")[1];
     */
 
+  var typing;
+  function type() {
+    message.channel.sendTyping().then(() => {
+      typing = setTimeout(() => {
+        type();
+      }, 6000);
+    });
+  }
+  type();
+
   var responses = await runPrompt(prefix, message),
     splitResponses = Array.from(
-      responses.slice(prefix.length).matchAll(/^[\w]+:/gim)
-    ).slice(1),
+      responses.slice(prefix.length - 9).matchAll(/^[\w]+:/gim)
+    ),
     response = responses
+      .slice(prefix.length - 9)
       .slice(
         splitResponses[0].index,
         splitResponses[1] ? splitResponses[1].index : undefined
@@ -136,7 +173,13 @@ client.on("messageCreate", async (message) => {
   logger(response, responseRaw, gif);
   await message.reply({
     content: response,
-    files: gif ? [new Discord.AttachmentBuilder(gif)] : undefined,
+    files: gif
+      ? [
+          new Discord.AttachmentBuilder(gif, {
+            name: `${response.replaceAll(" ", "_")}.gif`,
+          }),
+        ]
+      : undefined,
     allowedMentions: { repliedUser: false },
   });
 
@@ -151,6 +194,7 @@ client.on("messageCreate", async (message) => {
   });
 
   responding = false;
+  clearTimeout(typing);
 });
 
 client.on("ready", async () => {

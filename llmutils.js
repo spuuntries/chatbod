@@ -1,7 +1,6 @@
 require("dotenv").config();
 const { exec } = require("child_process"),
-  axios = require("axios"),
-  Discord = require("discord.js");
+  axios = require("axios");
 
 /**
  * Runs a command and returns its output.
@@ -24,25 +23,25 @@ function runCommand(command) {
  * Runs a prompt using the binary.
  * @async
  * @param {string} prompt - The prompt to run.
- * @param {Discord.Message} message - To display typing.
  * @returns {Promise<string>} The output of the command.
  */
-async function runPrompt(prompt, message) {
-  var typing;
-  function type() {
-    message.channel.sendTyping().then(() => {
-      typing = setTimeout(() => {
-        type();
-      }, 5000);
-    });
-  }
-  type();
-
+async function runPrompt(prompt) {
   const res = await runCommand(
-    `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -n 32 -b 64 -c 1024 --top_p 0.7 --temp 0.75`
+    `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -n 64 -b 64 -c 2048 --top_p 0.7 --temp 0.75 --repeat_penalty 1.2 --repeat_last_n 128`
   );
-  clearTimeout(typing);
   return res;
+}
+
+async function getCaption(buffer, c) {
+  const url = `https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large`;
+
+  try {
+    return (await axios.post(url, buffer))["data"][0]["generated_text"];
+  } catch (e) {
+    setTimeout(async () => {
+      await getCaption(buffer, c++);
+    }, 5000);
+  }
 }
 
 async function getTopMatchingGif(query) {
@@ -65,4 +64,4 @@ async function getTopMatchingGif(query) {
   }
 }
 
-module.exports = { runCommand, runPrompt, getTopMatchingGif };
+module.exports = { runCommand, runPrompt, getCaption, getTopMatchingGif };
