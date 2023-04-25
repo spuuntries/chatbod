@@ -91,12 +91,12 @@ client.on("messageCreate", async (message) => {
               ? " [gif]"
               : ""
           }${
-            message.attachments.some((a) =>
+            m.attachments.some((a) =>
               ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
             )
               ? ` (an image of ${await getCaption(
                   (
-                    await axios.get(message.attachments.at(0).url)
+                    await axios.get(m.attachments.at(0).url)
                   ).data
                 )})`
               : ""
