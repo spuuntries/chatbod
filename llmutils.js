@@ -38,9 +38,8 @@ async function getCaption(buffer, c) {
   try {
     return (await axios.post(url, buffer))["data"][0]["generated_text"];
   } catch (e) {
-    setTimeout(async () => {
-      await getCaption(buffer, c++);
-    }, 5000);
+    if (c < 10) await getCaption(buffer, c++);
+    else return undefined;
   }
 }
 
