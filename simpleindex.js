@@ -57,6 +57,10 @@ function extractEmotes(str) {
 }
 
 client.on("messageCreate", async (message) => {
+  if (procenv.CHANNELS) {
+    if (!procenv.CHANNELS.split("|").includes(message.channelId)) return;
+  }
+
   if (
     !message.content ||
     message.author.id == client.user.id ||
@@ -64,6 +68,7 @@ client.on("messageCreate", async (message) => {
     message.channel.type == Discord.ChannelType.DM
   )
     return;
+
   client.user.setPresence({
     status: "dnd",
     activities: [
