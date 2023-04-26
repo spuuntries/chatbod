@@ -77,6 +77,8 @@ client.on("messageCreate", async (message) => {
     ],
   });
 
+  clearTimeout(typing);
+
   function type() {
     message.channel.sendTyping().then(() => {
       typing = setTimeout(() => {
@@ -176,7 +178,7 @@ client.on("messageCreate", async (message) => {
   }
 
   logger(response, responseRaw, gif);
-  if (response.length < 1) response = await getTopMatchingGif("Yep");
+  if (response.length < 2) response = await getTopMatchingGif("Yep");
   await message.reply({
     content: response,
     files: gif
