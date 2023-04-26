@@ -35,10 +35,12 @@ async function runPrompt(prompt) {
 
 async function getCaption(buffer) {
   const hf = new HfInference(process.env.HF_TOKEN);
-  return await hf.imageToText(
-    { model: "Salesforce/blip-image-captioning-large", data: buffer },
-    { wait_for_model: true }
-  );
+  return (
+    await hf.imageToText(
+      { model: "Salesforce/blip-image-captioning-large", data: buffer },
+      { wait_for_model: true }
+    )
+  ).generated_text;
 }
 
 async function getTopMatchingGif(query) {
