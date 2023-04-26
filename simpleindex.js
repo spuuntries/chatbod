@@ -96,7 +96,7 @@ client.on("messageCreate", async (message) => {
             )
               ? ` (an image of ${await getCaption(
                   (
-                    await axios.get(m.attachments.at(0).url, {
+                    await axios.get(Array.from(m.attachments)[0][1].url, {
                       responseType: "arraybuffer",
                     })
                   ).data
