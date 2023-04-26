@@ -99,7 +99,8 @@ client.on("messageCreate", async (message) => {
                     await axios.get(Array.from(m.attachments)[0][1].url, {
                       responseType: "arraybuffer",
                     })
-                  ).data
+                  ).data,
+                  0
                 )})`
               : ""
           }`
