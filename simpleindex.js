@@ -13,7 +13,8 @@ const procenv = process.env,
   placeholder = procenv.PLACEHOLDER;
 
 var llm,
-  responding = false;
+  responding = false,
+  typing;
 
 /**
  * Finds the string between the specified start delimiter and the next prefix in the array.
@@ -76,7 +77,6 @@ client.on("messageCreate", async (message) => {
     ],
   });
 
-  var typing;
   function type() {
     message.channel.sendTyping().then(() => {
       typing = setTimeout(() => {
