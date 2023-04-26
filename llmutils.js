@@ -38,8 +38,16 @@ async function getCaption(buffer, c) {
   try {
     return (await axios.post(url, buffer))["data"][0]["generated_text"];
   } catch (e) {
-    if (c < 10) await getCaption(buffer, c++);
-    else return undefined;
+    setTimeout(async () => {
+      if (c < 10) {
+        console.error(
+          `[${new Date()}] Failed to get caption: ${e}, retrying...`
+        );
+        return await getCaption(buffer, c++);
+      } else {
+        throw new Error(`[${new Date()}] Failed to get caption!`);
+      }
+    }, 5000);
   }
 }
 
