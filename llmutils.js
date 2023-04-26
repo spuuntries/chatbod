@@ -32,22 +32,23 @@ async function runPrompt(prompt) {
   return res;
 }
 
-async function getCaption(buffer, c) {
+async function getCaption(buffer) {
   const url = `https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large`;
+  let retries = 0;
+  const maxRetries = 10;
 
-  try {
-    return (await axios.post(url, buffer))["data"][0]["generated_text"];
-  } catch (e) {
-    if (c < 10) {
-      console.log(`[${new Date()}] Failed to get caption: ${e}, retrying...`);
-      c++;
-      setTimeout(async () => {
-        return await getCaption(buffer, c);
-      }, 5000);
-    } else {
-      throw new Error(`[${new Date()}] Failed to get caption!`);
+  while (retries < maxRetries) {
+    try {
+      const response = await axios.post(url, buffer);
+      return response.data[0].generated_text;
+    } catch (error) {
+      console.log(`Error getting caption: ${error.message}`);
+      retries++;
+      await new Promise((resolve) => setTimeout(resolve, 5000));
     }
   }
+
+  console.log(`Max retries (${maxRetries}) exceeded to get caption`);
 }
 
 async function getTopMatchingGif(query) {
