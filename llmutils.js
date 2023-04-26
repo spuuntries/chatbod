@@ -36,12 +36,16 @@ async function runPrompt(prompt) {
 async function getCaption(image) {
   const hf = new HfInference(process.env.HF_TOKEN),
     blob = await (await fetch(image)).blob();
-  return (
-    await hf.imageToText(
-      { model: "Salesforce/blip-image-captioning-large", data: blob },
-      { retry_on_error: true }
-    )
-  ).generated_text;
+  try {
+    return (
+      await hf.imageToText(
+        { model: "Salesforce/blip-image-captioning-large", data: blob },
+        { retry_on_error: true }
+      )
+    ).generated_text;
+  } catch (e) {
+    return `failed to get the caption.`;
+  }
 }
 
 async function getTopMatchingGif(query) {
