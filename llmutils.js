@@ -39,7 +39,9 @@ async function getCaption(buffer) {
 
   while (retries < maxRetries) {
     try {
-      const response = await axios.post(url, buffer);
+      const response = await axios.post(url, buffer, {
+        headers: { Authorization: `Bearer ${process.env.HF_TOKEN}` },
+      });
       return response.data[0].generated_text;
     } catch (error) {
       console.log(`Error getting caption: ${error.message}`);
