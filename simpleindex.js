@@ -109,7 +109,7 @@ client.on("messageCreate", async (message) => {
             m.attachments.some((a) =>
               ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
             )
-              ? ` (an image, ${await getCaption(m.attachments.at(0).url)}`
+              ? ` (an image, ${await getCaption(m.attachments.at(0).url)})`
               : ""
           }`
       )

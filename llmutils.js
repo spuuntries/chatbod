@@ -40,7 +40,7 @@ async function getCaption(image) {
     return (
       await hf.imageToText(
         { model: "Salesforce/blip-image-captioning-large", data: blob },
-        { retry_on_error: true }
+        { wait_for_model: true }
       )
     ).generated_text;
   } catch (e) {
