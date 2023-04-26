@@ -181,7 +181,7 @@ client.on("messageCreate", async (message) => {
     content: response,
     files: gif
       ? [
-          new Discord.AttachmentBuilder(gif, {
+          new Discord.AttachmentBuilder(Buffer.from(gif), {
             name: `${response.replaceAll(" ", "_")}.gif`,
           }),
         ]
