@@ -28,17 +28,18 @@ function runCommand(command) {
  */
 async function runPrompt(prompt) {
   const res = await runCommand(
-    `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -n 64 -b 64 -c 2048 --top_p 0.7 --temp 0.75 --repeat_penalty 1.2 --repeat_last_n 128`
+    `llama.cpp/build/bin/main -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}" -n 32 -b 64 -c 2048 --top_p 0.7 --temp 0.75 --repeat_penalty 1.2 --repeat_last_n 128`
   );
   return res;
 }
 
 async function getCaption(buffer) {
   const hf = new HfInference(process.env.HF_TOKEN);
+  if (!Buffer.isBuffer(buffer)) throw new Error("Buffer isn't a buffer!");
   return (
     await hf.imageToText(
       { model: "Salesforce/blip-image-captioning-large", data: buffer },
-      { wait_for_model: true }
+      { retry_on_error: true }
     )
   ).generated_text;
 }
