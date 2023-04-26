@@ -182,6 +182,7 @@ client.on("messageCreate", async (message) => {
   }
 
   logger(response, responseRaw, gif);
+  if (response.length < 1) response = await getTopMatchingGif("Yep");
   await message.reply({
     content: response,
     files: gif
