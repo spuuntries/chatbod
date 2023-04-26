@@ -71,6 +71,16 @@ client.on("messageCreate", async (message) => {
     ],
   });
 
+  var typing;
+  function type() {
+    message.channel.sendTyping().then(() => {
+      typing = setTimeout(() => {
+        type();
+      }, 6000);
+    });
+  }
+  type();
+
   responding = true;
   const history = Array.from(
       (
@@ -99,8 +109,7 @@ client.on("messageCreate", async (message) => {
                     await axios.get(Array.from(m.attachments)[0][1].url, {
                       responseType: "arraybuffer",
                     })
-                  ).data,
-                  0
+                  ).data
                 )})`
               : ""
           }`
@@ -145,16 +154,6 @@ client.on("messageCreate", async (message) => {
       responses[prefix.split("\n").length - 1]
     ).split(":")[1];
     */
-
-  var typing;
-  function type() {
-    message.channel.sendTyping().then(() => {
-      typing = setTimeout(() => {
-        type();
-      }, 6000);
-    });
-  }
-  type();
 
   var responses = await runPrompt(prefix, message),
     splitResponses = Array.from(

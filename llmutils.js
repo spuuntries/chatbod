@@ -1,5 +1,6 @@
 require("dotenv").config();
 const { exec } = require("child_process"),
+  { HfInference } = require("@huggingface/inference"),
   axios = require("axios");
 
 /**
@@ -33,24 +34,11 @@ async function runPrompt(prompt) {
 }
 
 async function getCaption(buffer) {
-  const url = `https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large`;
-  let retries = 0;
-  const maxRetries = 10;
-
-  while (retries < maxRetries) {
-    try {
-      const response = await axios.post(url, buffer, {
-        headers: { Authorization: `Bearer ${process.env.HF_TOKEN}` },
-      });
-      return response.data[0].generated_text;
-    } catch (error) {
-      console.log(`Error getting caption: ${error.message}`);
-      retries++;
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-    }
-  }
-
-  console.log(`Max retries (${maxRetries}) exceeded to get caption`);
+  const hf = new HfInference(process.env.HF_TOKEN);
+  return await hf.imageToText(
+    { model: "Salesforce/blip-image-captioning-large", data: buffer },
+    { wait_for_model: true }
+  );
 }
 
 async function getTopMatchingGif(query) {
