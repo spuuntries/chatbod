@@ -109,13 +109,7 @@ client.on("messageCreate", async (message) => {
             m.attachments.some((a) =>
               ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
             )
-              ? ` (an image, ${await getCaption(
-                  (
-                    await axios.get(Array.from(m.attachments)[0][1].url, {
-                      responseType: "arraybuffer",
-                    })
-                  ).data
-                )})`
+              ? ` (an image, ${await getCaption(m.attachments.at(0).url)}`
               : ""
           }`
       )

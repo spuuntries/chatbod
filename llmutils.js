@@ -33,12 +33,12 @@ async function runPrompt(prompt) {
   return res;
 }
 
-async function getCaption(buffer) {
-  const hf = new HfInference(process.env.HF_TOKEN);
-  if (!Buffer.isBuffer(buffer)) throw new Error("Buffer isn't a buffer!");
+async function getCaption(image) {
+  const hf = new HfInference(process.env.HF_TOKEN),
+    blob = await (await fetch(image)).blob();
   return (
     await hf.imageToText(
-      { model: "Salesforce/blip-image-captioning-large", data: buffer },
+      { model: "Salesforce/blip-image-captioning-large", data: blob },
       { retry_on_error: true }
     )
   ).generated_text;
