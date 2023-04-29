@@ -159,16 +159,18 @@ client.on("messageCreate", async (message) => {
   var responses = await runPrompt(prefix, message),
     splitResponses = Array.from(
       responses.slice(prefix.length - 8).matchAll(/^[\w]+:/gim)
-    ),
-    response = responses
-      .slice(prefix.length - 8)
-      .slice(
-        splitResponses[0].index,
-        splitResponses[1] ? splitResponses[1].index : undefined
-      );
-  response = response.slice(response.indexOf(":") + 1);
+    );
 
   logger(splitResponses, `[${responses.slice(prefix.length - 8)}]`);
+
+  var response = responses
+    .slice(prefix.length - 8)
+    .slice(
+      splitResponses[0].index,
+      splitResponses[1] ? splitResponses[1].index : undefined
+    );
+  response = response.slice(response.indexOf(":") + 1);
+
   logger(responses);
 
   var gif, responseRaw;
