@@ -160,6 +160,7 @@ client.on("messageCreate", async (message) => {
     lastPrefix = responses.slice(prefix.length).search(/^[\w]+:/gim),
     response;
 
+  logger(responses);
   logger(responses.slice(prefix.length));
 
   if (lastPrefix == -1) response = responses;
