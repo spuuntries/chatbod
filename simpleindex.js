@@ -156,11 +156,11 @@ client.on("messageCreate", async (message) => {
     ).split(":")[1];
     */
 
-  var responses = await runPrompt(prefix, message),
+  var responses = await runPrompt(prefix),
     lastPrefix = responses.slice(prefix.length).search(/^[\w]+:/gim),
     response;
 
-  logger(responses);
+  logger(responses, lastPrefix);
   logger(responses.slice(prefix.length));
 
   if (lastPrefix == -1) response = responses;
