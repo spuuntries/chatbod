@@ -157,7 +157,7 @@ client.on("messageCreate", async (message) => {
     */
 
   var responses = await runPrompt(prefix, message),
-    lastPrefix = responses.search(/^[\w]+:/gim),
+    lastPrefix = responses.slice(prefix.length).search(/^[\w]+:/gim),
     response;
 
   if (lastPrefix == -1) response = responses;
