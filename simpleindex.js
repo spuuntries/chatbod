@@ -66,6 +66,7 @@ client.on("messageCreate", async (message) => {
     !message.content ||
     message.author.id == client.user.id ||
     responding ||
+    message.content.trim().startsWith("!ig") ||
     message.channel.type == Discord.ChannelType.DM
   )
     return;
