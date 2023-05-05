@@ -160,7 +160,7 @@ client.on("messageCreate", async (message) => {
     */
 
   var responses = (await runPrompt(prefix)).replaceAll('"', '\\"'),
-    lastPrefix = responses.slice(prefix.length).search(/^.+:/gim),
+    lastPrefix = responses.slice(prefix.length).search(/^[^ ]+:/gim),
     response;
 
   logger(responses);
@@ -179,8 +179,9 @@ client.on("messageCreate", async (message) => {
 
   logger(response, responseRaw, gif);
   if (response.length < 2) {
-    response = "yep";
-    gif = await getTopMatchingGif("Yep");
+    response = ["Me nut rlly sur how to respond to dat", "Mmhhm...", "Yup"][
+      Math.floor(Math.random() * 3)
+    ];
   }
   await message.reply({
     content: response,
