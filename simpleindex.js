@@ -98,7 +98,9 @@ client.on("messageCreate", async (message) => {
       ).values()
     )
       .filter(
-        (m) => m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000
+        (m) =>
+          m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
+          !m.content.trim().startsWith("!ig")
       )
       .map(
         async (m) =>
