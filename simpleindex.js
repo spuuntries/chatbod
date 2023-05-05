@@ -157,7 +157,7 @@ client.on("messageCreate", async (message) => {
     */
 
   var responses = (await runPrompt(prefix)).replaceAll('"', '\\"'),
-    lastPrefix = responses.slice(prefix.length).search(/^[\w]+:/gim),
+    lastPrefix = responses.slice(prefix.length).search(/^.+:/gim),
     response;
 
   logger(responses);
