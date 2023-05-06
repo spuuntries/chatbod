@@ -54,9 +54,10 @@ client.on("messageCreate", async (message) => {
 
   function type() {
     message.channel.sendTyping().then(() => {
-      typing = setTimeout(() => {
-        type();
-      }, 6000);
+      if (responding)
+        typing = setTimeout(() => {
+          type();
+        }, 6000);
     });
   }
   type();
