@@ -111,7 +111,7 @@ client.on("messageCreate", async (message) => {
   logger(lastPrefix);
   logger(responses.slice(prefix.length));
 
-  if (lastPrefix < 0) response = responses;
+  if (lastPrefix < 0) response = responses.slice(prefix.length);
   else response = responses.slice(prefix.length).slice(0, lastPrefix);
 
   var gif, responseRaw;
