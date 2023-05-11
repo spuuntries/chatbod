@@ -3,7 +3,7 @@ const { exec } = require("child_process"),
   { HfInference } = require("@huggingface/inference"),
   axios = require("axios");
 
-var captioned = [];
+var captioned = {};
 
 /**
  * Runs a command and returns its output.
@@ -38,6 +38,7 @@ async function runPrompt(prompt) {
 async function getCaption(image, maxRetries = 3) {
   const hf = new HfInference(process.env.HF_TOKEN);
   const blob = await (await fetch(image)).blob();
+  if (captioned[image]) return captioned[image];
   let retries = 0;
 
   while (retries < maxRetries) {
@@ -49,7 +50,7 @@ async function getCaption(image, maxRetries = 3) {
         })
       ).generated_text;
 
-      captioned.push(image);
+      captioned[image] = res;
       return res;
     } catch (e) {
       retries++;
