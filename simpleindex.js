@@ -163,7 +163,7 @@ client.on("ready", async () => {
       },
     ],
   });
-  logger("ready");
+  logger(`[v${require("./package.json").version}] ready`);
 });
 
 client.login(procenv.TOKEN);
