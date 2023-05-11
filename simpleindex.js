@@ -1,5 +1,3 @@
-const { default: axios } = require("axios");
-
 require("dotenv").config();
 const procenv = process.env,
   cp = require("child_process"),
