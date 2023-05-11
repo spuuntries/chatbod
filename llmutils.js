@@ -3,6 +3,8 @@ const { exec } = require("child_process"),
   { HfInference } = require("@huggingface/inference"),
   axios = require("axios");
 
+var captioned = [];
+
 /**
  * Runs a command and returns its output.
  * @param {string} command - The command to run.
@@ -40,12 +42,15 @@ async function getCaption(image, maxRetries = 10) {
 
   while (retries < maxRetries) {
     try {
-      return (
+      const res = (
         await hf.imageToText(
           { model: "Salesforce/blip-image-captioning-large", data: blob },
           { wait_for_model: true }
         )
       ).generated_text;
+
+      captioned.push(image);
+      return res;
     } catch (e) {
       retries++;
       console.log(`Attempt ${retries} failed to get caption: ${e.message}`);
