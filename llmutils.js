@@ -33,19 +33,25 @@ async function runPrompt(prompt) {
   return res;
 }
 
-async function getCaption(image) {
-  const hf = new HfInference(process.env.HF_TOKEN),
-    blob = await (await fetch(image)).blob();
-  try {
-    return (
-      await hf.imageToText(
-        { model: "Salesforce/blip-image-captioning-large", data: blob },
-        { wait_for_model: true }
-      )
-    ).generated_text;
-  } catch (e) {
-    return `failed to get the caption.`;
+async function getCaption(image, maxRetries = 3) {
+  const hf = new HfInference(process.env.HF_TOKEN);
+  const blob = await (await fetch(image)).blob();
+  let retries = 0;
+
+  while (retries < maxRetries) {
+    try {
+      return (
+        await hf.imageToText(
+          { model: "Salesforce/blip-image-captioning-large", data: blob },
+          { wait_for_model: true }
+        )
+      ).generated_text;
+    } catch (e) {
+      retries++;
+      console.log(`Attempt ${retries} failed to get caption: ${e.message}`);
+    }
   }
+  return `failed to get the caption.`;
 }
 
 async function getTopMatchingGif(query) {
