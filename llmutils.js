@@ -56,7 +56,6 @@ async function getCaption(image, maxRetries = 10) {
       console.log(
         `[${new Date()}] Attempt ${retries} failed to get caption: ${e.message}`
       );
-      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
   return `failed to get the caption.`;
