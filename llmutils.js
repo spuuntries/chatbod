@@ -33,7 +33,7 @@ async function runPrompt(prompt) {
   return res;
 }
 
-async function getCaption(image, maxRetries = 3) {
+async function getCaption(image, maxRetries = 10) {
   const hf = new HfInference(process.env.HF_TOKEN);
   const blob = await (await fetch(image)).blob();
   let retries = 0;
@@ -48,7 +48,7 @@ async function getCaption(image, maxRetries = 3) {
       ).generated_text;
     } catch (e) {
       retries++;
-      console.log(`Attempt ${retries} failed to get caption: ${e.message}`);
+      console.error(`Attempt ${retries} failed to get caption: ${e.message}`);
     }
   }
   return `failed to get the caption.`;
