@@ -9,6 +9,7 @@ const procenv = process.env,
   { runPrompt, getTopMatchingGif, getCaption } = require("./llmutils"),
   logger = (m) => console.log(`[${new Date()}] ${m}`),
   placeholder = procenv.PLACEHOLDER,
+  { Worker } = require("worker_threads"),
   worker = new Worker("./worker.js");
 
 var responding = false,
