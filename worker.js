@@ -1,10 +1,12 @@
+const { parentPort } = require("worker_threads");
+
 // Function to process promises sequentially
 async function processSequentially(promise) {
   // Wait for the promise to resolve
   const result = await promise;
 
   // Send the result back to the main thread
-  self.postMessage(result);
+  parentPort.postMessage(result);
 }
 
 // Message queue to store incoming promises
@@ -18,7 +20,7 @@ async function processMessageQueue() {
   }
 }
 
-self.addEventListener("message", async (event) => {
+parentPort.on("message", async (event) => {
   const promise = event.data;
 
   // Add the promise to the message queue
