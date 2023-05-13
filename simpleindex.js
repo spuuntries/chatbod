@@ -169,7 +169,7 @@ client.on("messageCreate", async (message) => {
 });
 
 // Listen for results from the worker
-worker.addEventListener("message", (event) => {
+worker.on("message", (event) => {
   logger(`handled ${event}`);
 });
 
