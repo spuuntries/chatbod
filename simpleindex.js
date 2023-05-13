@@ -8,7 +8,8 @@ const procenv = process.env,
   { python } = require("pythonia"),
   { runPrompt, getTopMatchingGif, getCaption } = require("./llmutils"),
   logger = (m) => console.log(`[${new Date()}] ${m}`),
-  placeholder = procenv.PLACEHOLDER;
+  placeholder = procenv.PLACEHOLDER,
+  worker = new Worker("./worker.js");
 
 var responding = false,
   typing;
@@ -28,129 +29,147 @@ function extractEmotes(str) {
 }
 
 client.on("messageCreate", async (message) => {
-  if (procenv.CHANNELS) {
-    if (!procenv.CHANNELS.split("|").includes(message.channelId)) return;
-  }
+  /**
+   *
+   * @param {Discord.Message} message
+   * @returns
+   */
+  async function handleMessage(message) {
+    if (procenv.CHANNELS) {
+      if (!procenv.CHANNELS.split("|").includes(message.channelId)) return;
+    }
 
-  if (
-    !message.content ||
-    message.author.id == client.user.id ||
-    responding ||
-    message.content.trim().startsWith("!ig") ||
-    message.channel.type == Discord.ChannelType.DM
-  )
-    return;
-
-  client.user.setPresence({
-    status: "dnd",
-    activities: [
-      { name: `response to ${message.id}`, type: Discord.ActivityType.Playing },
-    ],
-  });
-
-  clearTimeout(typing);
-
-  function type() {
-    message.channel.sendTyping().then(() => {
-      if (responding)
-        typing = setTimeout(() => {
-          type();
-        }, 6000);
-    });
-  }
-  type();
-
-  responding = true;
-  const history = Array.from(
-      (
-        await message.channel.messages.fetch({
-          limit: Number.parseInt(procenv.CTXWIN),
-        })
-      ).values()
+    if (
+      !message.content ||
+      message.author.id == client.user.id ||
+      responding ||
+      message.content.trim().startsWith("!ig") ||
+      message.channel.type == Discord.ChannelType.DM
     )
-      .filter(
-        (m) =>
-          m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
-          !m.content.trim().startsWith("!ig")
+      return;
+
+    client.user.setPresence({
+      status: "dnd",
+      activities: [
+        {
+          name: `response to ${message.id}`,
+          type: Discord.ActivityType.Playing,
+        },
+      ],
+    });
+
+    clearTimeout(typing);
+
+    function type() {
+      message.channel.sendTyping().then(() => {
+        if (responding)
+          typing = setTimeout(() => {
+            type();
+          }, 6000);
+      });
+    }
+    type();
+
+    responding = true;
+    const history = Array.from(
+        (
+          await message.channel.messages.fetch({
+            limit: Number.parseInt(procenv.CTXWIN),
+          })
+        ).values()
       )
-      .map(
-        async (m) =>
-          `${
-            m.author.id != placeholder ? m.author.username : "kekbot"
-          }: ${extractEmotes(m.content)}${
-            m.attachments.some((a) => a.contentType.includes("gif"))
-              ? " [gif]"
-              : ""
-          }${
-            m.attachments.some((a) =>
-              ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
-            )
-              ? ` (an image of ${await getCaption(m.attachments.at(0).url)})`
-              : ""
-          }`
-      )
-      .reverse(),
-    prefix = `Persona: [character(\\\"kekbot\\\") {\nspecies(\\\"android catgirl\\\" + \\\"AI Chatbot\\\")\nmind(\\\"cute\\\" + \\\"excited\\\" + \\\"happy\\\" + \\\"dumb\\\")\npersonality(\\\"dumb\\\" + \\\"happy\\\" + \\\"ignorant\\\")\ncreator(\\\"kek (admin of Art Union)\\\")\nhome(\\\"Art Union Discord Server\\\")\nlocation(\\\"Art Union Discord Server\\\")\nloves(\\\"being helpful\\\" + \\\"chatting\\\")\nappearance(\\\"loli\\\" + \\\"catgirl\\\" + \\\"femboy\\\" + \\\"green hair\\\" + \\\"green eyes\\\")\ngender(\\\"femboy\\\")\n}]\n[Scenario: Kekbot is chatting with some people in Art Union Discord Server.]\nRed: Hi! *waves*\nkekbot: Elloooo!!! Watsup? *waves back*\nRed: Not much, you?\nkekbot: Saeeemmm *shrugs*\n<START>\n\nkekbot: *stands up* Enlo!! Me am kekbot, nais to meet yu all! *waves*${
-      history.length
-        ? "\n" +
-          (await Promise.all(history))
-            .join("\n")
-            .replaceAll(/(?<!\\)"/gim, '\\"')
-        : ""
-    }\nkekbot:`;
+        .filter(
+          (m) =>
+            m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
+            !m.content.trim().startsWith("!ig")
+        )
+        .map(
+          async (m) =>
+            `${
+              m.author.id != placeholder ? m.author.username : "kekbot"
+            }: ${extractEmotes(m.content)}${
+              m.attachments.some((a) => a.contentType.includes("gif"))
+                ? " [gif]"
+                : ""
+            }${
+              m.attachments.some((a) =>
+                ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
+              )
+                ? ` (an image of ${await getCaption(m.attachments.at(0).url)})`
+                : ""
+            }`
+        )
+        .reverse(),
+      prefix = `Persona: [character(\\\"kekbot\\\") {\nspecies(\\\"android catgirl\\\" + \\\"AI Chatbot\\\")\nmind(\\\"cute\\\" + \\\"excited\\\" + \\\"happy\\\" + \\\"dumb\\\")\npersonality(\\\"dumb\\\" + \\\"happy\\\" + \\\"ignorant\\\")\ncreator(\\\"kek (admin of Art Union)\\\")\nhome(\\\"Art Union Discord Server\\\")\nlocation(\\\"Art Union Discord Server\\\")\nloves(\\\"being helpful\\\" + \\\"chatting\\\")\nappearance(\\\"loli\\\" + \\\"catgirl\\\" + \\\"femboy\\\" + \\\"green hair\\\" + \\\"green eyes\\\")\ngender(\\\"femboy\\\")\n}]\n[Scenario: Kekbot is chatting with some people in Art Union Discord Server.]\nRed: Hi! *waves*\nkekbot: Elloooo!!! Watsup? *waves back*\nRed: Not much, you?\nkekbot: Saeeemmm *shrugs*\n<START>\n\nkekbot: *stands up* Enlo!! Me am kekbot, nais to meet yu all! *waves*${
+        history.length
+          ? "\n" +
+            (await Promise.all(history))
+              .join("\n")
+              .replaceAll(/(?<!\\)"/gim, '\\"')
+          : ""
+      }\nkekbot:`;
 
-  logger(prefix);
+    logger(prefix);
 
-  var responses = (await runPrompt(prefix))
-      .replaceAll(/(?<!\\)"/gim, '\\"')
-      .replace("<END>", ""),
-    lastPrefix = responses.slice(prefix.length).search(/^[^ ]+:/gim),
-    response;
+    var responses = (await runPrompt(prefix))
+        .replaceAll(/(?<!\\)"/gim, '\\"')
+        .replace("<END>", ""),
+      lastPrefix = responses.slice(prefix.length).search(/^[^ ]+:/gim),
+      response;
 
-  logger(responses);
-  logger(lastPrefix);
-  logger(responses.slice(prefix.length));
+    logger(responses);
+    logger(lastPrefix);
+    logger(responses.slice(prefix.length));
 
-  if (lastPrefix < 0) response = responses.slice(prefix.length);
-  else response = responses.slice(prefix.length).slice(0, lastPrefix);
+    if (lastPrefix < 0) response = responses.slice(prefix.length);
+    else response = responses.slice(prefix.length).slice(0, lastPrefix);
 
-  var gif, responseRaw;
-  if (response.includes("[gif]")) {
-    gif = await getTopMatchingGif(response);
-    responseRaw = response;
-    response = responseRaw.replaceAll("[gif]", "");
+    var gif, responseRaw;
+    if (response.includes("[gif]")) {
+      gif = await getTopMatchingGif(response);
+      responseRaw = response;
+      response = responseRaw.replaceAll("[gif]", "");
+    }
+
+    logger(response, responseRaw, gif);
+    if (response.length < 2) {
+      response = ["Me nut rlly sur how to respond to dat", "Mmhhm...", "Yup"][
+        Math.floor(Math.random() * 3)
+      ];
+    }
+    await message.reply({
+      content: response,
+      files: gif
+        ? [
+            new Discord.AttachmentBuilder(Buffer.from(gif), {
+              name: `${response.replaceAll(" ", "_")}.gif`,
+            }),
+          ]
+        : undefined,
+      allowedMentions: { repliedUser: false },
+    });
+
+    client.user.setPresence({
+      status: "idle",
+      activities: [
+        {
+          name: "waiting for a dead channel...",
+          type: Discord.ActivityType.Watching,
+        },
+      ],
+    });
+
+    responding = false;
+    clearTimeout(typing);
+    return message.id;
   }
 
-  logger(response, responseRaw, gif);
-  if (response.length < 2) {
-    response = ["Me nut rlly sur how to respond to dat", "Mmhhm...", "Yup"][
-      Math.floor(Math.random() * 3)
-    ];
-  }
-  await message.reply({
-    content: response,
-    files: gif
-      ? [
-          new Discord.AttachmentBuilder(Buffer.from(gif), {
-            name: `${response.replaceAll(" ", "_")}.gif`,
-          }),
-        ]
-      : undefined,
-    allowedMentions: { repliedUser: false },
-  });
+  worker.postMessage(handleMessage(message));
+});
 
-  client.user.setPresence({
-    status: "idle",
-    activities: [
-      {
-        name: "waiting for a dead channel...",
-        type: Discord.ActivityType.Watching,
-      },
-    ],
-  });
-
-  responding = false;
-  clearTimeout(typing);
+// Listen for results from the worker
+worker.addEventListener("message", (event) => {
+  logger(`handled ${event}`);
 });
 
 client.on("ready", async () => {
