@@ -6,11 +6,9 @@ const procenv = process.env,
   client = new Discord.Client({
     intents: ["Guilds", "GuildMessages", "MessageContent"],
   }),
-  { python } = require("pythonia"),
   { runPrompt, getTopMatchingGif, getCaption } = require("./llmutils"),
   logger = (m) => console.log(`[${new Date()}] ${m}`),
   placeholder = procenv.PLACEHOLDER,
-  Discord = require("discord.js"),
   messageQueue = [];
 
 // Flag to indicate if the worker is currently processing the message queue
