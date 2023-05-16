@@ -31,12 +31,12 @@ function extractEmotes(str) {
 }
 
 /**
- *
- * @param {Discord.Message} m
+ * @param {string} cId
+ * @param {string} mId
  * @returns
  */
-async function handleMessage(m) {
-  const message = await m.fetch();
+async function handleMessage(cId, mId) {
+  const message = (await client.channels.fetch(cId)).messages.fetch(mId);
   if (procenv.CHANNELS) {
     if (!procenv.CHANNELS.split("|").includes(message.channelId)) return;
   }
@@ -192,7 +192,7 @@ parentPort.on("message", async (event) => {
   const message = event.data;
 
   // Add the promise to the message queue
-  messageQueue.push(handleMessage(message));
+  messageQueue.push(handleMessage(message[0], message[1]));
 
   await processMessageQueue();
 });
