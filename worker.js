@@ -31,12 +31,16 @@ function extractEmotes(str) {
 }
 
 /**
- * @param {string} cId
- * @param {string} mId
+ *
+ * @param {string} channelId
+ * @param {string} messageId
  * @returns
  */
-async function handleMessage(cId, mId) {
-  const message = (await client.channels.fetch(cId)).messages.fetch(mId);
+async function handleMessage(channelId, messageId) {
+  const message = (await client.channels.fetch(channelId)).messages.fetch({
+    id: messageId,
+  });
+  if (!message) return;
   if (procenv.CHANNELS) {
     if (!procenv.CHANNELS.split("|").includes(message.channelId)) return;
   }
@@ -189,7 +193,7 @@ async function processMessageQueue() {
 }
 
 parentPort.on("message", async (event) => {
-  const message = event.data;
+  const message = event;
 
   // Add the promise to the message queue
   messageQueue.push(handleMessage(message[0], message[1]));
