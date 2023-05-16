@@ -39,7 +39,7 @@ function extractEmotes(str) {
 async function handleMessage(channelId, messageId) {
   /** @type {Discord.TextChannel} */
   const channel = await client.channels.fetch(channelId),
-    message = channel.messages.fetch(messageId);
+    message = await channel.messages.fetch(messageId);
   if (!message) return;
   if (procenv.CHANNELS) {
     if (!procenv.CHANNELS.split("|").includes(message.channelId)) return;
