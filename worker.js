@@ -179,8 +179,8 @@ async function processSequentially(promise) {
   parentPort.postMessage(result);
 }
 
-// Function to process the message queue
-async function processMessageQueue() {
+// Function to process the message
+setInterval(async () => {
   // If the worker is already processing the message queue, return immediately
   if (isProcessingQueue) return;
   isProcessingQueue = true;
@@ -190,7 +190,7 @@ async function processMessageQueue() {
     await processSequentially(promise);
   }
   isProcessingQueue = false;
-}
+}, 2500);
 
 parentPort.on("message", async (event) => {
   const message = event;
