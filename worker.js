@@ -37,7 +37,7 @@ function extractEmotes(str) {
  */
 async function handleMessage(message) {
   if (procenv.CHANNELS) {
-    if (!procenv.CHANNELS.split("|").includes(message.channelId)) return;
+    if (!procenv.CHANNELS.split("|").includes(message.channel.id)) return;
   }
 
   if (
