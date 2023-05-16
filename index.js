@@ -11,7 +11,7 @@ const procenv = process.env,
 const worker = new Worker("./worker.js");
 
 client.on("messageCreate", async (message) => {
-  worker.postMessage(message.channelId, message.id);
+  worker.postMessage([message.channelId, message.id]);
 });
 
 client.on("ready", async () => {
