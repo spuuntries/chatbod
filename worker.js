@@ -197,8 +197,6 @@ parentPort.on("message", async (event) => {
 
   // Add the promise to the message queue
   messageQueue.push(handleMessage(message[0], message[1]));
-
-  await processMessageQueue();
 });
 
 client.on("ready", async () => {
