@@ -13,6 +13,9 @@ const procenv = process.env,
 var isProcessingQueue = false;
 
 client.on("messageCreate", (message) => {
+  if (procenv.CHANNELS) {
+    if (!procenv.CHANNELS.split("|").includes(channelId)) return;
+  }
   if (
     !message.content ||
     !message.author.id ||
