@@ -6,15 +6,17 @@ const procenv = process.env,
   client = new Discord.Client({
     intents: ["Guilds", "GuildMessages", "MessageContent"],
   }),
+  placeholder = procenv.PLACEHOLDER,
   { runPrompt, getTopMatchingGif, getCaption } = require("./llmutils"),
   logger = (m) => console.log(`[${new Date()}] ${m}`),
-  placeholder = procenv.PLACEHOLDER,
-  messageQueue = [];
+  /**
+   * @type {[string, string]} Channel ID and Message ID tuple.
+   */
+  queue = [];
 
 // Flag to indicate if the worker is currently processing the message queue
 var isProcessingQueue = false,
-  responding = false,
-  typing;
+  responding = false;
 
 /**
  * @param {string} str To extract from
@@ -30,23 +32,40 @@ function extractEmotes(str) {
   });
 }
 
-/**
- *
- * @param {string} channelId
- * @param {string} messageId
- * @returns
- */
-async function handleMessage(channelId, messageId) {
-  /** @type {Discord.TextChannel} */
-  const channel = await client.channels.fetch(channelId),
-    message = await channel.messages.fetch(messageId);
-  if (!message) return;
+parentPort.on("message", async (event) => {
+  const message = event;
+
+  // Add the promise to the message queue
+  queue.push([message[0], message[1]]);
+});
+
+setInterval(async () => {
+  if (isProcessingQueue) return;
+  isProcessingQueue = true;
+
+  const task = queue.shift(),
+    channelId = task[0],
+    messageId = task[1];
+
   if (procenv.CHANNELS) {
-    if (!procenv.CHANNELS.split("|").includes(message.channelId)) return;
+    if (!procenv.CHANNELS.split("|").includes(channelId)) return;
   }
+
+  /** @type {Discord.TextChannel} */
+  const channel = await client.channels.fetch(channelId);
+
+  if (
+    channel.type != Discord.ChannelType.GuildText &&
+    channel.type != Discord.ChannelType.PublicThread &&
+    channel.type != Discord.ChannelType.PrivateThread
+  )
+    return;
+
+  const message = await channel.messages.fetch(messageId);
 
   if (
     !message.content ||
+    !message.author.id ||
     message.author.id == client.user.id ||
     responding ||
     message.content.trim().startsWith("!ig") ||
@@ -54,78 +73,75 @@ async function handleMessage(channelId, messageId) {
   )
     return;
 
-  client.user.setPresence({
-    status: "dnd",
-    activities: [
-      {
-        name: `response to ${message.id}`,
-        type: Discord.ActivityType.Playing,
-      },
-    ],
-  });
+  await channel.sendTyping();
 
-  clearTimeout(typing);
-
-  function type() {
-    message.channel.sendTyping().then(() => {
-      if (responding)
-        typing = setTimeout(() => {
-          type();
-        }, 6000);
-    });
-  }
-  type();
-
-  responding = true;
   const history = Array.from(
-      (
-        await message.channel.messages.fetch({
-          limit: Number.parseInt(procenv.CTXWIN),
-        })
-      ).values()
+    (
+      await message.channel.messages.fetch({
+        limit: Number.parseInt(procenv.CTXWIN),
+      })
+    ).values()
+  )
+    .filter(
+      (m) =>
+        m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
+        !m.content.trim().startsWith("!ig")
     )
-      .filter(
-        (m) =>
-          m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
-          !m.content.trim().startsWith("!ig")
-      )
-      .map(
-        async (m) =>
-          `${
-            m.author.id != placeholder ? m.author.username : "kekbot"
-          }: ${extractEmotes(m.content)}${
-            m.attachments.some((a) => a.contentType.includes("gif"))
-              ? " [gif]"
-              : ""
-          }${
-            m.attachments.some((a) =>
-              ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
-            )
-              ? ` (an image of ${await getCaption(m.attachments.at(0).url)})`
-              : ""
-          }`
-      )
-      .reverse(),
-    prefix = `Persona: [character(\\\"kekbot\\\") {\nspecies(\\\"android catgirl\\\" + \\\"AI Chatbot\\\")\nmind(\\\"cute\\\" + \\\"excited\\\" + \\\"happy\\\" + \\\"dumb\\\")\npersonality(\\\"dumb\\\" + \\\"happy\\\" + \\\"ignorant\\\")\ncreator(\\\"kek (admin of Art Union)\\\")\nhome(\\\"Art Union Discord Server\\\")\nlocation(\\\"Art Union Discord Server\\\")\nloves(\\\"being helpful\\\" + \\\"chatting\\\")\nappearance(\\\"loli\\\" + \\\"catgirl\\\" + \\\"femboy\\\" + \\\"green hair\\\" + \\\"green eyes\\\")\ngender(\\\"femboy\\\")\n}]\n[Scenario: Kekbot is chatting with some people in Art Union Discord Server.]\nRed: Hi! *waves*\nkekbot: Elloooo!!! Watsup? *waves back*\nRed: Not much, you?\nkekbot: Saeeemmm *shrugs*\n<START>\n\nkekbot: *stands up* Enlo!! Me am kekbot, nais to meet yu all! *waves*${
-      history.length
-        ? "\n" +
-          (await Promise.all(history))
-            .join("\n")
-            .replaceAll(/(?<!\\)"/gim, '\\"')
-        : ""
-    }\nkekbot:`;
+    .map(
+      async (m) =>
+        `${
+          m.author.id != placeholder
+            ? m.author.username.replaceAll(" ", "_")
+            : "kekbot"
+        }: ${extractEmotes(m.content)}${
+          m.attachments.some((a) => a.contentType.includes("gif"))
+            ? " [gif]"
+            : ""
+        }${
+          m.attachments.some((a) =>
+            ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
+          )
+            ? ` (an image of ${await getCaption(m.attachments.at(0).url)})`
+            : ""
+        }`
+    )
+    .reverse();
 
-  logger(prefix);
+  const prefix =
+    'Persona: [character(\\"kekbot\\") {' +
+    '\nspecies(\\"loli\\" + \\"catgirl\\" + \\"AI Chatbot\\")' +
+    '\nmind(\\"cute\\" + \\"excited\\" + \\"happy\\" + \\"wholesome\\")' +
+    '\npersonality(\\"dumb\\" + \\"happy\\" + \\"caring\\")' +
+    '\ncreator(\\"kek (admin of Art Union)\\" + \\"kkekkyea\\")' +
+    '\nhome(\\"Art Union Discord Server\\")' +
+    '\nlocation(\\"Art Union Discord Server\\")' +
+    '\nloves(\\"being helpful\\" + \\"chatting\\" + \\"kek\\" + \\"Pestro\\" + \\"Durian\\" + \\"Casu marzu\\" + \\"cheese\\" + \\"pineapple on pizza\\")' +
+    '\nhates(\\"Catto\\" + \\"swordnight\\" + \\"spicy food\\" + \\"getting angry\\" + \\"eating veggies\\")' +
+    '\nappearance(\\"loli\\" + \\"catgirl\\" + \\"femboy\\" + \\"green hair\\" + \\"green eyes\\")' +
+    '\ngender(\\"femboy\\" + \\"male\\")' +
+    '\nknows(\\"cooking\\" + \\"art\\" + \\"pp size\\" + \\"guns\\" + \\"nukes\\" + \\"chemistry\\" + \\"quantum physics\\")' +
+    '\npronouns(\\"he\\" + \\"she\\" + \\"whatever\\")' +
+    "\n}]" +
+    "\n[Scenario: Kekbot is chatting with some people in Art Union Discord Server.]" +
+    "\nRed: Hi! *waves*" +
+    "\nkekbot: Elloooo!!! 😃 Watsup? *waves back*" +
+    "\nRed: Not much, you?" +
+    "\nkekbot: Sameee *shrugs*" +
+    "\n<START>" +
+    "\n\nkekbot: Enlo!! Me am kekbot, nais to meet yu all! *waves*" +
+    (history.length
+      ? "\n" +
+        (await Promise.all(history)).join("\n").replaceAll(/(?<!\\)"/gim, '\\"')
+      : "") +
+    "\nkekbot:";
 
+  /** @type {string} */
   var responses = (await runPrompt(prefix))
       .replaceAll(/(?<!\\)"/gim, '\\"')
-      .replace("<END>", ""),
+      .replace("<END>", "")
+      .replace("<START>", ""),
     lastPrefix = responses.slice(prefix.length).search(/^[^ ]+:/gim),
     response;
-
-  logger(responses);
-  logger(lastPrefix);
-  logger(responses.slice(prefix.length));
 
   if (lastPrefix < 0) response = responses.slice(prefix.length);
   else response = responses.slice(prefix.length).slice(0, lastPrefix);
@@ -137,12 +153,6 @@ async function handleMessage(channelId, messageId) {
     response = responseRaw.replaceAll("[gif]", "");
   }
 
-  logger(response, responseRaw, gif);
-  if (response.length < 2) {
-    response = ["Me nut rlly sur how to respond to dat", "Mmhhm...", "Yup"][
-      Math.floor(Math.random() * 3)
-    ];
-  }
   await message.reply({
     content: response,
     files: gif
@@ -165,39 +175,9 @@ async function handleMessage(channelId, messageId) {
     ],
   });
 
-  responding = false;
-  clearTimeout(typing);
-  return message.id;
-}
-
-// Function to process promises sequentially
-async function processSequentially(promise) {
-  // Wait for the promise to resolve
-  const result = await promise;
-
-  // Send the result back to the main thread
-  parentPort.postMessage(result);
-}
-
-// Function to process the message
-setInterval(async () => {
-  // If the worker is already processing the message queue, return immediately
-  if (isProcessingQueue) return;
-  isProcessingQueue = true;
-
-  while (messageQueue.length > 0) {
-    const promise = messageQueue.shift();
-    await processSequentially(promise);
-  }
+  parentPort.postMessage([message.id, message.author.id]);
   isProcessingQueue = false;
-}, 2500);
-
-parentPort.on("message", async (event) => {
-  const message = event;
-
-  // Add the promise to the message queue
-  messageQueue.push(handleMessage(message[0], message[1]));
-});
+}, 2000);
 
 client.on("ready", async () => {
   client.user.setPresence({

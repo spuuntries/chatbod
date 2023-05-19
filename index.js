@@ -14,7 +14,7 @@ client.on("messageCreate", async (message) => {
   worker.postMessage([message.channelId, message.id]);
 });
 
-client.on("ready", async () => {
+client.once("ready", async () => {
   client.user.setPresence({
     status: "idle",
     activities: [
@@ -27,6 +27,10 @@ client.on("ready", async () => {
 
   worker.on("message", (m) => {
     if (m == "ready") logger(`[v${require("./package.json").version}] ready`);
+    else {
+      if (m.length > 1) logger(`handled ${m[0]} by ${m[1]}`);
+      else logger(m);
+    }
   });
 });
 
