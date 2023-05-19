@@ -13,6 +13,16 @@ const procenv = process.env,
 var isProcessingQueue = false;
 
 client.on("messageCreate", (message) => {
+  if (
+    !message.content ||
+    !message.author.id ||
+    message.author.id == client.user.id ||
+    responding ||
+    message.content.trim().startsWith("!ig") ||
+    message.channel.type == Discord.ChannelType.DM
+  )
+    return;
+
   queue.push([message.channelId, message.id]);
   logger(queue);
 });
