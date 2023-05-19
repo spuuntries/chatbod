@@ -143,14 +143,15 @@ parentPort.on("message", async (event) => {
   /** @type {string} */
   var responses = (await runPrompt(prefix))
       .replaceAll(/(?<!\\)"/gim, '\\"')
-      .replace("<END>", "")
-      .replace("<START>", ""),
+      .replace("<END>", ""),
     lastPrefix = responses.slice(prefix.length).search(/^[^ \n]+:/gim),
     response;
 
   if (lastPrefix < 0) response = responses.slice(prefix.length);
   else response = responses.slice(prefix.length).slice(0, lastPrefix);
   logger(responses, lastPrefix, response);
+
+  response = response.replace("<START>", "");
 
   var gif, responseRaw;
   if (response.includes("[gif]")) {
