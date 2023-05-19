@@ -23,10 +23,15 @@ client.on("messageCreate", (message) => {
     return;
 
   queue.push([message.channelId, message.id]);
-  logger(queue);
+  logger(queue.toString());
 });
 
-setInterval(() => {
+setInterval(async () => {
+  for (const task of queue) {
+    const channel = await client.channels.fetch(task[0]);
+    if (!channel) return;
+    await channel.sendTyping();
+  }
   if (isProcessingQueue || queue.length == 0) return;
 
   worker.postMessage(queue.shift());
