@@ -17,7 +17,6 @@ client.on("messageCreate", (message) => {
     !message.content ||
     !message.author.id ||
     message.author.id == client.user.id ||
-    responding ||
     message.content.trim().startsWith("!ig") ||
     message.channel.type == Discord.ChannelType.DM
   )

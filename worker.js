@@ -8,15 +8,7 @@ const procenv = process.env,
   }),
   placeholder = procenv.PLACEHOLDER,
   { runPrompt, getTopMatchingGif, getCaption } = require("./llmutils"),
-  logger = (m) => console.log(`[${new Date()}] ${m}`),
-  /**
-   * @type {[string, string]} Channel ID and Message ID tuple.
-   */
-  queue = [];
-
-// Flag to indicate if the worker is currently processing the message queue
-var isProcessingQueue = false,
-  responding = false;
+  logger = (m) => console.log(`[${new Date()}] ${m}`);
 
 /**
  * @param {string} str To extract from
@@ -57,7 +49,6 @@ parentPort.on("message", async (event) => {
     !message.content ||
     !message.author.id ||
     message.author.id == client.user.id ||
-    responding ||
     message.content.trim().startsWith("!ig") ||
     message.channel.type == Discord.ChannelType.DM
   )
