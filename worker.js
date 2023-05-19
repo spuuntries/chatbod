@@ -72,7 +72,7 @@ parentPort.on("message", async (event) => {
     status: "dnd",
     activities: [
       {
-        name: `response to ${message.id}`,
+        name: `response to ${message.id} from ${message.author.tag}`,
         type: Discord.ActivityType.Playing,
       },
     ],
