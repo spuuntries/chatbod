@@ -12,8 +12,9 @@ const procenv = process.env,
 
 var isProcessingQueue = false;
 
-client.on("messageCreate", async (message) => {
+client.on("messageCreate", (message) => {
   queue.push([message.channelId, message.id]);
+  logger(queue);
 });
 
 setInterval(() => {
@@ -23,7 +24,7 @@ setInterval(() => {
   isProcessingQueue = true;
 }, 2000);
 
-client.once("ready", async () => {
+client.once("ready", () => {
   client.user.setPresence({
     status: "idle",
     activities: [
