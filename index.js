@@ -14,7 +14,7 @@ var isProcessingQueue = false;
 
 client.on("messageCreate", (message) => {
   if (procenv.CHANNELS) {
-    if (!procenv.CHANNELS.split("|").includes(channelId)) return;
+    if (!procenv.CHANNELS.split("|").includes(message.channelId)) return;
   }
   if (
     !message.content ||
