@@ -150,6 +150,7 @@ parentPort.on("message", async (event) => {
 
   if (lastPrefix < 0) response = responses.slice(prefix.length);
   else response = responses.slice(prefix.length).slice(0, lastPrefix);
+  logger(responses, lastPrefix, response);
 
   var gif, responseRaw;
   if (response.includes("[gif]")) {
