@@ -6,13 +6,22 @@ const procenv = process.env,
   }),
   logger = (m) => console.log(`[${new Date()}] ${m}`),
   placeholder = procenv.PLACEHOLDER,
-  { Worker } = require("worker_threads");
+  { Worker } = require("worker_threads"),
+  worker = new Worker("./worker.js"),
+  queue = [];
 
-const worker = new Worker("./worker.js");
+var isProcessingQueue = false;
 
 client.on("messageCreate", async (message) => {
-  worker.postMessage([message.channelId, message.id]);
+  queue.push([message.channelId, message.id]);
 });
+
+setInterval(() => {
+  if (isProcessingQueue || queue.length == 0) return;
+
+  worker.postMessage(queue.shift());
+  isProcessingQueue = true;
+}, 2000);
 
 client.once("ready", async () => {
   client.user.setPresence({
@@ -28,8 +37,10 @@ client.once("ready", async () => {
   worker.on("message", (m) => {
     if (m == "ready") logger(`[v${require("./package.json").version}] ready`);
     else {
-      if (m.length > 1) logger(`handled ${m[0]} by ${m[1]}`);
-      else logger(m);
+      if (m.length > 1) {
+        logger(`handled ${m[0]} by ${m[1]}`);
+        isProcessingQueue = false;
+      } else logger(m);
     }
   });
 });

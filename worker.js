@@ -33,17 +33,7 @@ function extractEmotes(str) {
 }
 
 parentPort.on("message", async (event) => {
-  const message = event;
-
-  // Add the promise to the message queue
-  queue.push([message[0], message[1]]);
-});
-
-setInterval(async () => {
-  if (isProcessingQueue || queue.length == 0) return;
-  isProcessingQueue = true;
-
-  const task = queue.shift(),
+  const task = event,
     channelId = task[0],
     messageId = task[1];
 
@@ -74,6 +64,19 @@ setInterval(async () => {
     return;
 
   await channel.sendTyping();
+  logger(
+    `handling ${message.id} from ${message.author.id} (${message.author.tag})`
+  );
+
+  client.user.setPresence({
+    status: "dnd",
+    activities: [
+      {
+        name: `response to ${message.id}`,
+        type: Discord.ActivityType.Playing,
+      },
+    ],
+  });
 
   const history = Array.from(
     (
@@ -135,12 +138,14 @@ setInterval(async () => {
       : "") +
     "\nkekbot:";
 
+  logger(prefix);
+
   /** @type {string} */
   var responses = (await runPrompt(prefix))
       .replaceAll(/(?<!\\)"/gim, '\\"')
       .replace("<END>", "")
       .replace("<START>", ""),
-    lastPrefix = responses.slice(prefix.length).search(/^[^ ]+:/gim),
+    lastPrefix = responses.slice(prefix.length).search(/^[^ \n]+:/gim),
     response;
 
   if (lastPrefix < 0) response = responses.slice(prefix.length);
@@ -177,7 +182,7 @@ setInterval(async () => {
 
   parentPort.postMessage([message.id, message.author.id]);
   isProcessingQueue = false;
-}, 2000);
+});
 
 client.on("ready", async () => {
   client.user.setPresence({
