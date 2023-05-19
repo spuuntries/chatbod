@@ -40,7 +40,7 @@ parentPort.on("message", async (event) => {
 });
 
 setInterval(async () => {
-  if (isProcessingQueue) return;
+  if (isProcessingQueue || queue.length == 0) return;
   isProcessingQueue = true;
 
   const task = queue.shift(),
