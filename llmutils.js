@@ -30,7 +30,7 @@ function runCommand(command) {
  */
 async function runPrompt(prompt) {
   const res = await runCommand(
-    `llama.cpp/build/bin/main -m models/7bpq/pyg.bin -e -p "${prompt}" -n 64 -b 64 -c 2048 --top_p 0.7 --temp 0.65 --repeat_penalty 1.08 --repeat_last_n 128`
+    `llama.cpp/build/bin/main -m models/7bpq/pyg.bin -e -p "${prompt}" -n 64 -b 128 -c 2048 --top_p 0.7 --temp 0.65 --repeat_penalty 1.08 --repeat_last_n 128`
   );
   return res;
 }
