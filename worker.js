@@ -115,7 +115,7 @@ parentPort.on("message", async (event) => {
     '\nknows(\\"cooking\\" + \\"art\\" + \\"guns\\" + \\"nukes\\" + \\"chemistry\\" + \\"quantum physics\\")' +
     '\npronouns(\\"he\\" + \\"she\\" + \\"whatever\\")' +
     "\n}]" +
-    "\n[Scenario: Kekbot is chatting with some people in Art Union Discord Server.]" +
+    '\n[Scenario: Kekbot is chatting with some people in Art Union Discord Server. Kekbot can send gifs by saying \\"[gif]\\"]' +
     "\nRed: Hi! *waves*" +
     "\nkekbot: Elloooo!!! 😃 Watsup? *waves back*" +
     "\nRed: Not much, you?" +
