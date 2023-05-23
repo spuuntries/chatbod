@@ -77,7 +77,11 @@ async function getTopMatchingGif(query) {
     )
       .map((k) => k.word)
       .join(", "),
-    url = `https://tenor.googleapis.com/v2/search?q=${keywords}&key=${process.env.TENOR_API_KEY}&client_key=kekbot&limit=1&media_filter=gif`;
+    url = `https://tenor.googleapis.com/v2/search?q=${
+      keywords ? keywords : "I'm not sure how to respond"
+    }&key=${
+      process.env.TENOR_API_KEY
+    }&client_key=kekbot&limit=1&media_filter=gif`;
 
   console.log(`[${new Date()}] ${keywords}`);
 
@@ -131,7 +135,10 @@ async function generateImage(query) {
   console.log(`[${new Date()}] ${keywords} | ${emotion}`);
 
   const res = await hf.textToImage({
-    inputs: `${keywords}, ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer, cinematic`,
+    model: "andite/pastel-mix",
+    inputs: `${
+      keywords ? `${keywords},` : ""
+    } ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer, cinematic`,
   });
   return res;
 }
