@@ -140,7 +140,6 @@ parentPort.on("message", async (event) => {
       "\nkekbot:",
     prefix = persona + dialog;
 
-  logger(persona);
   logger(prefix);
 
   /** @type {string} */
@@ -149,6 +148,8 @@ parentPort.on("message", async (event) => {
       .replace("<END>", ""),
     lastPrefix = responses.slice(prefix.length).search(/^[^ \n]+:/gim),
     response;
+
+  logger(responses.slice(persona.length));
 
   if (lastPrefix < 0) response = responses.slice(prefix.length);
   else response = responses.slice(prefix.length).slice(0, lastPrefix);
