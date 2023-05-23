@@ -182,7 +182,7 @@ parentPort.on("message", async (event) => {
             }),
           ]
         : undefined,
-    ],
+    ].filter(Boolean),
     allowedMentions: { repliedUser: false },
   });
 
