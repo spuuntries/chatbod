@@ -156,33 +156,32 @@ parentPort.on("message", async (event) => {
 
   response = response.replace("<START>", "");
 
-  var img, gif;
+  var img,
+    gif,
+    attFiles = [];
   if (response.includes("[img]")) {
     img = await generateImage(responses.slice(persona.length));
     response = response.replaceAll("[img]", "");
+    attFiles.push(
+      new Discord.AttachmentBuilder(Buffer.from(img), {
+        name: `${response.replaceAll(" ", "_")}.jpg`,
+      })
+    );
   }
 
   if (response.includes("[gif]")) {
     gif = await getTopMatchingGif(responses.slice(persona.length));
     response = response.replaceAll("[gif]", "");
+    attFiles.push(
+      new Discord.AttachmentBuilder(Buffer.from(gif), {
+        name: `${response.replaceAll(" ", "_")}.gif`,
+      })
+    );
   }
 
   await message.reply({
     content: response,
-    files: [
-      img
-        ? new Discord.AttachmentBuilder(Buffer.from(img), {
-            name: `${response.replaceAll(" ", "_")}.jpg`,
-          })
-        : undefined,
-      gif
-        ? [
-            new Discord.AttachmentBuilder(Buffer.from(gif), {
-              name: `${response.replaceAll(" ", "_")}.gif`,
-            }),
-          ]
-        : undefined,
-    ].filter(Boolean),
+    files: attFiles,
     allowedMentions: { repliedUser: false },
   });
 
