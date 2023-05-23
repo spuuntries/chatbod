@@ -123,7 +123,7 @@ parentPort.on("message", async (event) => {
       '\npronouns(\\"he\\" + \\"she\\" + \\"whatever\\")' +
       '\nlanguages(\\"Bahasa Indonesia\\" + \\"English\\" + \\"Kiwi\\")' +
       "\n}]" +
-      '\n[Scenario: Kekbot is chatting with some people in Art Union Discord Server. Kekbot can send GIFs and images by saying \\"[gif]\\" and \\"[img]\\"]' +
+      '\n[Scenario: Kekbot is chatting with some people in Art Union Discord Server. Kekbot can send GIFs by saying \\"[gif]\\" and images by saying \\"[img]\\"]' +
       "\nRed: Hi! *waves*" +
       "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [gif]" +
       "\nRed: Not much, you?" +

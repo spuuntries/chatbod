@@ -79,7 +79,7 @@ async function getTopMatchingGif(query) {
       .join(", "),
     url = `https://tenor.googleapis.com/v2/search?q=${keywords}&key=${process.env.TENOR_API_KEY}&client_key=kekbot&limit=1&media_filter=gif`;
 
-  logger(keywords);
+  console.log(`[${new Date()}] ${keywords}`);
 
   try {
     const response = await axios.get(url);
@@ -128,7 +128,7 @@ async function generateImage(query) {
       .map((k) => k.word)
       .join(", ");
 
-  logger(keywords, emotion);
+  console.log(`[${new Date()}] ${keywords} | ${emotion}`);
 
   const res = await hf.textToImage({
     inputs: `${keywords}, ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer, cinematic`,
