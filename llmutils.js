@@ -62,13 +62,26 @@ async function getCaption(image, maxRetries = 3) {
   return `failed to get the caption.`;
 }
 
-async function getTopMatchingGif(query) {
-  const summary = (
-      await hf.summarization({
+async function summarizeWithRetry(query) {
+  const maxRetries = 5;
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const result = await hf.summarization({
         model: "knkarthick/MEETING_SUMMARY",
         inputs: query,
-      })
-    ).summary_text,
+      });
+      return result.summary_text;
+    } catch (error) {
+      if (i === maxRetries - 1) {
+        throw new Error(`Failed retrying ${maxRetries} times to get summary`);
+      }
+    }
+  }
+}
+
+async function getTopMatchingGif(query) {
+  const summary = await summarizeWithRetry(query),
     keywords = (
       await hf.tokenClassification({
         model: "ml6team/keyphrase-extraction-distilbert-inspec",
@@ -117,12 +130,7 @@ async function generateImage(query) {
         inputs: lastMessage,
       })
     ).shift().label,
-    summary = (
-      await hf.summarization({
-        model: "knkarthick/MEETING_SUMMARY",
-        inputs: query,
-      })
-    ).summary_text,
+    summary = await summarizeWithRetry(query),
     keywords = (
       await hf.tokenClassification({
         model: "ml6team/keyphrase-extraction-distilbert-inspec",
@@ -134,12 +142,16 @@ async function generateImage(query) {
 
   console.log(`[${new Date()}] ${keywords} | ${emotion}`);
 
-  const res = await hf.textToImage({
-    model: "andite/pastel-mix",
-    inputs: `${
-      keywords ? `${keywords},` : ""
-    } ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer, cinematic`,
-  });
+  const res = Buffer.from(
+    await (
+      await hf.textToImage({
+        model: "andite/pastel-mix",
+        inputs: `${
+          keywords ? `${keywords},` : ""
+        } ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer, cinematic`,
+      })
+    ).arrayBuffer()
+  );
   return res;
 }
 
