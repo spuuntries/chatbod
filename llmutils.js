@@ -1,7 +1,8 @@
 require("dotenv").config();
 const { exec } = require("child_process"),
   { HfInference } = require("@huggingface/inference"),
-  axios = require("axios");
+  axios = require("axios"),
+  hf = new HfInference(process.env.HF_TOKEN);
 
 var captioned = {};
 
@@ -36,7 +37,6 @@ async function runPrompt(prompt) {
 }
 
 async function getCaption(image, maxRetries = 3) {
-  const hf = new HfInference(process.env.HF_TOKEN);
   const blob = await (await fetch(image)).blob();
   if (captioned[image]) return captioned[image];
   let retries = 0;
@@ -63,7 +63,21 @@ async function getCaption(image, maxRetries = 3) {
 }
 
 async function getTopMatchingGif(query) {
-  const url = `https://tenor.googleapis.com/v2/search?q=${query}&key=${process.env.TENOR_API_KEY}&client_key=kekbot&limit=1&media_filter=gif`;
+  const summary = (
+      await hf.summarization({
+        model: "knkarthick/MEETING_SUMMARY",
+        inputs: query,
+      })
+    ).summary_text,
+    keywords = (
+      await hf.tokenClassification({
+        model: "ml6team/keyphrase-extraction-distilbert-inspec",
+        inputs: summary,
+      })
+    )
+      .map((k) => k.word)
+      .join(", "),
+    url = `https://tenor.googleapis.com/v2/search?q=${keywords}&key=${process.env.TENOR_API_KEY}&client_key=kekbot&limit=1&media_filter=gif`;
 
   try {
     const response = await axios.get(url);
@@ -82,4 +96,46 @@ async function getTopMatchingGif(query) {
   }
 }
 
-module.exports = { runCommand, runPrompt, getCaption, getTopMatchingGif };
+/**
+ *
+ * @param {string} query
+ */
+async function generateImage(query) {
+  const lastMessage = query
+      .split("\n")
+      .pop()
+      .replace(/^[^ \n]+:/gim, ""),
+    emotion = (
+      await hf.textClassification({
+        model: "arpanghoshal/EmoRoBERTa",
+        inputs: lastMessage,
+      })
+    ).shift().label,
+    summary = (
+      await hf.summarization({
+        model: "knkarthick/MEETING_SUMMARY",
+        inputs: query,
+      })
+    ).summary_text,
+    keywords = (
+      await hf.tokenClassification({
+        model: "ml6team/keyphrase-extraction-distilbert-inspec",
+        inputs: summary,
+      })
+    )
+      .map((k) => k.word)
+      .join(", ");
+
+  const res = await hf.textToImage({
+    inputs: `${keywords}, ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer, cinematic`,
+  });
+  return res;
+}
+
+module.exports = {
+  runCommand,
+  runPrompt,
+  getCaption,
+  getTopMatchingGif,
+  generateImage,
+};

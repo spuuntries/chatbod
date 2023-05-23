@@ -26,7 +26,7 @@ function runCommand(command) {
 async function getEmbedding(string) {
   const res = (
     await runCommand(
-      `llama.cpp/build/bin/embedding -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${prompt}"`
+      `llama.cpp/build/bin/embedding -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${string}"`
     )
   ).split(" ");
   res.pop();

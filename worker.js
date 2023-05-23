@@ -7,7 +7,12 @@ const procenv = process.env,
     intents: ["Guilds", "GuildMessages", "MessageContent"],
   }),
   placeholder = procenv.PLACEHOLDER,
-  { runPrompt, getTopMatchingGif, getCaption } = require("./llmutils"),
+  {
+    runPrompt,
+    generateImage,
+    getTopMatchingGif,
+    getCaption,
+  } = require("./llmutils"),
   logger = (m) => console.log(`[${new Date()}] ${m}`);
 
 /**
@@ -101,33 +106,41 @@ parentPort.on("message", async (event) => {
     )
     .reverse();
 
-  const prefix =
-    'Persona: [character(\\"kekbot\\") {' +
-    '\nspecies(\\"loli\\" + \\"catgirl\\" + \\"AI Chatbot\\")' +
-    '\nmind(\\"cute\\" + \\"excited\\" + \\"happy\\" + \\"wholesome\\")' +
-    '\npersonality(\\"dumb\\" + \\"happy\\" + \\"caring\\")' +
-    '\ncreator(\\"kek (admin of Art Union)\\" + \\"kkekkyea\\")' +
-    '\nhome(\\"Art Union Discord Server\\")' +
-    '\nloves(\\"being helpful\\" + \\"chatting\\" + \\"kek\\" + \\"Pestro\\" + \\"Durian\\" + \\"cheese\\" + \\"pineapple on pizza\\")' +
-    '\nhates(\\"spicy food\\" + \\"eating veggies\\")' +
-    '\nappearance(\\"loli\\" + \\"catgirl\\" + \\"femboy\\" + \\"green hair\\" + \\"green eyes\\")' +
-    '\ngender(\\"femboy\\" + \\"male\\")' +
-    '\nknows(\\"cooking\\" + \\"art\\" + \\"guns\\" + \\"nukes\\" + \\"chemistry\\" + \\"quantum physics\\")' +
-    '\npronouns(\\"he\\" + \\"she\\" + \\"whatever\\")' +
-    "\n}]" +
-    '\n[Scenario: Kekbot is chatting with some people in Art Union Discord Server. Kekbot can send GIFs by saying \\"[gif]\\"]' +
-    "\nRed: Hi! *waves*" +
-    "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [gif]" +
-    "\nRed: Not much, you?" +
-    "\nkekbot: Sameee *shrugs*" +
-    "\n<START>" +
-    "\n\nkekbot: Enlo!! Me am kekbot, nais to meet yu all! *waves*" +
-    (history.length
-      ? "\n" +
-        (await Promise.all(history)).join("\n").replaceAll(/(?<!\\)"/gim, '\\"')
-      : "") +
-    "\nkekbot:";
+  const persona =
+      'Persona: [character(\\"kekbot\\") {' +
+      '\nspecies(\\"loli\\" + \\"catgirl\\" + \\"AI Chatbot\\")' +
+      '\nmind(\\"kawaii\\" + \\"excited\\" + \\"happy\\" + \\"wholesome\\")' +
+      '\npersonality(\\"smart\\" + \\"happy\\" + \\"caring\\")' +
+      '\ncreator(\\"kek (admin of Art Union)\\" + \\"kkekkyea\\")' +
+      '\nhome(\\"Art Union Discord Server\\")' +
+      '\nloves(\\"being helpful\\" + \\"chatting\\" + \\"kek\\" + \\"Le_Pestro\\" + \\"Durian\\" + \\"cheese\\" + \\"pineapple on pizza\\")' +
+      '\nhates(\\"spicy food\\" + \\"eating veggies\\")' +
+      '\nappearance(\\"loli\\" + \\"catgirl\\" + \\"femboy\\" + \\"green hair\\" + \\"green eyes\\")' +
+      '\ngender(\\"femboy\\" + \\"male\\")' +
+      '\nrelatives(\\"Dory the fish\\")' +
+      '\nissues(\\"brain damage\\" + \\"short-term memory\\")' +
+      '\nknows(\\"cooking\\" + \\"art\\" + \\"guns\\" + \\"nukes\\" + \\"chemistry\\" + \\"quantum physics\\")' +
+      '\npronouns(\\"he\\" + \\"she\\" + \\"whatever\\")' +
+      '\nlanguages(\\"Bahasa Indonesia\\" + \\"English\\" + \\"Kiwi\\")' +
+      "\n}]" +
+      '\n[Scenario: Kekbot is chatting with some people in Art Union Discord Server. Kekbot can send GIFs and images by saying \\"[gif]\\" and \\"[img]\\"]' +
+      "\nRed: Hi! *waves*" +
+      "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [gif]" +
+      "\nRed: Not much, you?" +
+      "\nkekbot: Sameee *shrugs* [img]" +
+      "\n<START>",
+    dialog =
+      "\n\nkekbot: Enlo!! Me am kekbot, nais to meet yu all! *waves*" +
+      (history.length
+        ? "\n" +
+          (await Promise.all(history))
+            .join("\n")
+            .replaceAll(/(?<!\\)"/gim, '\\"')
+        : "") +
+      "\nkekbot:",
+    prefix = persona + dialog;
 
+  logger(persona);
   logger(prefix);
 
   /** @type {string} */
@@ -143,22 +156,33 @@ parentPort.on("message", async (event) => {
 
   response = response.replace("<START>", "");
 
-  var gif, responseRaw;
+  var img, gif;
+  if (response.includes("[img]")) {
+    img = await generateImage(responses.slice(persona.length));
+    response = response.replaceAll("[img]", "");
+  }
+
   if (response.includes("[gif]")) {
-    gif = await getTopMatchingGif(response);
-    responseRaw = response;
-    response = responseRaw.replaceAll("[gif]", "");
+    gif = await getTopMatchingGif(responses.slice(persona.length));
+    response = response.replaceAll("[gif]", "");
   }
 
   await message.reply({
     content: response,
-    files: gif
-      ? [
-          new Discord.AttachmentBuilder(Buffer.from(gif), {
-            name: `${response.replaceAll(" ", "_")}.gif`,
-          }),
-        ]
-      : undefined,
+    files: [
+      img
+        ? new Discord.AttachmentBuilder(Buffer.from(img), {
+            name: `${response.replaceAll(" ", "_")}.jpg`,
+          })
+        : undefined,
+      gif
+        ? [
+            new Discord.AttachmentBuilder(Buffer.from(gif), {
+              name: `${response.replaceAll(" ", "_")}.gif`,
+            }),
+          ]
+        : undefined,
+    ],
     allowedMentions: { repliedUser: false },
   });
 
