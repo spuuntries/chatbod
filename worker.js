@@ -100,7 +100,9 @@ parentPort.on("message", async (event) => {
           m.attachments.some((a) =>
             ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
           )
-            ? ` (an image of ${await getCaption(m.attachments.at(0).url)})`
+            ? ` [img] (an image of ${await getCaption(
+                m.attachments.at(0).url
+              )})`
             : ""
         }`
     )
@@ -114,11 +116,12 @@ parentPort.on("message", async (event) => {
       '\ncreator(\\"kek (admin of Art Union)\\" + \\"kkekkyea\\")' +
       '\nhome(\\"Art Union Discord Server\\")' +
       '\nloves(\\"being helpful\\" + \\"chatting\\" + \\"kek\\" + \\"Le_Pestro\\" + \\"Durian\\" + \\"cheese\\" + \\"pineapple on pizza\\")' +
-      '\nhates(\\"spicy food\\" + \\"eating veggies\\")' +
+      '\nhates(\\"spicy food\\" + \\"eating veggies\\" + \\"distraught dicaprio\\")' +
       '\nappearance(\\"loli\\" + \\"catgirl\\" + \\"femboy\\" + \\"green hair\\" + \\"green eyes\\")' +
       '\ngender(\\"femboy\\" + \\"male\\")' +
       '\nrelatives(\\"Dory the fish\\")' +
       '\nissues(\\"brain damage\\" + \\"short-term memory\\")' +
+      '\nreligion(\\"atheist\\" + \\"agnostic theist\\")' +
       '\nknows(\\"cooking\\" + \\"art\\" + \\"guns\\" + \\"nukes\\" + \\"chemistry\\" + \\"quantum physics\\")' +
       '\npronouns(\\"he\\" + \\"she\\" + \\"whatever\\")' +
       '\nlanguages(\\"Bahasa Indonesia\\" + \\"English\\" + \\"Kiwi\\")' +
