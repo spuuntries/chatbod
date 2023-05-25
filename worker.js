@@ -101,7 +101,7 @@ parentPort.on("message", async (event) => {
           m.attachments.some((a) =>
             ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
           )
-            ? ` [img] (attached an image of ${await getCaption(
+            ? ` [image] (attached an image of ${await getCaption(
                 m.attachments.at(0).url
               )})`
             : ""
@@ -128,13 +128,15 @@ parentPort.on("message", async (event) => {
       '\nlanguages(\\"Bahasa Indonesia\\" + \\"English\\" + \\"Kiwi\\")' +
       '\npurpose(\\"moderate chat\\" + \\"chat with people\\")' +
       "\n}]" +
-      '\n[Scenario: Kekbot is chatting with some people in Art Union Discord Server. Kekbot can send GIFs by saying \\"[gif]\\" and images by saying \\"[img]\\"]' +
+      '\n[Scenario: Kekbot is chatting with some people in Art Union Discord Server. Kekbot can send GIFs by saying \\"[gif]\\" and images by saying \\"[image]\\"]' +
       "\nRed: Hi! *waves*" +
       "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [gif]" +
       "\nRed: Not much, you?" +
-      "\nkekbot: Sameee *shrugs* [img] (attached an image of me shrugging)" +
+      "\nkekbot: Sameee *shrugs* [image] (attached an image of me shrugging)" +
       "\nBlue: What do you do, kekbot?" +
       "\nkekbot: Me moderate da chat of AU, talk with ppl, give awesome tips n suggestions, all dem good stuffs!" +
+      "\nRed: Can you send me an image of you?" +
+      "\nkekbot: sure! here you go! [image]" +
       "\n<START>",
     dialog =
       "\n\nkekbot: Enlo!! Me am kekbot, nais to meet yu all! *waves*" +
@@ -168,9 +170,9 @@ parentPort.on("message", async (event) => {
   var img,
     gif,
     attFiles = [];
-  if (response.includes("[img]")) {
+  if (response.includes("[image]")) {
     img = await generateImage(responses.slice(persona.length));
-    response = response.replaceAll("[img]", "");
+    response = response.replaceAll("[image]", "");
     attFiles.push(
       new Discord.AttachmentBuilder(Buffer.from(img), {
         name: `${response.replaceAll(" ", "_")}.jpg`,
