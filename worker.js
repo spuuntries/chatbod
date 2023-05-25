@@ -188,6 +188,8 @@ parentPort.on("message", async (event) => {
     );
   }
 
+  response.replaceAll(/\(attached an image of [^\(\)]+\)\n?/gim, "");
+
   await message.reply({
     content: response,
     files: attFiles,

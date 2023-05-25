@@ -2,3 +2,4 @@ node_modules/
 llama.cpp/
 models/
 .venv/
+json.sqlite

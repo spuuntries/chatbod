@@ -2,9 +2,13 @@ require("dotenv").config();
 const { exec } = require("child_process"),
   { HfInference } = require("@huggingface/inference"),
   axios = require("axios"),
+  { QuickDB } = require("quick.db"),
+  db = new QuickDB(),
   hf = new HfInference(process.env.HF_TOKEN);
 
-var captioned = {};
+var captioned = (await db.get("cap"))
+  ? await db.get("cap")
+  : await db.set("cap", {});
 
 /**
  * Runs a command and returns its output.
@@ -44,13 +48,17 @@ async function getCaption(image, maxRetries = 3) {
   while (retries < maxRetries) {
     try {
       const res = (
-        await hf.imageToText({
-          model: "Salesforce/blip-image-captioning-large",
-          data: blob,
-        })
+        await hf.imageToText(
+          {
+            model: "Salesforce/blip-image-captioning-large",
+            data: blob,
+          },
+          { wait_for_model: true }
+        )
       ).generated_text;
 
-      captioned[image] = res;
+      await db.set(`cap.${image}`, res);
+      captioned = await db.get("cap");
       return res;
     } catch (e) {
       retries++;
@@ -69,10 +77,13 @@ async function summarizeWithRetry(query) {
 
   for (let i = 0; i < maxRetries; i++) {
     try {
-      const result = await hf.textGeneration({
-        model: "knkarthick/TOPIC-DIALOGSUM",
-        inputs: query,
-      });
+      const result = await hf.textGeneration(
+        {
+          model: "knkarthick/TOPIC-DIALOGSUM",
+          inputs: query,
+        },
+        { wait_for_model: true }
+      );
       return result.summary_text;
     } catch (error) {
       if (i === maxRetries - 1) {
@@ -147,8 +158,8 @@ async function generateImage(query) {
         model: "andite/pastel-mix",
         inputs: `${
           keywords ? `${keywords},` : ""
-        } ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer, cinematic`,
-        parameters: { guidance_scale: 7 },
+        } ${emotion}, ${emotion}, ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer`,
+        parameters: { guidance_scale: 7.5 },
       })
     ).arrayBuffer()
   );
