@@ -77,6 +77,7 @@ parentPort.on("message", async (event) => {
   const history = Array.from(
     (
       await message.channel.messages.fetch({
+        before: message.id,
         limit: Number.parseInt(procenv.CTXWIN),
       })
     ).values()
