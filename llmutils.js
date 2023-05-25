@@ -46,7 +46,7 @@ async function getCaption(image, maxRetries = 3) {
       const res = (
         await hf.imageToText(
           {
-            model: "Salesforce/blip-image-captioning-large",
+            model: "nlpconnect/vit-gpt2-image-captioning",
             data: blob,
           },
           { wait_for_model: true }
