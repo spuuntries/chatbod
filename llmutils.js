@@ -76,6 +76,9 @@ async function summarizeWithRetry(query) {
       if (i === maxRetries - 1) {
         throw new Error(`Failed retrying ${maxRetries} times to get summary`);
       }
+      console.log(
+        `[${new Date()}] Attempt ${i} failed to get caption: ${e.message}`
+      );
     }
   }
 }
@@ -137,6 +140,7 @@ async function generateImage(query) {
         inputs: `${
           keywords ? `${keywords},` : ""
         } ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer, cinematic`,
+        parameters: { guidance_scale: 7 },
       })
     ).arrayBuffer()
   );
