@@ -77,7 +77,7 @@ async function summarizeWithRetry(query) {
         throw new Error(`Failed retrying ${maxRetries} times to get summary`);
       }
       console.log(
-        `[${new Date()}] Attempt ${i} failed to get caption: ${e.message}`
+        `[${new Date()}] Attempt ${i} failed to get caption: ${error.message}`
       );
     }
   }
