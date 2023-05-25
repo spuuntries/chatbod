@@ -144,6 +144,7 @@ parentPort.on("message", async (event) => {
             .join("\n")
             .replaceAll(/(?<!\\)"/gim, '\\"')
         : "") +
+      `\n${message.content}` +
       "\nkekbot:",
     prefix = persona + dialog;
 
