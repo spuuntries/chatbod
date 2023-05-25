@@ -6,10 +6,6 @@ const { exec } = require("child_process"),
   db = new QuickDB(),
   hf = new HfInference(process.env.HF_TOKEN);
 
-var captioned = (await db.get("cap"))
-  ? await db.get("cap")
-  : await db.set("cap", {});
-
 /**
  * Runs a command and returns its output.
  * @param {string} command - The command to run.
@@ -42,7 +38,7 @@ async function runPrompt(prompt) {
 
 async function getCaption(image, maxRetries = 3) {
   const blob = await (await fetch(image)).blob();
-  if (captioned[image]) return captioned[image];
+  if (await db.has(image)) return await db.get(image);
   let retries = 0;
 
   while (retries < maxRetries) {
@@ -57,8 +53,7 @@ async function getCaption(image, maxRetries = 3) {
         )
       ).generated_text;
 
-      await db.set(`cap.${image}`, res);
-      captioned = await db.get("cap");
+      await db.set(image, res);
       return res;
     } catch (e) {
       retries++;
