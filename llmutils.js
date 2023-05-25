@@ -68,7 +68,7 @@ async function summarizeWithRetry(query) {
   for (let i = 0; i < maxRetries; i++) {
     try {
       const result = await hf.summarization({
-        model: "knkarthick/MEETING_SUMMARY",
+        model: "knkarthick/TOPIC-DIALOGSUM",
         inputs: query,
       });
       return result.summary_text;
@@ -81,17 +81,13 @@ async function summarizeWithRetry(query) {
 }
 
 async function getTopMatchingGif(query) {
-  const summary = await summarizeWithRetry(query),
-    keywords = (
-      await hf.tokenClassification({
-        model: "ml6team/keyphrase-extraction-distilbert-inspec",
-        inputs: summary,
-      })
-    )
-      .map((k) => k.word)
-      .join(", "),
+  const keywords = await summarizeWithRetry(query),
     url = `https://tenor.googleapis.com/v2/search?q=${
-      keywords ? keywords : "I'm not sure how to respond"
+      keywords
+        ? keywords
+        : ["I'm not sure", "This is a gif", "Jif or gif", "Ummm"][
+            Math.floor(Math.random() * 4)
+          ]
     }&key=${
       process.env.TENOR_API_KEY
     }&client_key=kekbot&limit=1&media_filter=gif`;
@@ -102,7 +98,7 @@ async function getTopMatchingGif(query) {
     const response = await axios.get(url);
 
     if (response.data.results.length > 0) {
-      const topResult = response.data.results[0];
+      const topResult = response.data.results[Math.floor(Math.random() * 4)];
       const gifUrl = topResult.media_formats.gif.url;
       const gifResponse = await axios.get(gifUrl, {
         responseType: "arraybuffer",
@@ -130,15 +126,7 @@ async function generateImage(query) {
         inputs: lastMessage,
       })
     ).shift().label,
-    summary = await summarizeWithRetry(query),
-    keywords = (
-      await hf.tokenClassification({
-        model: "ml6team/keyphrase-extraction-distilbert-inspec",
-        inputs: summary,
-      })
-    )
-      .map((k) => k.word)
-      .join(", ");
+    keywords = await summarizeWithRetry(query);
 
   console.log(`[${new Date()}] ${keywords} | ${emotion}`);
 

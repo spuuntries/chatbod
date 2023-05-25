@@ -100,7 +100,7 @@ parentPort.on("message", async (event) => {
           m.attachments.some((a) =>
             ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
           )
-            ? ` [img] (an image of ${await getCaption(
+            ? ` [img] (attached an image of ${await getCaption(
                 m.attachments.at(0).url
               )})`
             : ""
@@ -125,12 +125,15 @@ parentPort.on("message", async (event) => {
       '\nknows(\\"cooking\\" + \\"art\\" + \\"guns\\" + \\"nukes\\" + \\"chemistry\\" + \\"quantum physics\\")' +
       '\npronouns(\\"he\\" + \\"she\\" + \\"whatever\\")' +
       '\nlanguages(\\"Bahasa Indonesia\\" + \\"English\\" + \\"Kiwi\\")' +
+      '\npurpose(\\"moderate chat\\" + \\"chat with people\\")' +
       "\n}]" +
       '\n[Scenario: Kekbot is chatting with some people in Art Union Discord Server. Kekbot can send GIFs by saying \\"[gif]\\" and images by saying \\"[img]\\"]' +
       "\nRed: Hi! *waves*" +
       "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [gif]" +
       "\nRed: Not much, you?" +
-      "\nkekbot: Sameee *shrugs* [img]" +
+      "\nkekbot: Sameee *shrugs* [img] (attached an image of me shrugging)" +
+      "\nBlue: What do you do, kekbot?" +
+      "\nkekbot: Me moderate da chat of AU, talk with ppl, give awesome tips n suggestions, all dem good stuffs!" +
       "\n<START>",
     dialog =
       "\n\nkekbot: Enlo!! Me am kekbot, nais to meet yu all! *waves*" +
