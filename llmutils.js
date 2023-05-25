@@ -153,7 +153,7 @@ async function generateImage(query) {
         model: "andite/pastel-mix", // "gsdf/Counterfeit-V2.5",
         inputs: `${
           keywords ? `${keywords},` : ""
-        } ${emotion}, ${emotion}, ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer`,
+        } ${emotion}, ${emotion}, ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer, green_eyes, crop_top_overhang`,
         parameters: { guidance_scale: 7.5, num_inference_steps: 100 },
       })
     ).arrayBuffer()
