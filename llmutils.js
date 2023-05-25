@@ -55,7 +55,9 @@ async function getCaption(image, maxRetries = 3) {
     } catch (e) {
       retries++;
       console.log(
-        `[${new Date()}] Attempt ${retries} failed to get caption: ${e.message}`
+        `[${new Date()}] Attempt ${retries + 1} failed to get caption: ${
+          e.message
+        }`
       );
     }
   }
@@ -76,8 +78,11 @@ async function summarizeWithRetry(query) {
       if (i === maxRetries - 1) {
         throw new Error(`Failed retrying ${maxRetries} times to get summary`);
       }
+
       console.log(
-        `[${new Date()}] Attempt ${i} failed to get caption: ${error.message}`
+        `[${new Date()}] Attempt ${i + 1} failed to get caption: ${
+          error.message
+        }`
       );
     }
   }
@@ -101,7 +106,10 @@ async function getTopMatchingGif(query) {
     const response = await axios.get(url);
 
     if (response.data.results.length > 0) {
-      const topResult = response.data.results[Math.floor(Math.random() * 4)];
+      const topResult =
+        response.data.results[
+          Math.floor(Math.random() * response.data.results.length)
+        ];
       const gifUrl = topResult.media_formats.gif.url;
       const gifResponse = await axios.get(gifUrl, {
         responseType: "arraybuffer",
