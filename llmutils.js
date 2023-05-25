@@ -150,7 +150,7 @@ async function generateImage(query) {
   const res = Buffer.from(
     await (
       await hf.textToImage({
-        model: "gsdf/Counterfeit-V2.5",
+        model: "andite/pastel-mix", // "gsdf/Counterfeit-V2.5",
         inputs: `${
           keywords ? `${keywords},` : ""
         } ${emotion}, ${emotion}, ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer`,
