@@ -67,7 +67,7 @@ async function summarizeWithRetry(query) {
 
   for (let i = 0; i < maxRetries; i++) {
     try {
-      const result = await hf.summarization({
+      const result = await hf.textGeneration({
         model: "knkarthick/TOPIC-DIALOGSUM",
         inputs: query,
       });
