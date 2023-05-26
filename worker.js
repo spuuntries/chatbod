@@ -101,7 +101,7 @@ parentPort.on("message", async (event) => {
           m.attachments.some((a) =>
             ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
           )
-            ? ` [image] (attached an image of ${await getCaption(
+            ? ` [image] (an image of ${await getCaption(
                 m.attachments.at(0).url
               )})`
             : ""
@@ -132,7 +132,7 @@ parentPort.on("message", async (event) => {
       "\nRed: Hi! *waves*" +
       "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [gif]" +
       "\nRed: Not much, you?" +
-      "\nkekbot: Sameee *shrugs* [image] (attached an image of me shrugging)" +
+      "\nkekbot: Sameee *shrugs* [image]" +
       "\nBlue: What do you do, kekbot?" +
       "\nkekbot: Me moderate da chat of AU, talk with ppl, give awesome tips n suggestions, all dem good stuffs!" +
       "\nRed: Can you send me an image of you?" +
@@ -190,7 +190,7 @@ parentPort.on("message", async (event) => {
     );
   }
 
-  response = response.replaceAll(/\(attached an image of [^\(\)]+\)\n?/gim, "");
+  response = response.replaceAll(/\(an image of [^\(\)]+\)\n?/gim, "");
 
   await message.reply({
     content: response,
