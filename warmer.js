@@ -11,7 +11,7 @@ setInterval(async () => {
   try {
     const query = (
       await hf.textGeneration({
-        model: "distilgpt2",
+        model: "gpt2",
         inputs:
           "My name is " + niceware.generatePassphrase(4).join(" ") + " and I",
       })
