@@ -53,6 +53,6 @@ setInterval(async () => {
       }]`
     );
   }
-}, 5000);
+}, 15000);
 
 logger("Warmer worker is running...");
