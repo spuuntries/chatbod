@@ -9,11 +9,13 @@ const logger = (m) => console.log(`[${new Date()}] ${m}`),
 setInterval(async () => {
   var stage = 0;
   try {
-    const query = await hf.textGeneration({
-      model: "distilgpt2",
-      inputs:
-        "My name is " + niceware.generatePassphrase(4).join(" ") + " and I",
-    });
+    const query = (
+      await hf.textGeneration({
+        model: "distilgpt2",
+        inputs:
+          "My name is " + niceware.generatePassphrase(4).join(" ") + " and I",
+      })
+    ).generated_text;
 
     stage++;
     await hf.textGeneration(
