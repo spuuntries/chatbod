@@ -19,7 +19,7 @@ const procenv = process.env,
  * @param {string} str To extract from
  */
 function extractEmotes(str) {
-  const regex = /<.*:(.+?):\d+>/g;
+  const regex = /<.*:(.+?):\d+>/gim;
   return str.replace(regex, (match, p1, p2) => {
     if (p1) {
       return `:${p1}:`;
