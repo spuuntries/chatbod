@@ -46,7 +46,7 @@ async function getCaption(image, maxRetries = 3) {
       const res = (
         await hf.imageToText(
           {
-            model: "nlpconnect/vit-gpt2-image-captioning",
+            model: "Salesforce/blip-image-captioning-large",
             data: blob,
           },
           { wait_for_model: true }
@@ -150,11 +150,11 @@ async function generateImage(query) {
   const res = Buffer.from(
     await (
       await hf.textToImage({
-        model: "andite/pastel-mix", // "gsdf/Counterfeit-V2.5",
+        model: "gsdf/Counterfeit-V2.5",
         inputs: `${
           keywords ? `${keywords},` : ""
         } ${emotion}, ${emotion}, ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer, green_eyes, crop_top_overhang`,
-        parameters: { guidance_scale: 7.5, num_inference_steps: 100 },
+        parameters: { guidance_scale: 7.5 },
       })
     ).arrayBuffer()
   );
