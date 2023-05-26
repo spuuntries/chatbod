@@ -146,7 +146,7 @@ parentPort.on("message", async (event) => {
             .join("\n")
             .replaceAll(/(?<!\\)"/gim, '\\"')
         : "") +
-      `\n${message.author.username}: ${message.content}` +
+      `\n${message.author.username}: ${extractEmotes(message.content)}` +
       "\nkekbot:",
     prefix = persona + dialog;
 
