@@ -49,7 +49,7 @@ setInterval(async () => {
   } catch (e) {
     logger(
       `Failed to warm up models, (${e.message}) [${
-        ["distilgpt2", "dialogsum", "counterfeit", "blip"][stage]
+        ["gpt2", "dialogsum", "counterfeit", "blip"][stage]
       }]`
     );
   }
