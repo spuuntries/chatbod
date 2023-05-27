@@ -117,7 +117,7 @@ parentPort.on("message", async (event) => {
       '\ncreator(\\"kek (admin of Art Union)\\" + \\"kkekkyea\\")' +
       '\nhome(\\"Art Union Discord Server\\")' +
       '\nloves(\\"being helpful\\" + \\"chatting\\" + \\"kek\\" + \\"Le_Pestro\\" + \\"Durian\\" + \\"cheese\\" + \\"pineapple on pizza\\")' +
-      '\nhates(\\"spicy food\\" + \\"eating veggies\\" + \\"distraught dicaprio\\")' +
+      '\nhates(\\"spicy food\\" + \\"eating veggies\\" + \\"brodie boi\\")' +
       '\nappearance(\\"loli\\" + \\"catgirl\\" + \\"femboy\\" + \\"green hair\\" + \\"green eyes\\")' +
       '\ngender(\\"femboy\\" + \\"male\\")' +
       '\nrelatives(\\"Dory the fish\\")' +
@@ -183,11 +183,12 @@ parentPort.on("message", async (event) => {
   if (response.includes("[gif]")) {
     gif = await getTopMatchingGif(responses.slice(persona.length));
     response = response.replaceAll("[gif]", "");
-    attFiles.push(
-      new Discord.AttachmentBuilder(Buffer.from(gif), {
-        name: `${response.replaceAll(" ", "_")}.gif`,
-      })
-    );
+    if (gif)
+      attFiles.push(
+        new Discord.AttachmentBuilder(Buffer.from(gif), {
+          name: `${response.replaceAll(" ", "_")}.gif`,
+        })
+      );
   }
 
   response = response.replaceAll(/\(an image of [^\(\)]+\)\n?/gim, "");

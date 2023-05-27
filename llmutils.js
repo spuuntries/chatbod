@@ -4,7 +4,8 @@ const { exec } = require("child_process"),
   axios = require("axios"),
   { QuickDB } = require("quick.db"),
   db = new QuickDB(),
-  hf = new HfInference(process.env.HF_TOKEN);
+  hf = new HfInference(process.env.HF_TOKEN),
+  { randomInt } = require("crypto");
 
 /**
  * Runs a command and returns its output.
@@ -94,17 +95,16 @@ async function summarizeWithRetry(query) {
   }
 }
 
+/**
+ * Fetches the top matching GIF for a given query.
+ * @param {string} query - The search query.
+ * @returns {Promise<ArrayBuffer | undefined>} The GIF data as an ArrayBuffer or undefined.
+ */
 async function getTopMatchingGif(query) {
-  const keywords = await summarizeWithRetry(query),
-    url = `https://tenor.googleapis.com/v2/search?q=${
-      keywords
-        ? keywords
-        : ["I'm not sure", "This is a gif", "Jif or gif", "Ummm"][
-            Math.floor(Math.random() * 4)
-          ]
-    }&key=${
-      process.env.TENOR_API_KEY
-    }&client_key=kekbot&limit=1&media_filter=gif`;
+  const keywords = await summarizeWithRetry(query);
+  if (!keywords) return undefined;
+
+  const url = `https://tenor.googleapis.com/v2/search?q=${keywords}&key=${process.env.TENOR_API_KEY}&client_key=kekbot&limit=1&media_filter=gif`;
 
   console.log(`[${new Date()}] ${keywords}`);
 
@@ -113,9 +113,7 @@ async function getTopMatchingGif(query) {
 
     if (response.data.results.length > 0) {
       const topResult =
-        response.data.results[
-          Math.floor(Math.random() * response.data.results.length)
-        ];
+        response.data.results[randomInt(0, response.data.results.length - 1)];
       const gifUrl = topResult.media_formats.gif.url;
       const gifResponse = await axios.get(gifUrl, {
         responseType: "arraybuffer",
@@ -153,7 +151,7 @@ async function generateImage(query) {
         model: "gsdf/Counterfeit-V2.5",
         inputs: `${
           keywords ? `${keywords},` : ""
-        } ${emotion}, ${emotion}, ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer, green_eyes, crop_top_overhang`,
+        } ${emotion}, ${emotion}, ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer, green_eyes, crop_top`,
         parameters: { guidance_scale: 7.5 },
       })
     ).arrayBuffer()
