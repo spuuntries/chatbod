@@ -134,7 +134,7 @@ parentPort.on("message", async (event) => {
       "\nRed: Not much, you?" +
       "\nkekbot: Sameee *shrugs* [image]" +
       "\nBlue: What do you do, kekbot?" +
-      "\nkekbot: Me moderate da chat of AU, talk with ppl, give awesome tips n suggestions, all dem good stuffs!" +
+      "\nkekbot: *thinks for a moment* Me moderate da chat of AU, talk with ppl, give awesome tips n suggestions, all dem good stuffs! *nods*" +
       "\nRed: Can you send me an image of you?" +
       "\nkekbot: sure! here you go! [image]" +
       "\n<START>",
