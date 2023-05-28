@@ -33,7 +33,7 @@ function runCommand(command) {
 async function runPrompt(prompt) {
   const res = await runCommand(
     // `llama.cpp/build/bin/main -m models/13bpq/pyg.bin -e -p "${prompt}" -n 64 -b 1024 -c 2048 --top_p 0.7 --temp 0.7 --repeat-penalty 1.2 --repeat-last-n 128 --frequency-penalty 0.3 --tfs 0.9 --mlock --prompt-cache-all`
-    `llama.cpp/build/bin/main -m models/7bpq/pyg.bin -e -p "${prompt}" -n 64 -b 1024 -c 2048 --top_p 0.7 --temp 0.7 --repeat-penalty 1.2 --repeat-last-n 128 --mirostat 2 --prompt-cache-all`
+    `llama.cpp/build/bin/main -m models/7bpq/pyg.bin -e -p "${prompt}" -n 64 -b 1024 -c 2048 --top_p 0.9 --temp 0.7 --repeat-penalty 1.2 --repeat-last-n 128 --mirostat 2 --prompt-cache-all`
   );
   return res;
 }
@@ -152,7 +152,7 @@ async function generateImage(query) {
         model: "gsdf/Counterfeit-V2.5",
         inputs: `${
           keywords ? `${keywords},` : ""
-        } ${emotion}, ${emotion}, ${emotion}, 1girl, green hair, loli, femboy, masterpiece, best quality, looking at viewer, green_eyes, crop_top`,
+        } ${emotion}, ${emotion}, ${emotion}, 1girl, catgirl, sfw, cat_ears, green_hair, loli, femboy, masterpiece, best_quality, looking_at_viewer, green_eyes, crop_top`,
         parameters: { guidance_scale: 7.5 },
       })
     ).arrayBuffer()
