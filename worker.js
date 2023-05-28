@@ -170,9 +170,10 @@ parentPort.on("message", async (event) => {
   var img,
     gif,
     attFiles = [];
-  if (response.includes("[image]")) {
+  if (response.includes("[image]" || response.includes("[pic]"))) {
     img = await generateImage(responses.slice(persona.length));
     response = response.replaceAll("[image]", "");
+    response = response.replaceAll("[pic]", "");
     attFiles.push(
       new Discord.AttachmentBuilder(Buffer.from(img), {
         name: `${response.replaceAll(" ", "_")}.jpg`,
