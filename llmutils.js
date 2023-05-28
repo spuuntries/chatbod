@@ -152,8 +152,12 @@ async function generateImage(query) {
         model: "gsdf/Counterfeit-V2.5",
         inputs: `${
           keywords ? `${keywords},` : ""
-        } ${emotion}, ${emotion}, ${emotion}, 1girl, catgirl, sfw, cat_ears, green_hair, loli, femboy, masterpiece, best_quality, looking_at_viewer, green_eyes, crop_top`,
-        parameters: { guidance_scale: 7.5 },
+        } ${emotion}, ${emotion}, ${emotion}, 1girl, catgirl, cat_ears, green_hair, loli, femboy, masterpiece, best_quality, looking_at_viewer, green_eyes, crop_top`,
+        parameters: {
+          guidance_scale: 8,
+          negative_prompt:
+            "nsfw, breasts, large_breast, boobs, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
+        },
       })
     ).arrayBuffer()
   );
