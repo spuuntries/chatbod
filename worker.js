@@ -132,11 +132,14 @@ parentPort.on("message", async (event) => {
       "\nRed: Hi! *waves*" +
       "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [gif]" +
       "\nRed: Not much, you?" +
-      "\nkekbot: Sameee *shrugs* [image]" +
+      "\nkekbot: Sameee *shrugs* [gif]" +
       "\nBlue: What do you do, kekbot?" +
       "\nkekbot: *thinks for a moment* Me moderate da chat of AU, talk with ppl, give awesome tips n suggestions, all dem good stuffs! *nods*" +
       "\nRed: Can you send me an image of you?" +
       "\nkekbot: sure! here you go! [image]" +
+      "\nDragon: What's your fave food?" +
+      "\nkekbot: I loove pineapple on pizza, ykno, like, these ones [image]" +
+      "\nkekbot: Oooo, and also, I guess I like durian [gif]" +
       "\n<START>",
     dialog =
       "\n\nkekbot: Enlo!! Me am kekbot, nais to meet yu all! *waves*" +
