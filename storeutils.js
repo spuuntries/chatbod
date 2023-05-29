@@ -1,4 +1,9 @@
-const { IndexFlatL2 } = require("faiss-node"),
+// NOTE: This util is only for embeddings/vecstore, the actual sentences embedded will need to be implemented elsewhere
+
+const createKDTree = require("static-kdtree"),
+  logger = (m) => console.log(`[${new Date()}] ${m}`),
+  { QuickDB } = require("quick.db"),
+  db = new QuickDB(),
   { exec } = require("child_process");
 
 /**
@@ -23,7 +28,7 @@ function runCommand(command) {
  * @param {string} string - String to embed.
  * @returns {Promise<string[]>} Embeddings of the string
  */
-async function getEmbedding(string) {
+async function getEmbeddings(string) {
   const res = (
     await runCommand(
       `llama.cpp/build/bin/embedding -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${string}"`
@@ -34,52 +39,47 @@ async function getEmbedding(string) {
 }
 
 /**
- * Creates a new Faiss index store with the given dimension.
- * @param {number} dimension - The dimension of the embeddings.
+ * Creates a new vector store.
  * @param {number[][]} [embeddings=[]] - An optional array of initial embeddings.
- * @returns {IndexFlatL2} The created Faiss index store.
+ * @returns {number[][]}
  */
-function createStore(dimension, embeddings = []) {
-  const index = new IndexFlatL2(dimension);
+async function createStore(embeddings = []) {
+  if (!(await db.has("vecstore"))) await db.set(embeddings ? embeddings : []);
 
-  // Add embeddings to the index
-  for (const embedding of embeddings) {
-    index.add(embedding);
-  }
-
-  return index;
+  return await db.get("vecstore");
 }
 
 /**
- * Stores an embedding in the given Faiss index store.
- * @param {number[]} embedding - The embedding to store.
- * @param {IndexFlatL2} index - The Faiss index store.
+ * Stores embeddings in the vector store.
+ * @param {number[]} embeddings - The embeddings to store.
+ * @returns {number[][]}
  */
-function storeEmbedding(embedding, index) {
-  // Insert the embedding into the index
-  index.add(embedding);
+async function storeEmbeddings(embeddings) {
+  if (!(await db.has("vecstore")))
+    logger(`[WARN] vecstore not created when storing, creating one`);
+
+  return await db.push("vecstore", embeddings);
 }
 
 /**
- * Searches for the nearest neighbors of a query embedding in the given Faiss index store.
- * @param {number[]} query - The query embedding.
- * @param {IndexFlatL2} index - The Faiss index store.
- * @param {number} [k=4] - The number of nearest neighbors to search for.
- * @returns {Object} An object containing the indices (labels) and distances of the nearest neighbors.
+ * Searches for the nearest neighbors of query embeddings.
+ * @param {number[]} query - The queried embeddings.
+ * @param {number} [distance=4] - Max distance of neighbors, default is 4.
+ * @param {number} [max] - Max number of neighbors, default 2.
+ * @returns {number[][]}
  */
-function searchEmbedding(query, index, k = 4) {
-  // Search for the nearest neighbors of the query in the index
-  const results = index.search(query, k);
+async function searchEmbeddings(query, distance, max) {
+  if (!distance) var distance = 4;
+  if (!max) var max = 2;
+  const vecstore = await db.get("vecstore"),
+    tree = createKDTree(vecstore);
 
-  return {
-    labels: results.labels,
-    distances: results.distances,
-  };
+  return tree.knn(query, max, distance);
 }
 
 module.exports = {
-  getEmbedding,
+  getEmbeddings,
   createStore,
-  storeEmbedding,
-  searchEmbedding,
+  storeEmbeddings,
+  searchEmbeddings,
 };
