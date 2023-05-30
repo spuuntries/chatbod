@@ -4,7 +4,6 @@ const { exec } = require("child_process"),
   axios = require("axios"),
   { QuickDB } = require("quick.db"),
   db = new QuickDB(),
-  { client } = require("@gradio/client"),
   hf = new HfInference(process.env.HF_TOKEN),
   { randomInt } = require("crypto");
 
@@ -40,7 +39,8 @@ async function runPrompt(prompt) {
 }
 
 async function getCaption(image) {
-  const blob = await (await fetch(image)).blob(),
+  const { client } = await import("@gradio/client"),
+    blob = await (await fetch(image)).blob(),
     blip = await client("https://spuun-dialogsum.hf.space/", {
       hf_token: process.env.HF_TOKEN,
     });
@@ -52,7 +52,8 @@ async function getCaption(image) {
 }
 
 async function summarize(query) {
-  const dialogsum = await client("https://spuun-dialogsum.hf.space/", {
+  const { client } = await import("@gradio/client"),
+    dialogsum = await client("https://spuun-dialogsum.hf.space/", {
       hf_token: process.env.HF_TOKEN,
     }),
     res = await dialogsum.predict("/predict", [query]);
