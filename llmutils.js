@@ -45,7 +45,13 @@ async function getCaption(image) {
       hf_token: process.env.HF_TOKEN,
     });
   if (await db.has(image)) return await db.get(image);
-  const res = await blip.predict("/predict", [blob]);
+  var res;
+  try {
+    res = (await blip.predict("/predict", [blob])).data;
+  } catch (e) {
+    console.log(`[${new Date()}] blip: ${e}`);
+    return "failed to get caption.";
+  }
   if (!res) return "failed to get caption.";
   await db.set(image, res);
   return res;
@@ -56,7 +62,7 @@ async function summarize(query) {
     dialogsum = await client("https://spuun-dialogsum.hf.space/", {
       hf_token: process.env.HF_TOKEN,
     }),
-    res = await dialogsum.predict("/predict", [query]);
+    res = (await dialogsum.predict("/predict", [query])).data;
 
   if (!res) {
     console.log(`[WARN] [${new Date()}] dialogsum failed to return a value.`);

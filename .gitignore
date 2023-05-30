@@ -3,3 +3,4 @@ llama.cpp/
 models/
 .venv/
 json.sqlite
+.env

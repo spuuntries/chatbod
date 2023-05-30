@@ -147,7 +147,19 @@ parentPort.on("message", async (event) => {
             .join("\n")
             .replaceAll(/(?<!\\)"/gim, '\\"')
         : "") +
-      `\n${message.author.username}: ${extractEmotes(message.content)}` +
+      `\n${message.author.username}: ${extractEmotes(message.content)}${
+        message.attachments.some((a) => a.contentType.includes("gif"))
+          ? " [gif]"
+          : ""
+      }${
+        message.attachments.some((a) =>
+          ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
+        )
+          ? ` [image] (an image of ${await getCaption(
+              message.attachments.at(0).url
+            )})`
+          : ""
+      }` +
       "\nkekbot:",
     prefix = persona + dialog;
 
