@@ -2,6 +2,13 @@
 require("dotenv").config();
 
 const logger = (m) => console.log(`[${new Date()}] ${m}`),
+  { client } = require("@gradio/client"),
+  dialogsum = await client("https://spuun-dialogsum.hf.space/", {
+    hf_token: process.env.HF_TOKEN,
+  }),
+  blip = await client("https://spuun-dialogsum.hf.space/", {
+    hf_token: process.env.HF_TOKEN,
+  }),
   { HfInference } = require("@huggingface/inference"),
   hf = new HfInference(process.env.HF_TOKEN),
   niceware = require("niceware");
@@ -18,18 +25,13 @@ setInterval(async () => {
     ).generated_text;
 
     stage++;
-    await hf.textGeneration(
-      {
-        model: "knkarthick/TOPIC-DIALOGSUM",
-        inputs: query,
-      },
-      { wait_for_model: true }
-    );
+    if (!(await dialogsum.predict("/predict", [query])).data)
+      throw new Error("dialogsum failed");
 
     stage++;
     const image = await hf.textToImage(
       {
-        model: "gsdf/Counterfeit-V2.5",
+        model: "iZELX1/Anything-V3-X",
         inputs: query,
         parameters: { num_inference_steps: 10 },
       },
@@ -37,15 +39,10 @@ setInterval(async () => {
     );
 
     stage++;
-    await hf.imageToText(
-      {
-        model: "Salesforce/blip-image-captioning-large",
-        data: image,
-      },
-      { wait_for_model: true }
-    );
+    if (!(await blip.predict("/predict", [image])).data)
+      throw new Error("blip failed");
 
-    stage = 0;
+    image.stage = 0;
   } catch (e) {
     logger(
       `Failed to warm up models, (${e.message}) [${
@@ -53,6 +50,6 @@ setInterval(async () => {
       }]`
     );
   }
-}, 15000);
+}, 1800000);
 
 logger("Warmer worker is running...");

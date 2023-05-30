@@ -7,6 +7,7 @@ const procenv = process.env,
   logger = (m) => console.log(`[${new Date()}] ${m}`),
   { Worker } = require("worker_threads"),
   worker = new Worker("./worker.js"),
+  warmer = new Worker("./warmer.js"),
   queue = [];
 
 var isProcessingQueue = false;
@@ -49,6 +50,9 @@ client.once("ready", () => {
   worker.on("message", (m) => {
     if (m == "ready") {
       logger(`[v${require("./package.json").version}] ready`);
+
+      process.on("SIGTERM", async () => await warmer.terminate());
+      process.on("SIGINT", async () => await warmer.terminate());
     } else {
       if (m.length > 1) {
         logger(`handled ${m[0]} by ${m[1]}`);

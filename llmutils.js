@@ -4,6 +4,7 @@ const { exec } = require("child_process"),
   axios = require("axios"),
   { QuickDB } = require("quick.db"),
   db = new QuickDB(),
+  { client } = require("@gradio/client"),
   hf = new HfInference(process.env.HF_TOKEN),
   { randomInt } = require("crypto");
 
@@ -32,68 +33,35 @@ function runCommand(command) {
  */
 async function runPrompt(prompt) {
   const res = await runCommand(
-    // `llama.cpp/build/bin/main -m models/7bpq/pyg.bin -e -p "${prompt}" -n 64 -b 1024 -c 2048 --top_p 0.7 --temp 0.7 --repeat-penalty 1.2 --repeat-last-n 128 --frequency-penalty 0.3 --prompt-cache-all`
-    `llama.cpp/build/bin/main -m models/7bpq/pyg.bin -e -p "${prompt}" -n 64 -b 1024 -c 2048 --top_p 0.7 --temp 0.8 --repeat-penalty 1.2 --repeat-last-n 128 --mirostat 2 --prompt-cache-all`
+    // `llama.cpp/build/bin/main -m models/7bpq/pyg.bin -e -p "${prompt}" -n 64 -b 1024 -c 2048 --top_p 0.7 --temp 0.7 --repeat-penalty 1.2 --repeat-last-n 128 --frequency-penalty 0.3 --prompt-cache-all --prompt-cache mirostatcache --no-penalize-nl`
+    `llama.cpp/build/bin/main -m models/7bpq/pyg.bin -e -p "${prompt}" -n 64 -b 1024 -c 2048 --top_p 0.7 --temp 0.8 --repeat-penalty 1.2 --repeat-last-n 128 --mirostat 2 --prompt-cache-all --prompt-cache mirostatcache --no-penalize-nl`
   );
   return res;
 }
 
-async function getCaption(image, maxRetries = 3) {
-  const blob = await (await fetch(image)).blob();
+async function getCaption(image) {
+  const blob = await (await fetch(image)).blob(),
+    blip = await client("https://spuun-dialogsum.hf.space/", {
+      hf_token: process.env.HF_TOKEN,
+    });
   if (await db.has(image)) return await db.get(image);
-  let retries = 0;
-
-  while (retries < maxRetries) {
-    try {
-      const res = (
-        await hf.imageToText(
-          {
-            model: "Salesforce/blip-image-captioning-large",
-            data: blob,
-          },
-          { wait_for_model: true }
-        )
-      ).generated_text;
-
-      await db.set(image, res);
-      return res;
-    } catch (e) {
-      retries++;
-      console.log(
-        `[${new Date()}] Attempt ${retries + 1} failed to get caption: ${
-          e.message
-        }`
-      );
-    }
-  }
-  return `failed to get the caption.`;
+  const res = await blip.predict("/predict", [blob]);
+  if (!res) return "failed to get caption.";
+  await db.set(image, res);
+  return res;
 }
 
-async function summarizeWithRetry(query) {
-  const maxRetries = 5;
+async function summarize(query) {
+  const dialogsum = await client("https://spuun-dialogsum.hf.space/", {
+      hf_token: process.env.HF_TOKEN,
+    }),
+    res = await dialogsum.predict("/predict", [query]);
 
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      const result = await hf.textGeneration(
-        {
-          model: "knkarthick/TOPIC-DIALOGSUM",
-          inputs: query,
-        },
-        { wait_for_model: true }
-      );
-      return result.summary_text;
-    } catch (error) {
-      if (i === maxRetries - 1) {
-        throw new Error(`Failed retrying ${maxRetries} times to get summary`);
-      }
-
-      console.log(
-        `[${new Date()}] Attempt ${i + 1} failed to get caption: ${
-          error.message
-        }`
-      );
-    }
+  if (!res) {
+    console.log(`[WARN] [${new Date()}] dialogsum failed to return a value.`);
+    return undefined;
   }
+  return res;
 }
 
 /**
@@ -102,7 +70,7 @@ async function summarizeWithRetry(query) {
  * @returns {Promise<ArrayBuffer | undefined>} The GIF data as an ArrayBuffer or undefined.
  */
 async function getTopMatchingGif(query) {
-  const keywords = await summarizeWithRetry(query);
+  const keywords = await summarize(query);
   if (!keywords) return undefined;
 
   const url = `https://tenor.googleapis.com/v2/search?q=${keywords}&key=${process.env.TENOR_API_KEY}&client_key=kekbot&limit=1&media_filter=gif`;
@@ -142,14 +110,14 @@ async function generateImage(query) {
         inputs: lastMessage,
       })
     ).shift().label,
-    keywords = await summarizeWithRetry(query);
+    keywords = await summarize(query);
 
   console.log(`[${new Date()}] ${keywords} | ${emotion}`);
 
   const res = Buffer.from(
     await (
       await hf.textToImage({
-        model: "gsdf/Counterfeit-V2.5",
+        model: "iZELX1/Anything-V3-X",
         inputs: `${
           keywords ? `${keywords},` : ""
         } ${emotion}, ${emotion}, ${emotion}, 1girl, catgirl, cat_ears, green_hair, loli, femboy, masterpiece, best_quality, looking_at_viewer, green_eyes, crop_top`,
