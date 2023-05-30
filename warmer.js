@@ -12,7 +12,7 @@ setInterval(async () => {
     dialogsum = await client("https://spuun-dialogsum.hf.space/", {
       hf_token: process.env.HF_TOKEN,
     }),
-    blip = await client("https://spuun-dialogsum.hf.space/", {
+    blip = await client("https://spuun-blip-api.hf.space/", {
       hf_token: process.env.HF_TOKEN,
     });
   try {

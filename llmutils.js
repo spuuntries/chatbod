@@ -41,7 +41,7 @@ async function runPrompt(prompt) {
 async function getCaption(image) {
   const { client } = await import("@gradio/client"),
     blob = await (await fetch(image)).blob(),
-    blip = await client("https://spuun-dialogsum.hf.space/", {
+    blip = await client("https://spuun-blip-api.hf.space/", {
       hf_token: process.env.HF_TOKEN,
     });
   if (await db.has(image)) return await db.get(image);
