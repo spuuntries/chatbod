@@ -2,14 +2,14 @@
 require("dotenv").config();
 
 const logger = (m) => console.log(`[${new Date()}] ${m}`),
-  { client } = require("@gradio/client"),
   { HfInference } = require("@huggingface/inference"),
   hf = new HfInference(process.env.HF_TOKEN),
   niceware = require("niceware");
 
 setInterval(async () => {
   var stage = 0;
-  const dialogsum = await client("https://spuun-dialogsum.hf.space/", {
+  const { client } = await import("@gradio/client"),
+    dialogsum = await client("https://spuun-dialogsum.hf.space/", {
       hf_token: process.env.HF_TOKEN,
     }),
     blip = await client("https://spuun-dialogsum.hf.space/", {
