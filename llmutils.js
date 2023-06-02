@@ -38,16 +38,17 @@ async function runPrompt(prompt) {
   return res;
 }
 
-async function getCaption(image) {
+async function getCaption(img) {
   const { client } = await import("@gradio/client"),
-    blob = await (await fetch(image)).blob(),
+    blob = await (await fetch(img)).blob(),
     blip = await client("https://spuun-blip-api.hf.space/", {
       hf_token: process.env.HF_TOKEN,
-    });
+    }),
+    image = img.split("/").pop().split(".")[0];
   if (await db.has(image)) return await db.get(image);
   var res;
   try {
-    res = (await blip.predict("/predict", [blob])).data;
+    res = (await blip.predict("/predict", [blob])).data[0];
   } catch (e) {
     console.log(`[${new Date()}] blip: ${e}`);
     return "failed to get caption.";
@@ -89,7 +90,11 @@ async function getTopMatchingGif(query) {
 
     if (response.data.results.length > 0) {
       const topResult =
-        response.data.results[randomInt(0, response.data.results.length - 1)];
+        response.data.results.length - 1
+          ? response.data.results[
+              randomInt(0, response.data.results.length - 1)
+            ]
+          : response.data.results[0];
       const gifUrl = topResult.media_formats.gif.url;
       const gifResponse = await axios.get(gifUrl, {
         responseType: "arraybuffer",
