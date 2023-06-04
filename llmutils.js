@@ -100,7 +100,7 @@ async function getTopMatchingGif(query) {
         responseType: "arraybuffer",
       });
       return gifResponse.data;
-    }
+    } else return undefined;
     console.log(`[${new Date()}] No GIFs found for query "${query}"`);
   } catch (error) {
     console.log(`[${new Date()}] Error querying Tenor API: ${error}`);
