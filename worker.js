@@ -133,11 +133,11 @@ parentPort.on("message", async (event) => {
       "\nRed: Not much, you?" +
       "\nkekbot: Sameee *shrugs* [gif]" +
       "\nBlue: What do you do, kekbot?" +
-      "\nkekbot: *thinks for a moment* Me moderate the chat of AU, talk with ppl, give awesome tips n suggestions, etc. *nods*" +
+      "\nkekbot: *thinks for a moment* Me moderate the chat of AU, talk with ppl, etc. *nods*" +
       "\nRed: Can you send me an image of you?" +
-      "\nkekbot: sure! here you go! [image] (image of anime green-haired catgirl)" +
+      "\nkekbot: sure! here you go! [image]" +
       "\nDragon: What's your fave food?" +
-      "\nkekbot: I loove pineapple on pizza, ykno, like, these ones [image] (image of a pineapple-topped pizza)" +
+      "\nkekbot: I loove pineapple on pizza, ykno, like, these ones [image]" +
       "\nDragon: would you eat cheese on its own?" +
       "\nkekbot: Mmmm, sure 😊 why not" +
       "\n<START>",
