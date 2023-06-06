@@ -150,7 +150,9 @@ parentPort.on("message", async (event) => {
             .join("\n")
             .replaceAll(/(?<!\\)"/gim, '\\"')
         : "") +
-      `\n${message.author.username}: ${extractEmotes(message.content)}${
+      `\n${message.author.username}: ${extractEmotes(
+        message.content
+      ).replaceAll(/(?<!\\)"/gim, '\\"')}${
         message.attachments.some((a) => a.contentType.includes("gif"))
           ? " [gif]"
           : ""
