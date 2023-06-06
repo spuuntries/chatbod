@@ -33,7 +33,7 @@ function runCommand(command) {
 async function runPrompt(prompt) {
   const res = await runCommand(
     // `llama.cpp/build/bin/main -m models/7bpq/pyg.bin -e -p "${prompt}" -n 64 -b 1024 -c 2048 --top_p 0.7 --temp 0.7 --repeat-penalty 1.2 --repeat-last-n 128 --frequency-penalty 0.3 --prompt-cache-all --prompt-cache mirostatcache --no-penalize-nl`
-    `llama.cpp/build/bin/main -m models/13bpq/pyg.bin -e -p "${prompt}" -n 64 -b 1024 -c 2048 --top_p 0.7 --temp 0.8 --repeat-penalty 1.2 --mirostat 2 --prompt-cache-all --prompt-cache mirostatcache --no-penalize-nl`
+    `llama.cpp/build/bin/main -m models/13bpq/pyg.bin -e -p "${prompt}" -n 32 -b 1024 -c 2048 --top_p 0.7 --temp 0.8 --repeat-penalty 1.2 --mirostat 2 --prompt-cache-all --prompt-cache mirostatcache --no-penalize-nl`
   );
   return res;
 }
