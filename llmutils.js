@@ -132,9 +132,11 @@ async function generateImage(query) {
         model: "iZELX1/Anything-V3-X",
         inputs: `${
           keywords ? `${keywords},` : ""
-        } ${emotion}, ${emotion}, ${emotion}, catgirl, cat_ears,${
-          query.includes("kekbot") ? " green_hair," : ""
-        } loli, femboy, masterpiece, best_quality, looking_at_viewer, crop_top`,
+        } ${emotion}, ${emotion}, ${emotion},${
+          query.includes("kekbot")
+            ? " catgirl, cat_ears, green_hair, loli, femboy, looking_at_viewer, crop_top,"
+            : ""
+        } masterpiece, best_quality`,
         parameters: {
           guidance_scale: 8,
           negative_prompt:
