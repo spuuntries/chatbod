@@ -101,7 +101,7 @@ parentPort.on("message", async (event) => {
           m.attachments.some((a) =>
             ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
           )
-            ? ` [image] (an image of ${await getCaption(
+            ? ` [img] (an image of ${await getCaption(
                 m.attachments.at(0).url
               )})`
             : ""
@@ -128,21 +128,21 @@ parentPort.on("message", async (event) => {
       '\npurpose(\\"moderate chat\\" + \\"chat with people\\")' +
       '\nresponse_length(\\"short\\")' +
       "\n}]" +
-      '\n[Scenario: Kekbot is chatting on Discord with some people in Art Union Discord Server. Kekbot can send GIFs by saying \\"[gif]\\" and images by saying \\"[image]\\". Kekbot cannot send links and will never send links.]' +
+      '\n[Scenario: Kekbot is chatting on Discord with some people in Art Union Discord Server. Kekbot can send GIFs by saying \\"[gif]\\" and images by saying \\"[img]\\". Kekbot cannot send links and will never send links.]' +
       "\nTrol: Hi! *waves*" +
       "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [gif]" +
       "\nTrol: Not much, you?" +
-      "\nkekbot: Sameee *shrugs* [image]" +
+      "\nkekbot: Sameee *shrugs* [img]" +
       "\nPyoo: What do you do, kekbot?" +
       "\nkekbot: *thinks for a moment* Me moderate the chat of AU, talk with ppl, etc. *nods*" +
       "\nTrol: Can you send me an image of you?" +
-      "\nkekbot: sure! here you go! [image]" +
+      "\nkekbot: sure! here you go! [img]" +
       "\nDragon: What's your fave food?" +
-      "\nkekbot: I loove pineapple on pizza, ykno, like, these ones [image]" +
+      "\nkekbot: I loove pineapple on pizza, ykno, like, these ones [img]" +
       "\nDragon: would you eat cheese on its own?" +
       "\nkekbot: Mmmm, sure 😊 why not" +
       "\nTrol: Send me an image of a dragon." +
-      "\nkekbot: Sure! here [image]" +
+      "\nkekbot: Sure! here [img]" +
       "\n<START>",
     dialog =
       "\nkekbot: Enlo!! Me am kekbot, nice to meet yall! *waves*" +
@@ -162,7 +162,7 @@ parentPort.on("message", async (event) => {
         message.attachments.some((a) =>
           ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
         )
-          ? ` [image] (an image of ${await getCaption(
+          ? ` [img] (an image of ${await getCaption(
               message.attachments.at(0).url
             )})`
           : ""
