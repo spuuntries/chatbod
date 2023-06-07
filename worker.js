@@ -196,9 +196,6 @@ parentPort.on("message", async (event) => {
     )
   ) {
     img = await generateImage(responses.slice(persona.length));
-    response = response.replaceAll("[image]", "");
-    response = response.replaceAll("[img]", "");
-    response = response.replaceAll("[pic]", "");
     attFiles.push(
       new Discord.AttachmentBuilder(Buffer.from(img), {
         name: `${response.replaceAll(" ", "_")}.jpg`,
@@ -208,7 +205,6 @@ parentPort.on("message", async (event) => {
 
   if (response.includes("[gif]")) {
     gif = await getTopMatchingGif(responses.slice(persona.length));
-    response = response.replaceAll("[gif]", "");
     if (gif)
       attFiles.push(
         new Discord.AttachmentBuilder(Buffer.from(gif), {
@@ -218,6 +214,7 @@ parentPort.on("message", async (event) => {
   }
 
   response = response.replaceAll(/\(an image of [^\(\)]+\)\n?/gim, "");
+  response = response.replaceAll(/\[.+\]/gim, "");
 
   await message.reply({
     content: response,
