@@ -133,7 +133,7 @@ async function generateImage(query) {
         inputs: `${
           keywords ? `${keywords},` : ""
         } ${emotion}, ${emotion}, ${emotion},${
-          query.includes("kekbot")
+          query.replaceAll(/^[^ \n]+:/gim, "").includes("kekbot")
             ? " catgirl, cat_ears, green_hair, loli, femboy, looking_at_viewer, crop_top,"
             : ""
         } masterpiece, best_quality`,
