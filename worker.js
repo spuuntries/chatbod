@@ -213,7 +213,7 @@ parentPort.on("message", async (event) => {
       );
   }
 
-  response = response.replaceAll(/\(an image of [^\(\)]+\)\n?/gim, "");
+  response = response.replaceAll(/\(.*\)/gim, "");
   response = response.replaceAll(/\[.+\]/gim, "");
 
   await message.reply({
