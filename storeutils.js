@@ -1,5 +1,3 @@
-// NOTE: This util is only for embeddings/vecstore, the actual sentences embedded will need to be implemented elsewhere
-
 const createKDTree = require("static-kdtree"),
   logger = (m) => console.log(`[${new Date()}] ${m}`),
   { QuickDB } = require("quick.db"),
@@ -26,12 +24,12 @@ function runCommand(command) {
 /**
  * Get embedding of string.
  * @param {string} string - String to embed.
- * @returns {Promise<string[]>} Embeddings of the string
+ * @returns {Promise<number[]>} Embeddings of the string
  */
 async function getEmbeddings(string) {
   const res = (
     await runCommand(
-      `llama.cpp/build/bin/embedding -m models/7bq/ggml-model-q4_0-ggjt.bin -p "${string}"`
+      `llama.cpp/build/bin/embedding -m models/13bpq/pyg.bin -p "${string}"`
     )
   ).split(" ");
   res.pop();
@@ -39,9 +37,25 @@ async function getEmbeddings(string) {
 }
 
 /**
+ * Stores string as an embeddings pair in the vector store.
+ * @param {string} string - The string to store.
+ * @returns {Promise<{
+ *  embed: number[]
+ *  string: string;
+ * }[]>}
+ */
+async function storeString(string) {
+  if (!(await db.has("vecstore")))
+    logger(`[WARN] vecstore not created when storing, creating one`);
+
+  const embed = await getEmbeddings(string);
+  return await db.push("vecstore", { embed: embed, string: string });
+}
+
+/**
  * Creates a new vector store.
- * @param {number[][]} [embeddings=[]] - An optional array of initial embeddings.
- * @returns {number[][]}
+ * @param {object[]} [embeddings=[]] - An optional array of initial embeddings pairs.
+ * @returns {Promise<number[][]>}
  */
 async function createStore(embeddings = []) {
   if (!(await db.has("vecstore"))) await db.set(embeddings ? embeddings : []);
@@ -50,36 +64,30 @@ async function createStore(embeddings = []) {
 }
 
 /**
- * Stores embeddings in the vector store.
- * @param {number[]} embeddings - The embeddings to store.
- * @returns {number[][]}
- */
-async function storeEmbeddings(embeddings) {
-  if (!(await db.has("vecstore")))
-    logger(`[WARN] vecstore not created when storing, creating one`);
-
-  return await db.push("vecstore", embeddings);
-}
-
-/**
  * Searches for the nearest neighbors of query embeddings.
  * @param {number[]} query - The queried embeddings.
- * @param {number} [distance=4] - Max distance of neighbors, default is 4.
- * @param {number} [max] - Max number of neighbors, default 2.
- * @returns {number[][]}
+ * @param {number} [max] - Max number of neighbors, default 5.
  */
-async function searchEmbeddings(query, distance, max) {
-  if (!distance) var distance = 4;
-  if (!max) var max = 2;
-  const vecstore = await db.get("vecstore"),
-    tree = createKDTree(vecstore);
+async function searchEmbeddings(query, max) {
+  if (!max) var max = 5;
 
-  return tree.knn(query, max, distance);
+  /** @type {{
+   *  embed: number[]
+   *  string: string;
+   * }[]>}
+   */
+  const vecstore = await db.get("vecstore"),
+    tree = createKDTree(vecstore.map((e) => e["embed"]));
+
+  return tree
+    .knn(query, max)
+    .map((e) => vecstore.map((e) => e["string"])[e])
+    .slice(0, max - 1);
 }
 
 module.exports = {
   getEmbeddings,
   createStore,
-  storeEmbeddings,
+  storeString,
   searchEmbeddings,
 };

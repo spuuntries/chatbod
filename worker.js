@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const procenv = process.env,
-  { parentPort } = require("worker_threads"),
+  { parentPort, Worker } = require("worker_threads"),
   Discord = require("discord.js"),
   client = new Discord.Client({
     intents: ["Guilds", "GuildMessages", "MessageContent"],
@@ -12,7 +12,15 @@ const procenv = process.env,
     generateImage,
     getTopMatchingGif,
     getCaption,
+    getClosestQA,
   } = require("./llmutils"),
+  {
+    createStore,
+    storeString,
+    searchEmbeddings,
+    getEmbeddings,
+  } = require("./storeutils"),
+  typer = new Worker("./typeworker.js"),
   logger = (m) => console.log(`[${new Date()}] ${m}`);
 
 /**
@@ -30,6 +38,7 @@ function extractEmotes(str) {
 }
 
 parentPort.on("message", async (event) => {
+  await createStore();
   const task = event,
     channelId = task[0],
     messageId = task[1];
@@ -59,7 +68,7 @@ parentPort.on("message", async (event) => {
   )
     return;
 
-  await channel.sendTyping();
+  typer.postMessage([message.channelId]);
   logger(
     `handling ${message.id} from ${message.author.id} (${message.author.tag})`
   );
@@ -110,11 +119,11 @@ parentPort.on("message", async (event) => {
     .reverse();
 
   const persona =
-      'Persona: [character(\\"kekbot\\") {' +
+      'kekbot\'s Persona: [character(\\"kekbot\\") {' +
       '\nspecies(\\"loli\\" + \\"catgirl\\" + \\"AI\\")' +
       '\nmind(\\"kawaii\\" + \\"excited\\" + \\"happy\\" + \\"wholesome\\")' +
       '\npersonality(\\"smart\\" + \\"happy\\" + \\"caring\\")' +
-      '\ncreator(\\"@kkekkyea\\")' +
+      '\ncreator(\\"kek.c (also known as kek)\\")' +
       '\nhome(\\"Art Union Discord Server\\")' +
       '\nloves(\\"being helpful\\" + \\"chatting\\" + \\"Le_Pestro\\" + \\"Durian\\" + \\"cheese\\" + \\"pineapple on pizza\\")' +
       '\nhates(\\"spicy food\\" + \\"eating veggies\\")' +
@@ -144,15 +153,24 @@ parentPort.on("message", async (event) => {
       "\nTrol: Send me an image of a dragon." +
       "\nkekbot: Sure! here [img]" +
       "\n<START>",
+    supplement = await searchEmbeddings(
+      getEmbeddings(
+        `${message.author.username.replaceAll(" ", "_")}: ${message.content}`
+      )
+    ),
+    fixSupp = await getClosestQA(
+      `${message.author.username.replaceAll(" ", "_")}: ${message.content}`,
+      supplement
+    ),
     dialog =
-      "\nkekbot: Enlo!! Me am kekbot, nice to meet yall! *waves*" +
+      "\nkekbot: Enlo there!" +
       (history.length
         ? "\n" +
           (await Promise.all(history))
             .join("\n")
             .replaceAll(/(?<!\\)"/gim, '\\"')
         : "") +
-      `\n${message.author.username}: ${extractEmotes(
+      `\n${message.author.username.replaceAll(" ", "_")}: ${extractEmotes(
         message.content
       ).replaceAll(/(?<!\\)"/gim, '\\"')}${
         message.attachments.some((a) => a.contentType.includes("gif"))
@@ -167,6 +185,7 @@ parentPort.on("message", async (event) => {
             )})`
           : ""
       }` +
+      `\n${fixSupp}` +
       "\nkekbot:",
     prefix = persona + dialog;
 
@@ -216,11 +235,14 @@ parentPort.on("message", async (event) => {
   response = response.replaceAll(/\(.*\)/gim, "");
   response = response.replaceAll(/\[.+\]/gim, "");
 
+  await storeString(response);
+
   await message.reply({
     content: response,
     files: attFiles,
     allowedMentions: { repliedUser: false },
   });
+  typer.postMessage([message.channelId]);
 
   client.user.setPresence({
     status: "idle",

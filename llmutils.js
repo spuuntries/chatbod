@@ -33,7 +33,7 @@ function runCommand(command) {
 async function runPrompt(prompt) {
   const res = await runCommand(
     // `llama.cpp/build/bin/main -m models/7bpq/pyg.bin -e -p "${prompt}" -n 64 -b 1024 -c 2048 --top_p 0.7 --temp 0.7 --repeat-penalty 1.2 --repeat-last-n 128 --frequency-penalty 0.3 --prompt-cache-all --prompt-cache mirostatcache --no-penalize-nl`
-    `llama.cpp/build/bin/main -m models/13bpq/pyg.bin -e -p "${prompt}" -n 48 -b 1024 -c 2048 --top_p 0.7 --temp 0.8 --repeat-penalty 1.08 --mirostat 2 --prompt-cache-all --prompt-cache mirostatcache --no-penalize-nl`
+    `llama.cpp/build/bin/main -m models/13bpq/pyg.bin -e -p "${prompt}" -n 64 -b 1024 -c 2048 --top_p 0.7 --temp 0.8 --repeat-penalty 1.08 --mirostat 2 --prompt-cache-all --prompt-cache mirostatcache --no-penalize-nl`
   );
   return res;
 }
@@ -101,7 +101,6 @@ async function getTopMatchingGif(query) {
       });
       return gifResponse.data;
     } else return undefined;
-    console.log(`[${new Date()}] No GIFs found for query "${query}"`);
   } catch (error) {
     console.log(`[${new Date()}] Error querying Tenor API: ${error}`);
   }
@@ -148,10 +147,30 @@ async function generateImage(query) {
   return res;
 }
 
+/**
+ * Function to query a QA model to rank the arrSet for closest to query
+ * @param {string} query
+ * @param {string[]} arrSet
+ */
+async function getClosestQA(query, arrSet) {
+  return (
+    await hf.sentenceSimilarity(
+      {
+        model: "sentence-transformers/multi-qa-mpnet-base-dot-v1",
+        inputs: { source_sentence: query, sentences: arrSet },
+      },
+      { wait_for_model: true }
+    )
+  )
+    .map((e, i) => [arrSet[i], e])
+    .sort((a, b) => b[1] - a[1])[0][0];
+}
+
 module.exports = {
   runCommand,
   runPrompt,
   getCaption,
   getTopMatchingGif,
   generateImage,
+  getClosestQA,
 };
