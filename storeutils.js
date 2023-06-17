@@ -58,7 +58,8 @@ async function storeString(string) {
  * @returns {Promise<number[][]>}
  */
 async function createStore(embeddings = []) {
-  if (!(await db.has("vecstore"))) await db.set(embeddings ? embeddings : []);
+  if (!(await db.has("vecstore")))
+    await db.set("vecstore", embeddings ? embeddings : []);
 
   return await db.get("vecstore");
 }
