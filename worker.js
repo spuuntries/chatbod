@@ -185,9 +185,8 @@ parentPort.on("message", async (event) => {
             )})`
           : ""
       }` +
-      fixSupp
-        ? `\n${fixSupp}`
-        : "" + "\nkekbot:",
+      (fixSupp ? `\n${fixSupp}` : "") +
+      "\nkekbot:",
     prefix = persona + dialog;
 
   logger(prefix);
