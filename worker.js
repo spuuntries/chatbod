@@ -110,7 +110,7 @@ parentPort.on("message", async (event) => {
           m.attachments.some((a) =>
             ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
           )
-            ? ` [img] (an image of ${await getCaption(
+            ? ` [image] (an image of ${await getCaption(
                 m.attachments.at(0).url
               )})`
             : ""
@@ -123,7 +123,7 @@ parentPort.on("message", async (event) => {
       '\nspecies(\\"loli\\" + \\"catgirl\\" + \\"AI\\")' +
       '\nmind(\\"kawaii\\" + \\"excited\\" + \\"happy\\" + \\"wholesome\\")' +
       '\npersonality(\\"smart\\" + \\"happy\\" + \\"caring\\")' +
-      '\ncreator(\\"kek.c (also known as kek)\\")' +
+      '\ncreator(\\"kek\\")' +
       '\nhome(\\"Art Union Discord Server\\")' +
       '\nloves(\\"being helpful\\" + \\"chatting\\" + \\"Le_Pestro\\" + \\"Durian\\" + \\"cheese\\" + \\"pineapple on pizza\\")' +
       '\nhates(\\"spicy food\\" + \\"eating veggies\\")' +
@@ -137,21 +137,21 @@ parentPort.on("message", async (event) => {
       '\npurpose(\\"moderate chat\\" + \\"chat with people\\")' +
       '\nresponse_length(\\"short\\")' +
       "\n}]" +
-      '\n[Scenario: Kekbot is chatting on Discord with some people in Art Union Discord Server. Kekbot can send GIFs by saying \\"[gif]\\" and images by saying \\"[img]\\". Kekbot cannot send links and will never send links.]' +
+      '\n[Scenario: Kekbot is chatting on Discord with some people in Art Union Discord Server. Kekbot can send GIFs by saying \\"[gif]\\" and images by saying \\"[image]\\". Kekbot cannot send links and will never send links.]' +
       "\nTrol: Hi! *waves*" +
       "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [gif]" +
       "\nTrol: Not much, you?" +
-      "\nkekbot: Sameee *shrugs* [img]" +
+      "\nkekbot: Sameee *shrugs* [image]" +
       "\nPyoo: What do you do, kekbot?" +
       "\nkekbot: *thinks for a moment* Me moderate the chat of AU, talk with ppl, etc. *nods*" +
       "\nTrol: Can you send me an image of you?" +
-      "\nkekbot: sure! here you go! [img]" +
+      "\nkekbot: sure! here you go! [image]" +
       "\nDragon: What's your fave food?" +
-      "\nkekbot: I loove pineapple on pizza, ykno, like, these ones [img]" +
+      "\nkekbot: I loove pineapple on pizza, ykno, like, these ones [image]" +
       "\nDragon: would you eat cheese on its own?" +
       "\nkekbot: Mmmm, sure 😊 why not" +
       "\nTrol: Send me an image of a dragon." +
-      "\nkekbot: Sure! here [img]" +
+      "\nkekbot: Sure! here [image]" +
       "\n<START>",
     supplement = await searchEmbeddings(
       getEmbeddings(
@@ -161,8 +161,8 @@ parentPort.on("message", async (event) => {
     fixSupp = await getClosestQA(
       `${message.author.username.replaceAll(" ", "_")}: ${message.content}`,
       supplement
-    ),
-    dialog =
+    );
+  const dialog =
       "\nkekbot: Enlo there!" +
       (history.length
         ? "\n" +
@@ -180,7 +180,7 @@ parentPort.on("message", async (event) => {
         message.attachments.some((a) =>
           ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
         )
-          ? ` [img] (an image of ${await getCaption(
+          ? ` [image] (an image of ${await getCaption(
               message.attachments.at(0).url
             )})`
           : ""
@@ -190,6 +190,7 @@ parentPort.on("message", async (event) => {
     prefix = persona + dialog;
 
   logger(prefix);
+  logger(fixSupp);
 
   /** @type {string} */
   var responses = (await runPrompt(prefix))
@@ -210,9 +211,9 @@ parentPort.on("message", async (event) => {
     gif,
     attFiles = [];
   if (
-    response.includes(
-      "[image]" || response.includes("[pic]") || response.includes("[img]")
-    )
+    response.includes("[image]") ||
+    response.includes("[pic]") ||
+    response.includes("[img]")
   ) {
     img = await generateImage(responses.slice(persona.length));
     attFiles.push(
