@@ -153,16 +153,17 @@ async function generateImage(query) {
  * @param {string[]} arrSet
  */
 async function getClosestQA(query, arrSet) {
-  return (
-    await hf.sentenceSimilarity(
-      {
-        model: "sentence-transformers/multi-qa-mpnet-base-dot-v1",
-        inputs: { source_sentence: query, sentences: arrSet },
-      },
-      { wait_for_model: true }
-    )
-  )
-    .map((e, i) => [arrSet[i], e])
+  const { client } = await import("@gradio/client"),
+    qa = await client("https://spuun-qa.hf.space/", {
+      hf_token: process.env.HF_TOKEN,
+    }),
+    result = (
+      await qa.predict("/predict", [query, arrSet.join("|")])
+    ).data[0].split(",");
+
+  return result
+    .filter((e) => !isNaN(e))
+    .map((e, i) => [arrSet[i], Number.parseFloat(e)])
     .sort((a, b) => b[1] - a[1])[0][0];
 }
 
