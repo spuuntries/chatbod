@@ -6,9 +6,10 @@ const procenv = process.env,
   client = new Discord.Client({
     intents: ["Guilds", "GuildMessages", "MessageContent"],
   }),
-  logger = (m) => console.log(`[${new Date()}] ${m}`),
-  /** @type {Discord.Channel[] | []} */
-  typingChannels = [];
+  logger = (m) => console.log(`[${new Date()}] ${m}`);
+
+/** @type {Discord.Channel[] | []} */
+var typingChannels = [];
 
 client.once("ready", () => {
   parentPort.on("message", async (message) => {
