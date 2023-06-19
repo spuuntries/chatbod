@@ -97,7 +97,9 @@ parentPort.on("message", async (event) => {
         !m.content.trim().startsWith("!ig")
     )
     .map(async (m) => {
-      await m.member.fetch()`${
+      await m.member.fetch();
+
+      return `${
         m.author.id != placeholder
           ? m.member
             ? message.member.displayName.replaceAll(" ", "_")
