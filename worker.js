@@ -97,7 +97,7 @@ parentPort.on("message", async (event) => {
         !m.content.trim().startsWith("!ig")
     )
     .map(async (m) => {
-      await m.member.fetch();
+      await message.guild.members.fetch(m.author.id);
 
       return `${
         m.author.id != placeholder
@@ -119,7 +119,7 @@ parentPort.on("message", async (event) => {
     })
     .reverse();
 
-  await message.member.fetch();
+  await message.guild.members.fetch(message.author.id);
 
   const persona =
       'kekbot\'s Persona: [character(\\"kekbot\\") {' +
