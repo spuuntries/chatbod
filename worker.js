@@ -157,8 +157,12 @@ parentPort.on("message", async (event) => {
       getEmbeddings(
         `${
           message.member
-            ? message.member.displayName.replaceAll(" ", "_")
-            : message.author.username.replaceAll(" ", "_")
+            ? message.member.displayName
+                .replaceAll(" ", "_")
+                .replaceAll(/(?<!\\)"/gim, '\\"')
+            : message.author.username
+                .replaceAll(" ", "_")
+                .replaceAll(/(?<!\\)"/gim, '\\"')
         }: ${message.content}`
       )
     ),
@@ -184,8 +188,12 @@ parentPort.on("message", async (event) => {
         : "") +
       `\n${
         message.member
-          ? message.member.displayName.replaceAll(" ", "_")
-          : message.author.username.replaceAll(" ", "_")
+          ? message.member.displayName
+              .replaceAll(" ", "_")
+              .replaceAll(/(?<!\\)"/gim, '\\"')
+          : message.author.username
+              .replaceAll(" ", "_")
+              .replaceAll(/(?<!\\)"/gim, '\\"')
       }: ${extractEmotes(message.content).replaceAll(/(?<!\\)"/gim, '\\"')}${
         message.attachments.some((a) => a.contentType.includes("gif"))
           ? " [gif]"
