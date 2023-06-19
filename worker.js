@@ -98,14 +98,13 @@ parentPort.on("message", async (event) => {
     )
     .map(async (m) => {
       await message.guild.members.fetch(m.author.id);
+      let author;
+      if (m.author.id != placeholder)
+        if (m.member) author = m.member.displayName.replaceAll(" ", "_");
+        else author = m.author.username.replaceAll(" ", "_");
+      else author = "kekbot";
 
-      return `${
-        m.author.id != placeholder
-          ? m.member
-            ? m.member.displayName.replaceAll(" ", "_")
-            : m.author.username.replaceAll(" ", "_")
-          : "kekbot"
-      }: ${extractEmotes(m.content)}${
+      return `${author}: ${extractEmotes(m.content)}${
         m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
       }${
         m.attachments.some((a) =>
