@@ -96,29 +96,28 @@ parentPort.on("message", async (event) => {
         m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
         !m.content.trim().startsWith("!ig")
     )
-    .map(
-      async (m) =>
-        `${
-          m.author.id != placeholder
-            ? m.member
-              ? message.member.displayName.replaceAll(" ", "_")
-              : m.author.username.replaceAll(" ", "_")
-            : "kekbot"
-        }: ${extractEmotes(m.content)}${
-          m.attachments.some((a) => a.contentType.includes("gif"))
-            ? " [gif]"
-            : ""
-        }${
-          m.attachments.some((a) =>
-            ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
-          )
-            ? ` [image] (an image of ${await getCaption(
-                m.attachments.at(0).url
-              )})`
-            : ""
-        }`
-    )
+    .map(async (m) => {
+      await m.member.fetch()`${
+        m.author.id != placeholder
+          ? m.member
+            ? message.member.displayName.replaceAll(" ", "_")
+            : m.author.username.replaceAll(" ", "_")
+          : "kekbot"
+      }: ${extractEmotes(m.content)}${
+        m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
+      }${
+        m.attachments.some((a) =>
+          ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
+        )
+          ? ` [image] (an image of ${await getCaption(
+              m.attachments.at(0).url
+            )})`
+          : ""
+      }`;
+    })
     .reverse();
+
+  await message.member.fetch();
 
   const persona =
       'kekbot\'s Persona: [character(\\"kekbot\\") {' +
@@ -148,7 +147,7 @@ parentPort.on("message", async (event) => {
       "\nTrol: Can you send me an image of you?" +
       "\nkekbot: sure! here you go! [image]" +
       "\nDragon: What's your fave food?" +
-      "\nkekbot: I loove pineapple on pizza, ykno, like, these ones [image]" +
+      "\nkekbot: Me loove pineapple on pizza, ykno, like, deez ones [image]" +
       "\nDragon: would you eat cheese on its own?" +
       "\nkekbot: Mmmm, sure 😊 why not" +
       "\nTrol: Send me an image of a dragon." +
@@ -166,8 +165,12 @@ parentPort.on("message", async (event) => {
     fixSupp = await getClosestQA(
       `${
         message.member
-          ? message.member.displayName.replaceAll(" ", "_")
-          : message.author.username.replaceAll(" ", "_")
+          ? message.member.displayName
+              .replaceAll(" ", "_")
+              .replaceAll(/(?<!\\)"/gim, '\\"')
+          : message.author.username
+              .replaceAll(" ", "_")
+              .replaceAll(/(?<!\\)"/gim, '\\"')
       }: ${message.content}`,
       supplement
     ),
