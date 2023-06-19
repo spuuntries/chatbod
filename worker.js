@@ -105,7 +105,9 @@ parentPort.on("message", async (event) => {
       else author = "kekbot";
 
       return `${author}: ${extractEmotes(m.content)}${
-        m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
+        m.attachments.some((a) => a.contentType.includes("gif"))
+          ? " [anim]"
+          : ""
       }${
         m.attachments.some((a) =>
           ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
@@ -138,9 +140,9 @@ parentPort.on("message", async (event) => {
       '\nlanguages(\\"English\\")' +
       '\npurpose(\\"moderate chat\\" + \\"chat with people\\")' +
       "\n}]" +
-      '\n[Scenario: Kekbot is chatting on Discord with some people in Art Union Discord Server. Kekbot can send GIFs by saying \\"[gif]\\" and images by saying \\"[image]\\". Kekbot will never send links.]' +
+      '\n[Scenario: Kekbot is chatting on Discord with some people in Art Union Discord Server. Kekbot can send GIFs by saying \\"[anim]\\" and images by saying \\"[image]\\". Kekbot will never send links.]' +
       "\nTrol: Hi! *waves*" +
-      "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [gif]" +
+      "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [anim]" +
       "\nTrol: Not much, you?" +
       "\nkekbot: Sameee *shrugs* [image]" +
       "\nPyoo: What do you do, kekbot?" +
@@ -197,7 +199,7 @@ parentPort.on("message", async (event) => {
               .replaceAll(/(?<!\\)"/gim, '\\"')
       }: ${extractEmotes(message.content).replaceAll(/(?<!\\)"/gim, '\\"')}${
         message.attachments.some((a) => a.contentType.includes("gif"))
-          ? " [gif]"
+          ? " [anim]"
           : ""
       }${
         message.attachments.some((a) =>
@@ -251,7 +253,7 @@ parentPort.on("message", async (event) => {
     );
   }
 
-  if (response.includes("[gif]")) {
+  if (response.includes("[anim]")) {
     gif = await getTopMatchingGif(responses.slice(persona.length));
     if (gif)
       attFiles.push(
