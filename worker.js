@@ -102,7 +102,7 @@ parentPort.on("message", async (event) => {
       return `${
         m.author.id != placeholder
           ? m.member
-            ? message.member.displayName.replaceAll(" ", "_")
+            ? m.member.displayName.replaceAll(" ", "_")
             : m.author.username.replaceAll(" ", "_")
           : "kekbot"
       }: ${extractEmotes(m.content)}${
