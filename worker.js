@@ -266,7 +266,7 @@ parentPort.on("message", async (event) => {
   response = response.replaceAll(/\(\D*\)/gim, "");
   response = response.replaceAll(/\[.+\]/gim, "");
 
-  await storeString(response);
+  await storeString(response.replaceAll(/(?<!\\)"/gim, '\\"'));
 
   await message.reply({
     content: response,
