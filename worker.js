@@ -4,7 +4,7 @@ const procenv = process.env,
   { parentPort, Worker } = require("worker_threads"),
   Discord = require("discord.js"),
   client = new Discord.Client({
-    intents: ["Guilds", "GuildMessages", "MessageContent"],
+    intents: ["Guilds", "GuildMessages", "MessageContent", "GuildMembers"],
   }),
   placeholder = procenv.PLACEHOLDER,
   {
