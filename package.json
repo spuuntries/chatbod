@@ -5,15 +5,15 @@
   "author": "spuun <kek@spuun.art>",
   "license": "MIT",
   "dependencies": {
-    "@gradio/client": "^0.1.1",
-    "@huggingface/inference": "^2.3.3",
+    "@gradio/client": "^0.1.2",
+    "@huggingface/inference": "^2.5.2",
     "axios": "^1.4.0",
     "better-sqlite3": "^8.4.0",
     "discord.js": "^14.11.0",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.3.1",
     "nanoid": "^3.3.6",
     "niceware": "^4.0.0",
-    "pythonia": "^1.0.1",
+    "pythonia": "^1.0.2",
     "quick.db": "^9.1.6",
     "static-kdtree": "^1.0.2"
   }

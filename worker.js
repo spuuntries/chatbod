@@ -224,7 +224,10 @@ parentPort.on("message", async (event) => {
 
   logger(responses.slice(persona.length));
 
-  if (lastPrefix < 0) response = responses.slice(prefix.length);
+  if (lastPrefix < 0)
+    response = responses.slice(
+      prefix.replaceAll(/(?<!\\)"/gim, '\\"').replace("<END>", "").length
+    );
   else response = responses.slice(prefix.length).slice(0, lastPrefix);
   logger(responses);
   logger(lastPrefix);
