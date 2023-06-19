@@ -214,7 +214,9 @@ parentPort.on("message", async (event) => {
 
   if (lastPrefix < 0) response = responses.slice(prefix.length);
   else response = responses.slice(prefix.length).slice(0, lastPrefix);
-  logger(responses, lastPrefix, response);
+  logger(responses);
+  logger(lastPrefix);
+  logger(response);
 
   response = response.replace("<START>", "");
 
