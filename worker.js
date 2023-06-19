@@ -216,7 +216,7 @@ parentPort.on("message", async (event) => {
   logger(supplement, fixSupp);
 
   /** @type {string} */
-  var responses = (await runPrompt(prefix))
+  var responses = (await runPrompt(prefix.replaceAll("`", "\\`")))
       .replaceAll(/(?<!\\)"/gim, '\\"')
       .replace("<END>", ""),
     lastPrefix = responses.slice(prefix.length).search(/^[^ \n]+:/gim),
