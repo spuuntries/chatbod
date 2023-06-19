@@ -100,7 +100,9 @@ parentPort.on("message", async (event) => {
       async (m) =>
         `${
           m.author.id != placeholder
-            ? m.author.username.replaceAll(" ", "_")
+            ? m.member
+              ? message.member.displayName.replaceAll(" ", "_")
+              : m.author.username.replaceAll(" ", "_")
             : "kekbot"
         }: ${extractEmotes(m.content)}${
           m.attachments.some((a) => a.contentType.includes("gif"))
@@ -135,9 +137,8 @@ parentPort.on("message", async (event) => {
       '\npronouns(\\"whatever\\")' +
       '\nlanguages(\\"English\\")' +
       '\npurpose(\\"moderate chat\\" + \\"chat with people\\")' +
-      '\nresponse_length(\\"short\\")' +
       "\n}]" +
-      '\n[Scenario: Kekbot is chatting on Discord with some people in Art Union Discord Server. Kekbot can send GIFs by saying \\"[gif]\\" and images by saying \\"[image]\\". Kekbot cannot send links and will never send links.]' +
+      '\n[Scenario: Kekbot is chatting on Discord with some people in Art Union Discord Server. Kekbot can send GIFs by saying \\"[gif]\\" and images by saying \\"[image]\\". Kekbot will never send links.]' +
       "\nTrol: Hi! *waves*" +
       "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [gif]" +
       "\nTrol: Not much, you?" +
@@ -155,14 +156,22 @@ parentPort.on("message", async (event) => {
       "\n<START>",
     supplement = await searchEmbeddings(
       getEmbeddings(
-        `${message.author.username.replaceAll(" ", "_")}: ${message.content}`
+        `${
+          message.member
+            ? message.member.displayName.replaceAll(" ", "_")
+            : message.author.username.replaceAll(" ", "_")
+        }: ${message.content}`
       )
     ),
     fixSupp = await getClosestQA(
-      `${message.author.username.replaceAll(" ", "_")}: ${message.content}`,
+      `${
+        message.member
+          ? message.member.displayName.replaceAll(" ", "_")
+          : message.author.username.replaceAll(" ", "_")
+      }: ${message.content}`,
       supplement
-    );
-  const dialog =
+    ),
+    dialog =
       "\nkekbot: Enlo there!" +
       (history.length
         ? "\n" +
@@ -170,9 +179,11 @@ parentPort.on("message", async (event) => {
             .join("\n")
             .replaceAll(/(?<!\\)"/gim, '\\"')
         : "") +
-      `\n${message.author.username.replaceAll(" ", "_")}: ${extractEmotes(
-        message.content
-      ).replaceAll(/(?<!\\)"/gim, '\\"')}${
+      `\n${
+        message.member
+          ? message.member.displayName.replaceAll(" ", "_")
+          : message.author.username.replaceAll(" ", "_")
+      }: ${extractEmotes(message.content).replaceAll(/(?<!\\)"/gim, '\\"')}${
         message.attachments.some((a) => a.contentType.includes("gif"))
           ? " [gif]"
           : ""
@@ -190,7 +201,7 @@ parentPort.on("message", async (event) => {
     prefix = persona + dialog;
 
   logger(prefix);
-  logger(fixSupp);
+  logger(supplement, fixSupp);
 
   /** @type {string} */
   var responses = (await runPrompt(prefix))
