@@ -38,7 +38,7 @@ function extractEmotes(str) {
 }
 
 parentPort.on("message", async (event) => {
-  await createStore();
+  // await createStore();
   const task = event,
     channelId = task[0],
     messageId = task[1];
@@ -156,31 +156,31 @@ parentPort.on("message", async (event) => {
       "\nTrol: Send me an image of a dragon." +
       "\nkekbot: Sure! here [image]" +
       "\n<START>",
-    supplement = await searchEmbeddings(
-      getEmbeddings(
-        `${
-          message.member
-            ? message.member.displayName
-                .replaceAll(" ", "_")
-                .replaceAll(/(?<!\\)"/gim, '\\"')
-            : message.author.username
-                .replaceAll(" ", "_")
-                .replaceAll(/(?<!\\)"/gim, '\\"')
-        }: ${message.content}`
-      )
-    ),
-    fixSupp = await getClosestQA(
-      `${
-        message.member
-          ? message.member.displayName
-              .replaceAll(" ", "_")
-              .replaceAll(/(?<!\\)"/gim, '\\"')
-          : message.author.username
-              .replaceAll(" ", "_")
-              .replaceAll(/(?<!\\)"/gim, '\\"')
-      }: ${message.content}`,
-      supplement
-    ),
+    // supplement = await searchEmbeddings(
+    //   getEmbeddings(
+    //     `${
+    //       message.member
+    //         ? message.member.displayName
+    //             .replaceAll(" ", "_")
+    //             .replaceAll(/(?<!\\)"/gim, '\\"')
+    //         : message.author.username
+    //             .replaceAll(" ", "_")
+    //             .replaceAll(/(?<!\\)"/gim, '\\"')
+    //     }: ${message.content}`
+    //   )
+    // ),
+    //  fixSupp = await getClosestQA(
+    //   `${
+    //     message.member
+    //       ? message.member.displayName
+    //           .replaceAll(" ", "_")
+    //           .replaceAll(/(?<!\\)"/gim, '\\"')
+    //       : message.author.username
+    //           .replaceAll(" ", "_")
+    //           .replaceAll(/(?<!\\)"/gim, '\\"')
+    //   }: ${message.content}`,
+    //   supplement
+    // ),
     dialog =
       "\nkekbot: Enlo there!" +
       (history.length
@@ -210,7 +210,7 @@ parentPort.on("message", async (event) => {
             )})`
           : ""
       }` +
-      (fixSupp ? `\n${fixSupp}` : "") +
+      //(fixSupp ? `\n${fixSupp}` : "") +
       "\nkekbot:",
     prefix = persona + dialog;
 
@@ -267,7 +267,7 @@ parentPort.on("message", async (event) => {
   response = response.replaceAll(/\(\D[^)]+$/gim, "");
   response = response.replaceAll(/\[.+\]/gim, "");
 
-  await storeString(response.replaceAll(/(?<!\\)"/gim, '\\"'));
+  // await storeString(response.replaceAll(/(?<!\\)"/gim, '\\"'));
 
   await message.reply({
     content: response,
