@@ -215,7 +215,7 @@ parentPort.on("message", async (event) => {
     prefix = persona + dialog;
 
   logger(prefix);
-  logger(supplement, fixSupp);
+  //  logger(supplement, fixSupp);
 
   /** @type {string} */
   var responses = (await runPrompt(prefix.replaceAll("`", "\\`")))
