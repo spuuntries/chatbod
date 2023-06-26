@@ -74,11 +74,11 @@ async function summarize(query) {
 
 /**
  *
- * @param {string} image - link of image to check
+ * @param {Buffer} image - buffer of image to check
  */
 async function nsfwProcess(image) {
   const { client } = await import("@gradio/client"),
-    blob = await (await fetch(image)).blob(),
+    blob = new Blob([image]),
     nsfwdet = await client("https://spuun-nsfw-det.hf.space/", {
       hf_token: process.env.HF_TOKEN,
     }),

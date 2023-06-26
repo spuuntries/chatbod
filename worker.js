@@ -13,6 +13,7 @@ const procenv = process.env,
     getTopMatchingGif,
     getCaption,
     getClosestQA,
+    nsfwProcess,
   } = require("./llmutils"),
   {
     createStore,
@@ -105,9 +106,7 @@ parentPort.on("message", async (event) => {
       else author = "kekbot";
 
       return `${author}: ${extractEmotes(m.content)}${
-        m.attachments.some((a) => a.contentType.includes("gif"))
-          ? " [anim]"
-          : ""
+        m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
       }${
         m.attachments.some((a) =>
           ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
@@ -140,9 +139,9 @@ parentPort.on("message", async (event) => {
       '\nlanguages(\\"English\\")' +
       '\npurpose(\\"moderate chat\\" + \\"chat with people\\")' +
       "\n}]" +
-      '\n[Scenario: Kekbot is chatting on Discord with some people in Art Union Discord Server. Kekbot can send GIFs by saying \\"[anim]\\" and images by saying \\"[image]\\". Kekbot will never send links.]' +
+      '\n[Scenario: Kekbot is chatting on Discord with some people in Art Union Discord Server. Kekbot can send images by saying \\"[image]\\" and GIFs by saying \\"[gif]\\". Kekbot will never send links.]' +
       "\nTrol: Hi! *waves*" +
-      "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [anim]" +
+      "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [gif]" +
       "\nTrol: Not much, you?" +
       "\nkekbot: Sameee *shrugs* [image]" +
       "\nPyoo: What do you do, kekbot?" +
@@ -199,7 +198,7 @@ parentPort.on("message", async (event) => {
               .replaceAll(/(?<!\\)"/gim, '\\"')
       }: ${extractEmotes(message.content).replaceAll(/(?<!\\)"/gim, '\\"')}${
         message.attachments.some((a) => a.contentType.includes("gif"))
-          ? " [anim]"
+          ? " [gif]"
           : ""
       }${
         message.attachments.some((a) =>
@@ -248,17 +247,19 @@ parentPort.on("message", async (event) => {
     img = await generateImage(responses.slice(persona.length));
     attFiles.push(
       new Discord.AttachmentBuilder(Buffer.from(img), {
-        name: `${response.replaceAll(" ", "_")}.jpg`,
+        name: `${
+          (await nsfwProcess(Buffer.from(img))) ? "SPOILER_" : ""
+        }${response.replaceAll(" ", "_").slice(0, 1024)}.jpg`,
       })
     );
   }
 
-  if (response.includes("[anim]")) {
+  if (response.includes("[gif]")) {
     gif = await getTopMatchingGif(responses.slice(persona.length));
     if (gif)
       attFiles.push(
         new Discord.AttachmentBuilder(Buffer.from(gif), {
-          name: `${response.replaceAll(" ", "_")}.gif`,
+          name: `${response.replaceAll(" ", "_").slice(0, 1024)}.gif`,
         })
       );
   }
