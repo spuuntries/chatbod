@@ -74,15 +74,15 @@ async function summarize(query) {
 
 /**
  *
- * @param {Buffer} image - image buffer to check
+ * @param {string} image - link of image to check
  */
 async function nsfwProcess(image) {
   const { client } = await import("@gradio/client"),
     blob = await (await fetch(image)).blob(),
-    dialogsum = await client("https://spuun-nsfw-det.hf.space/", {
+    nsfwdet = await client("https://spuun-nsfw-det.hf.space/", {
       hf_token: process.env.HF_TOKEN,
     }),
-    res = (await dialogsum.predict("/predict", [blob])).data[0];
+    res = (await nsfwdet.predict("/predict", [blob])).data[0];
 
   if (!res) {
     console.log(
