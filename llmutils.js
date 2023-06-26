@@ -73,6 +73,28 @@ async function summarize(query) {
 }
 
 /**
+ *
+ * @param {Buffer} image - image buffer to check
+ */
+async function nsfwProcess(image) {
+  const { client } = await import("@gradio/client"),
+    blob = await (await fetch(image)).blob(),
+    dialogsum = await client("https://spuun-nsfw-det.hf.space/", {
+      hf_token: process.env.HF_TOKEN,
+    }),
+    res = (await dialogsum.predict("/predict", [blob])).data[0];
+
+  if (!res) {
+    console.log(
+      `[WARN] [${new Date()}] nsfw failed to return a value, defaulting to false.`
+    );
+    return false;
+  }
+
+  return JSON.parse(res.toLowerCase());
+}
+
+/**
  * Fetches the top matching GIF for a given query.
  * @param {string} query - The search query.
  * @returns {Promise<ArrayBuffer | undefined>} The GIF data as an ArrayBuffer or undefined.
@@ -172,6 +194,7 @@ module.exports = {
   runPrompt,
   getCaption,
   getTopMatchingGif,
+  nsfwProcess,
   generateImage,
   getClosestQA,
 };
