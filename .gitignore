@@ -4,3 +4,4 @@ models/
 .venv/
 json.sqlite
 .env
+.pnpm-debug.log

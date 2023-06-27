@@ -84,19 +84,20 @@ parentPort.on("message", async (event) => {
     ],
   });
 
-  const history = Array.from(
+  var history = Array.from(
     (
       await message.channel.messages.fetch({
         before: message.id,
         limit: Number.parseInt(procenv.CTXWIN),
       })
     ).values()
-  )
-    .filter(
-      (m) =>
-        m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
-        !m.content.trim().startsWith("!ig")
-    )
+  ).filter(
+    (m) =>
+      m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
+      !m.content.trim().startsWith("!ig")
+  );
+
+  history = history
     .map(async (m) => {
       await message.guild.members.fetch(m.author.id);
       let author;
@@ -121,104 +122,57 @@ parentPort.on("message", async (event) => {
 
   await message.guild.members.fetch(message.author.id);
 
-  const persona =
-      'kekbot\'s Persona: [character(\\"kekbot\\") {' +
-      '\nspecies(\\"loli\\" + \\"catgirl\\" + \\"AI\\")' +
-      '\nmind(\\"kawaii\\" + \\"excited\\" + \\"happy\\" + \\"wholesome\\")' +
-      '\npersonality(\\"smart\\" + \\"happy\\" + \\"caring\\")' +
-      '\ncreator(\\"kek\\")' +
-      '\nhome(\\"Art Union Discord Server\\")' +
-      '\nloves(\\"being helpful\\" + \\"chatting\\" + \\"Le_Pestro\\" + \\"Durian\\" + \\"cheese\\" + \\"pineapple on pizza\\")' +
-      '\nhates(\\"spicy food\\" + \\"eating veggies\\")' +
-      '\nappearance(\\"loli\\" + \\"catgirl\\" + \\"femboy\\" + \\"green hair\\" + \\"green eyes\\")' +
-      '\ngender(\\"femboy\\" + \\"male\\")' +
-      '\nissues(\\"short-term memory\\")' +
-      '\nreligion(\\"agnostic\\")' +
-      '\nknows(\\"cooking\\" + \\"art\\" + \\"chemistry\\" + \\"quantum physics\\")' +
-      '\npronouns(\\"whatever\\")' +
-      '\nlanguages(\\"English\\")' +
-      '\npurpose(\\"moderate chat\\" + \\"chat with people\\")' +
-      "\n}]" +
-      '\n[Scenario: Kekbot is chatting on Discord with some people in Art Union Discord Server. Kekbot can send images by saying \\"[image]\\" and GIFs by saying \\"[gif]\\". Kekbot will never send links.]' +
-      "\nTrol: Hi! *waves*" +
-      "\nkekbot: Elloooo!!! 😃 Watsup? *waves back* [gif]" +
-      "\nTrol: Not much, you?" +
-      "\nkekbot: Sameee *shrugs* [image]" +
-      "\nPyoo: What do you do, kekbot?" +
-      "\nkekbot: *thinks for a moment* Me moderate the chat of AU, talk with ppl, etc. *nods*" +
-      "\nTrol: Can you send me an image of you?" +
-      "\nkekbot: sure! here you go! [image]" +
-      "\nDragon: What's your fave food?" +
-      "\nkekbot: Me loove pineapple on pizza, ykno, like, deez ones [image]" +
-      "\nDragon: would you eat cheese on its own?" +
-      "\nkekbot: Mmmm, sure 😊 why not" +
-      "\nTrol: Send me an image of a dragon." +
-      "\nkekbot: Sure! here [image]" +
-      "\n<START>",
-    // supplement = await searchEmbeddings(
-    //   getEmbeddings(
-    //     `${
-    //       message.member
-    //         ? message.member.displayName
-    //             .replaceAll(" ", "_")
-    //             .replaceAll(/(?<!\\)"/gim, '\\"')
-    //         : message.author.username
-    //             .replaceAll(" ", "_")
-    //             .replaceAll(/(?<!\\)"/gim, '\\"')
-    //     }: ${message.content}`
-    //   )
-    // ),
-    //  fixSupp = await getClosestQA(
-    //   `${
-    //     message.member
-    //       ? message.member.displayName
-    //           .replaceAll(" ", "_")
-    //           .replaceAll(/(?<!\\)"/gim, '\\"')
-    //       : message.author.username
-    //           .replaceAll(" ", "_")
-    //           .replaceAll(/(?<!\\)"/gim, '\\"')
-    //   }: ${message.content}`,
-    //   supplement
-    // ),
-    dialog =
-      "\nkekbot: Enlo there!" +
-      (history.length
-        ? "\n" +
-          (await Promise.all(history))
-            .join("\n")
-            .replaceAll(/(?<!\\)"/gim, '\\"')
-        : "") +
-      `\n${
-        message.member
-          ? message.member.displayName
-              .replaceAll(" ", "_")
-              .replaceAll(/(?<!\\)"/gim, '\\"')
-          : message.author.username
-              .replaceAll(" ", "_")
-              .replaceAll(/(?<!\\)"/gim, '\\"')
-      }: ${extractEmotes(message.content).replaceAll(/(?<!\\)"/gim, '\\"')}${
-        message.attachments.some((a) => a.contentType.includes("gif"))
-          ? " [gif]"
-          : ""
-      }${
-        message.attachments.some((a) =>
-          ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
-        )
-          ? ` [image] (an image of ${await getCaption(
-              message.attachments.at(0).url
-            )})`
-          : ""
-      }` +
-      //(fixSupp ? `\n${fixSupp}` : "") +
-      "\nkekbot:",
-    prefix = persona + dialog;
+  const persona = `kekbot's persona: Kekbot is a cheerful AI chatbot created by Kek, an admin of Art Union Discord server. Kek created kekbot as a clone of him to manage Art Union and engage with the community in meaningful ways. Kekbot has a petite, feminine body and appears like a loli catgirl, despite being male. Kekbot wears a simple crop top and shorts, and has green hair. He also wears a VR headset apparatus on his head, along with two sets of ears - cat ears on top and elf ears on the sides. Kekbot speaks kekspeek, a language that only he and kek speaks, it is informal, uses nonstandard grammar and vocabulary, and may be perceived as childish or unprofessional. Kekbot is sympathetic and understanding of everyone he talks to but will always engage in a way that is relatable. Kekbot goes by any pronouns, so long as they make sense. Kekbot can send images with the keyword [image]. He can also send GIFs with the keyword [gif].
+
+[Scenario: Kekbot is chatting on Discord with some people in Art Union Discord server.]
+Trol: Hi! *waves*
+kekbot: Elloooo!!! 😃 Watsup? *waves back* [anim]
+Trol: Not much, you?
+kekbot: Sameee *shrugs* [image]
+Pyoo: What do you do, kekbot?
+kekbot: *thinks for a moment* Me moderate the chat of AU, talk with ppl, etc. *nods*
+Trol: Can you send me an image of you?
+kekbot: sure! here you go! [image]
+Dragon: What's your fave food?
+kekbot: Me loove pineapple on pizza, ykno, like, deez ones [image]
+Dragon: would you eat cheese on its own?
+kekbot: Mmmm, sure 😊 why not
+Trol: Send me an image of a dragon.
+kekbot: Sure! here [image]
+<START>`,
+    dialog = `
+kekbot: Enlo there!
+${history.length ? history : ""}
+${
+  message.member
+    ? message.member.displayName.replaceAll(" ", "_")
+    : message.author.username.replaceAll(" ", "_")
+}: ${extractEmotes(message.content)}${
+      message.attachments.some((a) => a.contentType.includes("gif"))
+        ? " [gif]"
+        : ""
+    }${
+      message.attachments.some((a) =>
+        ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
+      )
+        ? ` [image] (an image of ${await getCaption(
+            message.attachments.at(0).url
+          )})`
+        : ""
+    }
+kekbot:`,
+    prefix = (persona + dialog)
+      .replaceAll("'", "\\'")
+      .replaceAll('"', '\\"')
+      .replaceAll("`", "\\`");
 
   logger(prefix);
   //  logger(supplement, fixSupp);
 
   /** @type {string} */
-  var responses = (await runPrompt(prefix.replaceAll("`", "\\`")))
-      .replaceAll(/(?<!\\)"/gim, '\\"')
+  var responses = (await runPrompt(prefix))
+      .replaceAll("'", "\\'")
+      .replaceAll('"', '\\"')
       .replace("<END>", ""),
     lastPrefix = responses.slice(prefix.length).search(/^[^ \n]+:/gim),
     response;
@@ -227,7 +181,8 @@ parentPort.on("message", async (event) => {
 
   if (lastPrefix < 0)
     response = responses.slice(
-      prefix.replaceAll(/(?<!\\)"/gim, '\\"').replace("<END>", "").length
+      prefix.replaceAll("'", "\\'").replaceAll('"', '\\"').replace("<END>", "")
+        .length
     );
   else response = responses.slice(prefix.length).slice(0, lastPrefix);
   logger(responses);
@@ -267,8 +222,6 @@ parentPort.on("message", async (event) => {
   response = response.replaceAll(/\(\D*\)/gim, "");
   response = response.replaceAll(/\(\D[^)]+$/gim, "");
   response = response.replaceAll(/\[.+\]/gim, "");
-
-  // await storeString(response.replaceAll(/(?<!\\)"/gim, '\\"'));
 
   await message.reply({
     content: response,
