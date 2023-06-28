@@ -119,6 +119,7 @@ parentPort.on("message", async (event) => {
       }`;
     })
     .reverse();
+  history = await Promise.all(history);
 
   await message.guild.members.fetch(message.author.id);
 
