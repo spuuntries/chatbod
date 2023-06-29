@@ -165,8 +165,8 @@ ${
     }
 kekbot:`,
     prefix = (persona + dialog)
-      .replaceAll("'", "\\'")
-      .replaceAll('"', '\\"')
+      .replaceAll(/[\'']/gim, "\\'")
+      .replaceAll(/[\""]/gim, '\\"')
       .replaceAll("`", "\\`")
       .replace("<END>", "");
 
@@ -175,8 +175,8 @@ kekbot:`,
 
   /** @type {string} */
   var responses = (await runPrompt(prefix))
-      .replaceAll("'", "\\'")
-      .replaceAll('"', '\\"')
+      .replaceAll(/[\'']/gim, "\\'")
+      .replaceAll(/[\""]/gim, '\\"')
       .replaceAll("`", "\\`")
       .replace("<END>", ""),
     lastPrefix = responses.slice(prefix.length).search(/^[^ \n]+:/gim),
