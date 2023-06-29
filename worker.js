@@ -182,7 +182,7 @@ kekbot:`,
     lastPrefix = responses.slice(prefix.length).search(/^[^ \n]+:/gim),
     response;
 
-  logger(responses.slice(persona.length));
+  logger(responses.slice(prefix.length));
 
   if (lastPrefix < 0) response = responses.slice(prefix.length);
   else response = responses.slice(prefix.length).slice(0, lastPrefix);
