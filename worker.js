@@ -165,13 +165,16 @@ ${
         : ""
     }
 kekbot:`,
-    prefix = JSON.stringify(persona + dialog).replace("<END>", "");
+    prefix = eval(JSON.stringify(persona + dialog)).replace("<END>", "");
 
   logger(prefix);
   //  logger(supplement, fixSupp);
 
   /** @type {string} */
-  var responses = JSON.stringify(await runPrompt(prefix)).replace("<END>", ""),
+  var responses = eval(JSON.stringify(await runPrompt(prefix))).replace(
+      "<END>",
+      ""
+    ),
     response = responses.slice(prefix.length),
     lastPrefix = response.search(/^[^ \n]+:/gim);
 
