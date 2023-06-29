@@ -180,6 +180,7 @@ kekbot:`,
 
   logger(prefix.length);
   logger(responses.length);
+  logger(response);
 
   if (lastPrefix >= 0) response = response.slice(0, lastPrefix);
   logger(responses);
