@@ -15,6 +15,7 @@ const procenv = process.env,
     getClosestQA,
     nsfwProcess,
   } = require("./llmutils"),
+  jsesc = require("jsesc"),
   {
     createStore,
     storeString,
@@ -164,23 +165,13 @@ ${
         : ""
     }
 kekbot:`,
-    prefix = (persona + dialog)
-      .replaceAll(/([^'\\]*(?:\\.[^'\\]*)*)'/gim, "$1\\'")
-      .replaceAll(/([^"\\]*(?:\\.[^"\\]*)*)"/gim, '$1\\"')
-      .replaceAll(/([^\\\\]*(?:\\.[^\\\\]*)*)"/gim, "$1\\\\")
-      .replaceAll("`", "\\`")
-      .replace("<END>", "");
+    prefix = jsesc(persona + dialog).replace("<END>", "");
 
   logger(prefix);
   //  logger(supplement, fixSupp);
 
   /** @type {string} */
-  var responses = (await runPrompt(prefix))
-      .replaceAll(/([^'\\]*(?:\\.[^'\\]*)*)'/gim, "$1\\'")
-      .replaceAll(/([^"\\]*(?:\\.[^"\\]*)*)"/gim, '$1\\"')
-      .replaceAll(/([^\\\\]*(?:\\.[^\\\\]*)*)"/gim, "$1\\\\")
-      .replaceAll("`", "\\`")
-      .replace("<END>", ""),
+  var responses = jsesc(await runPrompt(prefix)).replace("<END>", ""),
     response = responses.slice(prefix.length),
     lastPrefix = response.search(/^[^ \n]+:/gim);
 
