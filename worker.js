@@ -184,14 +184,7 @@ kekbot:`,
 
   logger(responses.slice(persona.length));
 
-  if (lastPrefix < 0)
-    response = responses.slice(
-      prefix
-        .replaceAll("'", "\\'")
-        .replaceAll('"', '\\"')
-        .replaceAll("`", "\\`")
-        .replace("<END>", "").length - 1
-    );
+  if (lastPrefix < 0) response = responses.slice(prefix.length);
   else response = responses.slice(prefix.length).slice(0, lastPrefix);
   logger(responses);
   logger(lastPrefix);
