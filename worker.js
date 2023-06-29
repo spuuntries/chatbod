@@ -175,15 +175,13 @@ kekbot:`,
       .replaceAll(/[\""]/gim, '\\"')
       .replaceAll("`", "\\`")
       .replace("<END>", ""),
-    lastPrefix = responses.slice(prefix.length).search(/^[^ \n]+:/gim),
-    response;
+    response = responses.slice(prefix.length),
+    lastPrefix = response.search(/^[^ \n]+:/gim);
 
   logger(prefix.length);
   logger(responses.length);
-  logger(responses.slice(prefix.length));
 
-  if (lastPrefix < 0) response = responses.slice(prefix.length);
-  else response = responses.slice(prefix.length).slice(0, lastPrefix);
+  if (lastPrefix >= 0) response = response.slice(0, lastPrefix);
   logger(responses);
   logger(lastPrefix);
   logger(response);
