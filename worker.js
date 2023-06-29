@@ -164,13 +164,19 @@ ${
         : ""
     }
 kekbot:`,
-    prefix = (persona + dialog).replaceAll("`", "\\`").replace("<END>", "");
+    prefix = (persona + dialog)
+      .replace(/([^'\\]*(?:\\.[^'\\]*)*)'/g, "$1\\'")
+      .replace(/([^"\\]*(?:\\.[^"\\]*)*)"/g, '$1\\"')
+      .replaceAll("`", "\\`")
+      .replace("<END>", "");
 
   logger(prefix);
   //  logger(supplement, fixSupp);
 
   /** @type {string} */
   var responses = (await runPrompt(prefix))
+      .replace(/([^'\\]*(?:\\.[^'\\]*)*)'/g, "$1\\'")
+      .replace(/([^"\\]*(?:\\.[^"\\]*)*)"/g, '$1\\"')
       .replaceAll("`", "\\`")
       .replace("<END>", ""),
     response = responses.slice(prefix.length - 1),
