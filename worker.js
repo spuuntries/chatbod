@@ -171,8 +171,6 @@ kekbot:`,
 
   /** @type {string} */
   var responses = (await runPrompt(prefix))
-      .replaceAll(/[\'']/gim, "\\'")
-      .replaceAll(/[\""]/gim, '\\"')
       .replaceAll("`", "\\`")
       .replace("<END>", ""),
     response = responses.slice(prefix.length),
