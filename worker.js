@@ -164,11 +164,7 @@ ${
         : ""
     }
 kekbot:`,
-    prefix = (persona + dialog)
-      .replaceAll(/[\'']/gim, "\\'")
-      .replaceAll(/[\""]/gim, '\\"')
-      .replaceAll("`", "\\`")
-      .replace("<END>", "");
+    prefix = (persona + dialog).replaceAll("`", "\\`").replace("<END>", "");
 
   logger(prefix);
   //  logger(supplement, fixSupp);

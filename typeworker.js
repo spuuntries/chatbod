@@ -43,7 +43,7 @@ client.once("ready", () => {
 
       await channel.sendTyping();
     });
-  }, 5000);
+  }, 3000);
 
   logger(`Typer worker ready.`);
 });
