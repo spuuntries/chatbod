@@ -165,8 +165,8 @@ ${
     }
 kekbot:`,
     prefix = (persona + dialog)
-      .replace(/([^'\\]*(?:\\.[^'\\]*)*)'/g, "$1\\'")
-      .replace(/([^"\\]*(?:\\.[^"\\]*)*)"/g, '$1\\"')
+      .replace(/([^'\\]*(?:\\.[^'\\]*)*)'/gim, "$1\\'")
+      .replace(/([^"\\]*(?:\\.[^"\\]*)*)"/gim, '$1\\"')
       .replaceAll("`", "\\`")
       .replace("<END>", "");
 
@@ -175,8 +175,8 @@ kekbot:`,
 
   /** @type {string} */
   var responses = (await runPrompt(prefix))
-      .replace(/([^'\\]*(?:\\.[^'\\]*)*)'/g, "$1\\'")
-      .replace(/([^"\\]*(?:\\.[^"\\]*)*)"/g, '$1\\"')
+      .replace(/([^'\\]*(?:\\.[^'\\]*)*)'/gim, "$1\\'")
+      .replace(/([^"\\]*(?:\\.[^"\\]*)*)"/gim, '$1\\"')
       .replaceAll("`", "\\`")
       .replace("<END>", ""),
     response = responses.slice(prefix.length - 1),
