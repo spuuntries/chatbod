@@ -179,7 +179,7 @@ kekbot:`,
       .replaceAll(/([^"\\]*(?:\\.[^"\\]*)*)"/gim, '$1\\"')
       .replaceAll("`", "\\`")
       .replace("<END>", ""),
-    response = responses.slice(prefix.length - 1),
+    response = responses.slice(prefix.length),
     lastPrefix = response.search(/^[^ \n]+:/gim);
 
   logger(prefix.length);
