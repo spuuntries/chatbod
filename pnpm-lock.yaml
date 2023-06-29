@@ -23,9 +23,6 @@ dependencies:
   dotenv:
     specifier: ^16.3.1
     version: 16.3.1
-  jsesc:
-    specifier: ^3.0.2
-    version: 3.0.2
   nanoid:
     specifier: ^3.3.6
     version: 3.3.6
@@ -422,12 +419,6 @@ packages:
 
   /is-buffer@1.1.6:
     resolution: {integrity: sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==}
-    dev: false
-
-  /jsesc@3.0.2:
-    resolution: {integrity: sha512-xKqzzWXDttJuOcawBt4KnKHHIf5oQ/Cxax+0PWFG+DFDgHNAdi+TXECADI+RYiFUMmx8792xsMbbgXj4CwnP4g==}
-    engines: {node: '>=6'}
-    hasBin: true
     dev: false
 
   /lodash.snakecase@4.1.1:
