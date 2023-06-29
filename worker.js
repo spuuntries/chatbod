@@ -190,7 +190,7 @@ kekbot:`,
         .replaceAll("'", "\\'")
         .replaceAll('"', '\\"')
         .replaceAll("`", "\\`")
-        .replace("<END>", "").length
+        .replace("<END>", "").length - 1
     );
   else response = responses.slice(prefix.length).slice(0, lastPrefix);
   logger(responses);
