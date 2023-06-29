@@ -173,7 +173,7 @@ kekbot:`,
   var responses = (await runPrompt(prefix))
       .replaceAll("`", "\\`")
       .replace("<END>", ""),
-    response = responses.slice(prefix.length),
+    response = responses.slice(prefix.length - 1),
     lastPrefix = response.search(/^[^ \n]+:/gim);
 
   logger(prefix.length);
