@@ -119,7 +119,7 @@ parentPort.on("message", async (event) => {
       }`;
     })
     .reverse();
-  history = await Promise.all(history);
+  history = (await Promise.all(history)).join("\n");
 
   await message.guild.members.fetch(message.author.id);
 
@@ -165,7 +165,8 @@ kekbot:`,
     prefix = (persona + dialog)
       .replaceAll("'", "\\'")
       .replaceAll('"', '\\"')
-      .replaceAll("`", "\\`");
+      .replaceAll("`", "\\`")
+      .replace("<END>", "");
 
   logger(prefix);
   //  logger(supplement, fixSupp);
@@ -174,6 +175,7 @@ kekbot:`,
   var responses = (await runPrompt(prefix))
       .replaceAll("'", "\\'")
       .replaceAll('"', '\\"')
+      .replaceAll("`", "\\`")
       .replace("<END>", ""),
     lastPrefix = responses.slice(prefix.length).search(/^[^ \n]+:/gim),
     response;
@@ -182,8 +184,11 @@ kekbot:`,
 
   if (lastPrefix < 0)
     response = responses.slice(
-      prefix.replaceAll("'", "\\'").replaceAll('"', '\\"').replace("<END>", "")
-        .length
+      prefix
+        .replaceAll("'", "\\'")
+        .replaceAll('"', '\\"')
+        .replaceAll("`", "\\`")
+        .replace("<END>", "").length
     );
   else response = responses.slice(prefix.length).slice(0, lastPrefix);
   logger(responses);
