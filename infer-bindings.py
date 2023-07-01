@@ -1,4 +1,4 @@
-from llama_cpp import Llama, LlamaDiskCache
+from llama_cpp import Llama, LlamaRAMCache
 import random
 
 llm = Llama(
@@ -10,17 +10,19 @@ llm = Llama(
     use_mlock=True,
     use_mmap=False,
 )
-cache = LlamaDiskCache(capacity_bytes=67108864)
+cache = LlamaRAMCache(capacity_bytes=67108864)
 llm.set_cache(cache)
 
 
 def generate(prompt):
     output = llm(
         prompt,
-        max_tokens=64,
+        max_tokens=48,
         temperature=0.85,
         mirostat_mode=2,
         repeat_penalty=1.08,
         top_p=0.65,
     )
+    if output["choices"][0]["finish_reason"] == "length":
+        output["choices"][0]["text"] = output["choices"][0]["text"] + "—"
     return output["choices"][0]["text"]
