@@ -3,5 +3,6 @@ llama.cpp/
 models/
 .venv/
 json.sqlite
+__pycache__
 .env
 .pnpm-debug.log

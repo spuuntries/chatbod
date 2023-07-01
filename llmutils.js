@@ -2,26 +2,19 @@ require("dotenv").config();
 const { exec } = require("child_process"),
   { HfInference } = require("@huggingface/inference"),
   axios = require("axios"),
+  { python } = require("pythonia"),
   { QuickDB } = require("quick.db"),
   db = new QuickDB(),
   hf = new HfInference(process.env.HF_TOKEN),
   { randomInt } = require("crypto");
+var bindings;
 
 /**
- * Runs a command and returns its output.
- * @param {string} command - The command to run.
- * @returns {Promise<string>} The output of the command.
+ * Set up bindings
  */
-function runCommand(command) {
-  return new Promise((resolve, reject) => {
-    exec(command, (err, stdout, stderr) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(stdout.trim());
-      }
-    });
-  });
+async function setBindings() {
+  if (!bindings) bindings = await python("./infer-bindings.py");
+  return bindings;
 }
 
 /**
@@ -31,10 +24,8 @@ function runCommand(command) {
  * @returns {Promise<string>} The output of the command.
  */
 async function runPrompt(prompt) {
-  const res = await runCommand(
-    // `llama.cpp/build/bin/main -m models/13bpq/pyg.bin -e -p "${prompt}" -n 64 -b 1024 -c 2048 --top_p 0.8 --temp 0.8 --repeat-penalty 1.1 --repeat-last-n 128 --frequency-penalty 0.3 --prompt-cache-all --prompt-cache mirostatcache --no-penalize-nl`
-    `llama.cpp/build/bin/main -m models/13bpq/pyg.bin -e -p "${prompt}" -n 48 -b 1024 -c 2048 --top_p 0.65 --temp 0.85 --repeat-penalty 1.08 --mirostat 2 --prompt-cache-all --prompt-cache mirostatcache --no-penalize-nl`
-  );
+  const binder = await setBindings(),
+    res = await bindings.generate(prompt);
   return res;
 }
 
@@ -190,7 +181,7 @@ async function getClosestQA(query, arrSet) {
 }
 
 module.exports = {
-  runCommand,
+  setBindings,
   runPrompt,
   getCaption,
   getTopMatchingGif,

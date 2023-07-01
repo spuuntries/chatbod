@@ -1,4 +1,9 @@
 {
   "editor.wordWrap": "on",
-  "discord.enabled": true
+  "discord.enabled": true,
+  "python.analysis.typeCheckingMode": "off",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "python.formatting.provider": "none"
 }
