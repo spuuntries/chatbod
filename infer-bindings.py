@@ -1,4 +1,4 @@
-from llama_cpp import Llama, LlamaRAMCache
+from llama_cpp import Llama
 import random
 
 llm = Llama(
@@ -8,8 +8,6 @@ llm = Llama(
     n_batch=512,
     n_threads=4,
 )
-cache = LlamaRAMCache()
-llm.set_cache(cache)
 
 
 def generate(prompt):
