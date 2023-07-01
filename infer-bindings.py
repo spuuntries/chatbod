@@ -2,7 +2,7 @@ from llama_cpp import Llama
 import random
 
 llm = Llama(
-    model_path="./models/7bq/pyg.bin",
+    model_path="./models/13bq/pyg.bin",
     seed=random.randint(1, 9999),
     n_ctx=2048,
     n_batch=512,
