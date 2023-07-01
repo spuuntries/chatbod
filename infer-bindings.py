@@ -6,6 +6,7 @@ llm = Llama(
     seed=random.randint(1, 9999),
     n_ctx=2048,
     n_batch=512,
+    n_threads=4,
     use_mlock=True,
     use_mmap=False,
 )

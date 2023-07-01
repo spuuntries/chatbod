@@ -171,16 +171,13 @@ kekbot:`,
   //  logger(supplement, fixSupp);
 
   /** @type {string} */
-  var responses = (await runPrompt(prefix)).replace("<END>", ""),
-    response = responses.slice(prefix.length),
+  var response = (await runPrompt(prefix)).replace("<END>", ""),
     lastPrefix = response.search(/^[^ \n]+:/gim);
 
   logger(prefix.length);
-  logger(responses.length);
   logger(response);
 
   if (lastPrefix >= 0) response = response.slice(0, lastPrefix);
-  logger(responses);
   logger(lastPrefix);
   logger(response);
 
