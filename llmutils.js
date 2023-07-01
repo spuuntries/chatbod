@@ -14,6 +14,9 @@ var bindings;
  */
 async function setBindings() {
   if (!bindings) bindings = await python("./infer-bindings.py");
+  process.on("SIGINT", () => {
+    bindings.exit();
+  });
   return bindings;
 }
 
@@ -25,7 +28,7 @@ async function setBindings() {
  */
 async function runPrompt(prompt) {
   const binder = await setBindings(),
-    res = await bindings.generate(prompt);
+    res = await binder.generate(prompt);
   return res;
 }
 
