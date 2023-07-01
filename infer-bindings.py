@@ -1,4 +1,4 @@
-from llama_cpp import Llama, LlamaRAMCache
+from llama_cpp import Llama, LlamaDiskCache
 import random
 
 llm = Llama(
@@ -10,7 +10,7 @@ llm = Llama(
     use_mlock=True,
     use_mmap=False,
 )
-cache = LlamaRAMCache(capacity_bytes=67108864)
+cache = LlamaDiskCache(capacity_bytes=67108864)
 llm.set_cache(cache)
 
 
