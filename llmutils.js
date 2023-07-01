@@ -28,7 +28,7 @@ async function setBindings() {
  */
 async function runPrompt(prompt) {
   const binder = await setBindings(),
-    res = await binder.generate(prompt);
+    res = await binder.generate$(prompt, { $timeout: Infinity });
   return res;
 }
 
