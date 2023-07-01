@@ -8,7 +8,7 @@ llm = Llama(
     n_batch=512,
     n_threads=4,
 )
-cache = LlamaDiskCache(capacity_bytes=67108864)
+cache = LlamaDiskCache()
 llm.set_cache(cache)
 
 
