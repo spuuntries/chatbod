@@ -191,7 +191,7 @@ kekbot:`,
     response.includes("[pic]") ||
     response.includes("[img]")
   ) {
-    img = await generateImage(responses.slice(persona.length));
+    img = await generateImage(dialog + response);
     attFiles.push(
       new Discord.AttachmentBuilder(Buffer.from(img), {
         name: `${
@@ -202,7 +202,7 @@ kekbot:`,
   }
 
   if (response.includes("[gif]")) {
-    gif = await getTopMatchingGif(responses.slice(persona.length));
+    gif = await getTopMatchingGif(dialog + response);
     if (gif)
       attFiles.push(
         new Discord.AttachmentBuilder(Buffer.from(gif), {
