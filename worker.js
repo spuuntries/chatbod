@@ -187,7 +187,7 @@ ${history.length ? history : ""}
           )})`
         : ""
     }
-kekbot:`,
+[${timeref}] kekbot:`,
     prefix = (persona + dialog).replace("<END>", "");
 
   logger(prefix);
