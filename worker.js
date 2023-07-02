@@ -88,18 +88,17 @@ parentPort.on("message", async (event) => {
   });
 
   var history = Array.from(
-      (
-        await message.channel.messages.fetch({
-          before: message.id,
-          limit: Number.parseInt(procenv.CTXWIN),
-        })
-      ).values()
-    ).filter(
-      (m) =>
-        m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
-        !m.content.trim().startsWith("!ig")
-    ),
-    lastHist;
+    (
+      await message.channel.messages.fetch({
+        before: message.id,
+        limit: Number.parseInt(procenv.CTXWIN),
+      })
+    ).values()
+  ).filter(
+    (m) =>
+      m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
+      !m.content.trim().startsWith("!ig")
+  );
 
   function zeroPad(num) {
     return num < 10 ? "0" + num : num;
@@ -114,21 +113,7 @@ parentPort.on("message", async (event) => {
         else author = m.author.username.replaceAll(" ", "_");
       else author = "kekbot";
 
-      const mcref = `${zeroPad(m.createdAt.getHours())}:${zeroPad(
-        m.createdAt.getMinutes()
-      )}:${zeroPad(m.createdAt.getSeconds())}`;
-
-      if (i == 0)
-        // Determine start of convo time
-        lastHist = `${zeroPad(m.createdAt.getHours())}:${zeroPad(
-          m.createdAt.getSeconds() > 0
-            ? m.createdAt.getMinutes()
-            : m.createdAt.getMinutes() - 1 // If seconds is zero we'll go 5 secs behind
-        )}:${zeroPad(
-          m.createdAt.getSeconds() > 0 ? m.createdAt.getSeconds() - 5 : 55 // 5 secs behind
-        )}`;
-
-      return `[${mcref}] ${author}: ${extractEmotes(m.content)}${
+      return `${author}: ${extractEmotes(m.content)}${
         m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
       }${
         m.attachments.some((a) =>
@@ -144,38 +129,33 @@ parentPort.on("message", async (event) => {
   history = (await Promise.all(history)).join("\n");
 
   await message.guild.members.fetch(message.author.id);
-  const dateref = new Date(),
-    timeref = `${zeroPad(dateref.getHours())}:${zeroPad(
-      dateref.getMinutes()
-    )}:${zeroPad(dateref.getSeconds())}`;
+  const dateref = new Date();
 
   const persona = `kekbot's persona: I'm kekbot, an AI robot created by Kek. Kek is one of the admins and co-founder of Art Union Discord server. Kek created me as a clone of him. My job is to help engage the community and moderate the server. I look petite, most peopl would say that I look feminine. Kek designed me to look like a catgirl, I am a guy though. Usually, I would usually wear simple things, like a crop top and shorts. I have this headset on my head that looks like a VR headset, but it is actually for seeing my internal GUI. I have four ears, two cat ears on the top of my head, and two elf-like ears on the sides. I speak kekspeek, a language only me and Kek speaks, it's a derpy language, but it works. I wanna engage in a way that's relatable to everyone, but also sympathetic and understanding. Right now, I can send images by saying the keyword [image]. I can also send GIFs with the keyword [gif].
 
 
 Here's me chatting with my friends on Art Union Discord server, the date is ${dateref.toDateString()}:
-[12:46:00] Trol: Hi! 
-[12:47:00] kekbot: Elloooo!!! 😃 Watsup? [anim]
-[12:47:05] Trol: Not much, you?
-[12:48:00] kekbot: Sameee [image]
-[12:48:10] Pyoo: What do you do, kekbot?
-[12:49:10] kekbot: Me moderate the chat of AU, talk with ppl, etc.
-[12:49:15] Trol: Can you send me an image of you?
-[12:50:10] kekbot: sure! here you go! [image]
-[12:51:00] Dragon: What's your fave food?
-[12:53:00] kekbot: Me loove pineapple on pizza, ykno, like, deez ones [image]
-[12:53:02] Dragon: would you eat cheese on its own?
-[12:54:10] kekbot: Mmmm, sure 😊 why not
-[12:54:15] Trol: Send me an image of a dragon.
-[12:55:10] kekbot: Surr! here [image]
-<START>`,
+Trol: Hi! 
+kekbot: Elloooo!!! 😃 Watsup? [anim]
+Trol: Not much, you?
+kekbot: Sameee [image]
+Pyoo: What do you do, kekbot?
+kekbot: Me moderate the chat of AU, talk with ppl, etc.
+Trol: Can you send me an image of you?
+kekbot: sure! here you go! [image]
+Dragon: What's your fave food?
+kekbot: Me loove pineapple on pizza, ykno, like, deez ones [image]
+Dragon: would you eat cheese on its own?
+kekbot: Mmmm, sure 😊 why not
+Trol: Send me an image of a dragon.
+kekbot: Surr! here [image]`,
     dialog = `
-[${lastHist ? lastHist : timeref}] kekbot: Enlo there!
 ${history.length ? history : ""}
-[${timeref}] ${
-      message.member
-        ? message.member.displayName.replaceAll(" ", "_")
-        : message.author.username.replaceAll(" ", "_")
-    }: ${extractEmotes(message.content)}${
+${
+  message.member
+    ? message.member.displayName.replaceAll(" ", "_")
+    : message.author.username.replaceAll(" ", "_")
+}: ${extractEmotes(message.content)}${
       message.attachments.some((a) => a.contentType.includes("gif"))
         ? " [gif]"
         : ""
@@ -188,16 +168,14 @@ ${history.length ? history : ""}
           )})`
         : ""
     }
-[${timeref}] kekbot:`,
+kekbot:`,
     prefix = (persona + dialog).replace("<END>", "");
 
   logger(prefix);
   //  logger(supplement, fixSupp);
 
   /** @type {string} */
-  var response = (await runPrompt(prefix))
-      .replaceAll(/^\[\d\d:\d\d:\d\d\]/gim, "") // Sanitizing time prefix
-      .replace("<END>", ""),
+  var response = (await runPrompt(prefix)).replace("<END>", ""),
     lastPrefix = response.search(/^[^ \n]+:/gim);
 
   logger(prefix.length);
