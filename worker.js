@@ -15,7 +15,6 @@ const procenv = process.env,
     getClosestQA,
     nsfwProcess,
   } = require("./llmutils"),
-  jsesc = require("jsesc"),
   {
     createStore,
     storeString,
