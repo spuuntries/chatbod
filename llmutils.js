@@ -134,7 +134,7 @@ async function generateImage(query) {
     emotion = (
       await hf.textClassification({
         model: "arpanghoshal/EmoRoBERTa",
-        inputs: lastMessage,
+        inputs: lastMessage.length ? lastMessage : query.split("\n").pop(),
       })
     ).shift().label,
     keywords = await summarize(query);
