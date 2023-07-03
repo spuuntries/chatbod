@@ -127,14 +127,10 @@ async function getTopMatchingGif(query) {
  * @param {string} query
  */
 async function generateImage(query) {
-  const lastMessage = query
-      .split("\n")
-      .pop()
-      .replace(/^[^ \n]+:/gim, ""),
-    emotion = (
+  const emotion = (
       await hf.textClassification({
         model: "arpanghoshal/EmoRoBERTa",
-        inputs: lastMessage.length ? lastMessage : query.split("\n").pop(),
+        inputs: query,
       })
     ).shift().label,
     keywords = await summarize(query);
