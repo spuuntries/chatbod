@@ -171,7 +171,8 @@ kek: Cool, ty
 kekbot: No probs
 kek: Wat u be doin anw?
 kekbot: Me jus chillin
-kek: Ic, ok`,
+kek: Ic, ok
+kekbot: mmhm`,
     dialog = `
 ${history.length ? history : ""}
 ${
