@@ -66,6 +66,7 @@ parentPort.on("message", async (event) => {
     !message.content ||
     !message.author.id ||
     message.author.id == client.user.id ||
+    message.content.trim().includes("!hig") ||
     message.content.trim().startsWith("!ig") ||
     message.channel.type == Discord.ChannelType.DM
   )
