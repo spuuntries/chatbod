@@ -108,11 +108,11 @@ parentPort.on("message", async (event) => {
           limit: Number.parseInt(procenv.CTXWIN),
         })
       ).values()
-    ).filter(
-      (m) =>
-        m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
-        !m.content.trim().startsWith("!ig")
     )
+  ).filter(
+    (m) =>
+      m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
+      !m.content.trim().startsWith("!ig")
   );
 
   function zeroPad(num) {
