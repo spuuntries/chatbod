@@ -86,17 +86,33 @@ parentPort.on("message", async (event) => {
     ],
   });
 
-  var history = Array.from(
-    (
-      await message.channel.messages.fetch({
-        before: message.id,
-        limit: Number.parseInt(procenv.CTXWIN),
-      })
-    ).values()
-  ).filter(
-    (m) =>
-      m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
-      !m.content.trim().startsWith("!ig")
+  /**
+   *
+   * @param {Discord.Message[]} messages
+   * @returns
+   */
+  function filterMessages(messages) {
+    let index = 0;
+    while (index < messages.length) {
+      if (messages[index].content.includes("!hig")) break;
+      index++;
+    }
+    return messages.slice(0, index);
+  }
+
+  var history = filterMessages(
+    Array.from(
+      (
+        await message.channel.messages.fetch({
+          before: message.id,
+          limit: Number.parseInt(procenv.CTXWIN),
+        })
+      ).values()
+    ).filter(
+      (m) =>
+        m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
+        !m.content.trim().startsWith("!ig")
+    )
   );
 
   function zeroPad(num) {
