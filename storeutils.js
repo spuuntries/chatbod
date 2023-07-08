@@ -1,24 +1,17 @@
-const createKDTree = require("static-kdtree"),
-  logger = (m) => console.log(`[${new Date()}] ${m}`),
+const logger = (m) => console.log(`[${new Date()}] ${m}`),
   { QuickDB } = require("quick.db"),
-  db = new QuickDB(),
-  { exec } = require("child_process");
+  db = new QuickDB();
+var bindings;
 
 /**
- * Runs a command and returns its output.
- * @param {string} command - The command to run.
- * @returns {Promise<string>} The output of the command.
+ * Set up bindings
  */
-function runCommand(command) {
-  return new Promise((resolve, reject) => {
-    exec(command, (err, stdout, stderr) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(stdout.trim());
-      }
-    });
+async function setBindings() {
+  if (!bindings) bindings = await python("./infer-bindings.py");
+  process.on("SIGINT", () => {
+    bindings.exit();
   });
+  return bindings;
 }
 
 /**
@@ -27,11 +20,8 @@ function runCommand(command) {
  * @returns {Promise<number[]>} Embeddings of the string
  */
 async function getEmbeddings(string) {
-  const res = (
-    await runCommand(
-      `llama.cpp/build/bin/embedding -m models/13bpq/pyg.bin -p "${string}"`
-    )
-  ).split(" ");
+  const binder = await setBindings(),
+    res = (await binder.embed$(string, { $timeout: Infinity })).split(" ");
   res.pop();
   return res;
 }
