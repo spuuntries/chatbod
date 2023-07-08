@@ -2,6 +2,7 @@ node_modules/
 llama.cpp/
 models/
 .venv/
+tests/foo.dat
 json.sqlite
 __pycache__
 .env
