@@ -101,16 +101,31 @@ parentPort.on("message", async (event) => {
     return messages.slice(0, index);
   }
 
-  var history = filterMessages(
-    Array.from(
+  var history = Array.from(
       (
         await message.channel.messages.fetch({
           before: message.id,
           limit: Number.parseInt(procenv.CTXWIN),
         })
       ).values()
-    )
-  ).filter(
+    ),
+    ignoredWindow = 0;
+
+  history.forEach((e) => {
+    if (e.cleanContent.includes("!ig") || e.cleanContent.includes("!hig"))
+      ignoredWindow++;
+  });
+
+  history = Array.from(
+    (
+      await message.channel.messages.fetch({
+        before: message.id,
+        limit: Number.parseInt(procenv.CTXWIN) + ignoredWindow,
+      })
+    ).values()
+  );
+
+  history = filterMessages(history).filter(
     (m) =>
       m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
       !m.content.trim().startsWith("!ig")

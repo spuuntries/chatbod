@@ -5,10 +5,12 @@ llm = Llama(
     model_path="./models/13bpq/pyg.bin",
     seed=random.randint(1, 9999),
     n_ctx=2048,
-    n_batch=512,
+    n_batch=1024,
     n_threads=4,
+    use_mlock=True,
+    use_mmap=False,
 )
-cache = LlamaDiskCache()
+cache = LlamaRAMCache(capacity_bytes=6000000000)
 llm.set_cache(cache)
 
 
