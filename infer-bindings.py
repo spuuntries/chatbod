@@ -10,7 +10,7 @@ llm = Llama(
     use_mlock=True,
     use_mmap=False,
 )
-cache = LlamaRAMCache(capacity_bytes=6000000000)
+cache = LlamaDiskCache()
 llm.set_cache(cache)
 
 
