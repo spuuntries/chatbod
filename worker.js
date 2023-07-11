@@ -125,9 +125,31 @@ parentPort.on("message", async (event) => {
     ).values()
   );
 
+  function checkIfInCurrentInterval(t, unixTimestamp) {
+    // get current hour
+    var currentHour = new Date().getHours();
+    // calculate current interval
+    var currentInterval = Math.floor(currentHour / t);
+
+    // convert timestamp to hour
+    var dateFromTimestamp = new Date(unixTimestamp);
+    var hourFromTimestamp = dateFromTimestamp.getHours();
+    // calculate interval from timestamp
+    var intervalFromTimestamp = Math.floor(hourFromTimestamp / t);
+
+    // compare intervals
+    if (currentInterval === intervalFromTimestamp) {
+      console.log("Given Unix timestamp is within the current time window.");
+      return true;
+    } else {
+      console.log("Given Unix timestamp is outside the current time window.");
+      return false;
+    }
+  }
+
   history = filterMessages(history).filter(
     (m) =>
-      m.createdTimestamp > Date.now() - procenv.TLIMIT * 60 * 1000 &&
+      checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
       !m.content.trim().startsWith("!ig")
   );
 
