@@ -139,10 +139,8 @@ parentPort.on("message", async (event) => {
 
     // compare intervals
     if (currentInterval === intervalFromTimestamp) {
-      console.log("Given Unix timestamp is within the current time window.");
       return true;
     } else {
-      console.log("Given Unix timestamp is outside the current time window.");
       return false;
     }
   }
