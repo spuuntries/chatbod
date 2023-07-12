@@ -14,6 +14,9 @@ setInterval(async () => {
     }),
     blip = await client("https://spuun-blip-api.hf.space/", {
       hf_token: process.env.HF_TOKEN,
+    }),
+    summarizer = await client("https://spuun-summarizer.hf.space/", {
+      hf_token: process.env.HF_TOKEN,
     });
   try {
     const query = (
@@ -42,11 +45,15 @@ setInterval(async () => {
     if (!(await blip.predict("/predict", [image])).data)
       throw new Error("blip failed");
 
+    stage++;
+    if (!(await summarizer.predict("/predict", [query])).data)
+      throw new Error("summarizer failed");
+
     image.stage = 0;
   } catch (e) {
     logger(
       `Failed to warm up models, (${e.message}) [${
-        ["gpt2", "dialogsum", "counterfeit", "blip"][stage]
+        ["gpt2", "dialogsum", "counterfeit", "blip", "summarizer"][stage]
       }]`
     );
   }

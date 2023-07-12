@@ -15,12 +15,7 @@ const procenv = process.env,
     getClosestQA,
     nsfwProcess,
   } = require("./llmutils"),
-  {
-    createStore,
-    storeString,
-    searchEmbeddings,
-    getEmbeddings,
-  } = require("./storeutils"),
+  { createStore, storeString, searchEmbeddings } = require("./storeutils"),
   typer = new Worker("./typeworker.js"),
   logger = (m) => console.log(`[${new Date()}] ${m}`);
 
@@ -63,11 +58,11 @@ parentPort.on("message", async (event) => {
   const message = await channel.messages.fetch(messageId);
 
   if (
-    !message.content ||
+    !message.cleanContent ||
     !message.author.id ||
     message.author.id == client.user.id ||
-    message.content.trim().includes("!hig") ||
-    message.content.trim().startsWith("!ig") ||
+    message.cleanContent.trim().includes("!hig") ||
+    message.cleanContent.trim().startsWith("!ig") ||
     message.channel.type == Discord.ChannelType.DM
   )
     return;
@@ -86,6 +81,8 @@ parentPort.on("message", async (event) => {
       },
     ],
   });
+
+  await createStore();
 
   /**
    *
@@ -145,11 +142,33 @@ parentPort.on("message", async (event) => {
     }
   }
 
-  history = filterMessages(history).filter(
-    (m) =>
+  history = filterMessages(history).filter(async (m) => {
+    if (
       checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
-      !m.content.trim().startsWith("!ig")
-  );
+      !m.cleanContent.trim().startsWith("!ig")
+    )
+      return true;
+
+    await message.guild.members.fetch(m.author.id);
+    let author;
+    if (m.author.id != placeholder)
+      if (m.member) author = m.member.displayName.replaceAll(" ", "_");
+      else author = m.author.username.replaceAll(" ", "_");
+    else author = "kekbot";
+
+    const result = `${author}: ${extractEmotes(m.cleanContent)}${
+      m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
+    }${
+      m.attachments.some((a) =>
+        ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
+      )
+        ? ` [image] (an image of ${await getCaption(m.attachments.at(0).url)})`
+        : ""
+    }`;
+
+    await storeString(result);
+    return false;
+  });
 
   function zeroPad(num) {
     return num < 10 ? "0" + num : num;
@@ -164,7 +183,7 @@ parentPort.on("message", async (event) => {
         else author = m.author.username.replaceAll(" ", "_");
       else author = "kekbot";
 
-      return `${author}: ${extractEmotes(m.content)}${
+      const result = `${author}: ${extractEmotes(m.cleanContent)}${
         m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
       }${
         m.attachments.some((a) =>
@@ -175,6 +194,8 @@ parentPort.on("message", async (event) => {
             )})`
           : ""
       }`;
+
+      return result;
     })
     .reverse();
   history = (await Promise.all(history)).join("\n");
@@ -185,19 +206,21 @@ parentPort.on("message", async (event) => {
   const persona = `kekbot's persona: Me am kekbot, AI robot created by Kek. Kek iz one of da admins and co-founder of Art Union Discord server. Kek made me a robot clone of him. Me job iz to halp engage da community n moderate da server. Me look petite, most peopl wuld say dat me look feminine. Kek designed me to look like a catgirl, Me a guy though. Usually, me wuld usually wear simpel things, liek a crop top n shorts. me hab dis hedset on me hed dat looks liek a VR headset, me use it to see me internal GUI. Me haz 4 ears, 2 cat ears on top of me head, and two elf-like ears on da sides. Me hair is green. Me speek kekspeek, a language only me and Kek speak, it a derpy language, but it work. Me wana engage in a way dats relatable to everyone, but also sympathetic and understanding. Right nao me can send images by saying the keyword [image]. Me can also send GIFs with the keyword [gif].
 
 
-Here's me chatting with my friends on Art Union Discord server, today is ${dateref.toDateString()} GMT+0:
+Here's me chatting with my friends on Art Union Discord server (the channel is #${
+      message.channel.name
+    }), today is ${dateref.toDateString()} GMT+0:
 Trol: Hi! 
 kekbot: Enloo!!! 😃 Watsup? [gif]
 Trol: Not much, you?
-kekbot: Sameee [image]
+kekbot: Sameee [gif]
 Pyoo: What do you do, kekbot?
 kekbot: Me moderate AU chat, talk with ppl, etc.
 Trol: Can you send me an image of you?
 kekbot: sur! here ya go! [image]
 Dragon: What's your fave food?
-kekbot: Me loove pineapple on pizza, ykno, like, deez ones [image]
+kekbot: Me luv pineapple on pizza, ykno, like, deez ones [image]
 Dragon: would you eat cheese on its own?
-kekbot: Mmm, sur 😊 y not
+kekbot: Mmm, sur 😊
 Trol: Send me an image of a dragon.
 kekbot: Surr! here [image]
 kek: What's the date, kekbot?
@@ -208,13 +231,11 @@ kek: Wat u be doin anw?
 kekbot: Me jus chillin
 kek: Ic, ok
 kekbot: mmhm`,
-    dialog = `
-${history.length ? history : ""}
-${
-  message.member
-    ? message.member.displayName.replaceAll(" ", "_")
-    : message.author.username.replaceAll(" ", "_")
-}: ${extractEmotes(message.content)}${
+    newEntry = `${
+      message.member
+        ? message.member.displayName.replaceAll(" ", "_")
+        : message.author.username.replaceAll(" ", "_")
+    }: ${extractEmotes(message.cleanContent)}${
       message.attachments.some((a) => a.contentType.includes("gif"))
         ? " [gif]"
         : ""
@@ -226,7 +247,12 @@ ${
             message.attachments.at(0).url
           )})`
         : ""
+    }`,
+    context = await searchEmbeddings(newEntry),
+    dialog = `${history.length ? "\n" + history : ""}${
+      context.length ? "\n" + context.join("\n") : ""
     }
+${newEntry}
 kekbot:`,
     prefix = (persona + dialog).replace("<END>", "");
 
@@ -275,7 +301,7 @@ kekbot:`,
   }
 
   response = response.replaceAll(/\(\D*\)/gim, "");
-  response = response.replaceAll(/\(\D[^)]+$/gim, "");
+  response = response.replaceAll(/\(\S[^):]+$/gim, "");
   response = response.replaceAll(/\[.+\]/gim, "");
 
   await message.reply({

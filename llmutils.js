@@ -7,16 +7,17 @@ const { exec } = require("child_process"),
   db = new QuickDB(),
   hf = new HfInference(process.env.HF_TOKEN),
   { randomInt } = require("crypto");
-var bindings;
+var bindings, siginter;
 
 /**
  * Set up bindings
  */
 async function setBindings() {
   if (!bindings) bindings = await python("./infer-bindings.py");
-  process.on("SIGINT", () => {
-    bindings.exit();
-  });
+  if (!siginter)
+    siginter = process.on("SIGINT", () => {
+      bindings.exit();
+    });
   return bindings;
 }
 

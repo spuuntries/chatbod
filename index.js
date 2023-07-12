@@ -17,11 +17,11 @@ client.on("messageCreate", (message) => {
     if (!procenv.CHANNELS.split("|").includes(message.channelId)) return;
   }
   if (
-    !message.content ||
+    !message.cleanContent ||
     !message.author.id ||
     message.author.id == client.user.id ||
-    message.content.trim().includes("!hig") ||
-    message.content.trim().startsWith("!ig") ||
+    message.cleanContent.trim().includes("!hig") ||
+    message.cleanContent.trim().startsWith("!ig") ||
     message.channel.type == Discord.ChannelType.DM
   )
     return;
