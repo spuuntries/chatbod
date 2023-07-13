@@ -275,6 +275,7 @@ kekbot:`,
     prefix = (persona + dialog).replace("<END>", "");
 
   logger(prefix);
+  logger(context);
   //  logger(supplement, fixSupp);
 
   /** @type {string} */
