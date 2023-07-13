@@ -178,7 +178,7 @@ parentPort.on("message", async (event) => {
     .filter((m) => m.createdAt.toDateString() == new Date().toDateString()) // This makes sure everything is on the same day
     .filter(async (m) => {
       checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
-        !m.cleanContent.trim().startsWith("!ig");
+        !m.content.trim().startsWith("!ig");
     }) // This checks intervals
     .map(async (m, i) => {
       await message.guild.members.fetch(m.author.id);
