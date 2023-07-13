@@ -137,7 +137,7 @@ parentPort.on("message", async (event) => {
     // compare intervals
     if (
       currentInterval === intervalFromTimestamp &&
-      dateFromTimestamp.getDate() == new Date().getDate()
+      dateFromTimestamp.toISOString() == new Date().toISOString()
     ) {
       return true;
     } else {
