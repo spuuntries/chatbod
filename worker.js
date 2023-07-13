@@ -166,7 +166,7 @@ parentPort.on("message", async (event) => {
         : ""
     }`;
 
-    await storeString(result);
+    if (!m.cleanContent.trim().startsWith("!ig")) await storeString(result);
     return false;
   });
 
