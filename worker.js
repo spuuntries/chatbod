@@ -174,11 +174,8 @@ parentPort.on("message", async (event) => {
     if (!m.cleanContent.trim().startsWith("!ig")) await storeString(result);
   });
 
-  history = history.filter(
-    (m) => m.createdAt.toDateString() == new Date().toDateString()
-  ); // This makes sure everything is on the same day
-
   history = history
+    .filter((m) => m.createdAt.toDateString() == new Date().toDateString()) // This makes sure everything is on the same day
     .filter(async (m) => {
       checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
         !m.cleanContent.trim().startsWith("!ig");
