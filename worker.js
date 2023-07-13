@@ -131,14 +131,26 @@ parentPort.on("message", async (event) => {
 
     // convert timestamp to hour
     var dateFromTimestamp = new Date(unixTimestamp);
-    var hourFromTimestamp = dateFromTimestamp.getHours();
+    var hourFromTimestamp = dateFromTimestamp.getUTCHours();
     // calculate interval from timestamp
     var intervalFromTimestamp = Math.floor(hourFromTimestamp / t);
 
-    // compare intervals
+    // get UTC strings and extract date parts
+    var currentDateUTC = new Date()
+      .toUTCString()
+      .split(" ")
+      .slice(0, 4)
+      .join(" ");
+    var timestampDateUTC = dateFromTimestamp
+      .toUTCString()
+      .split(" ")
+      .slice(0, 4)
+      .join(" ");
+
+    // compare intervals and dates
     if (
       currentInterval === intervalFromTimestamp &&
-      _.isEqual(dateFromTimestamp.toDateString(), new Date().toDateString())
+      currentDateUTC === timestampDateUTC
     ) {
       return true;
     } else {
