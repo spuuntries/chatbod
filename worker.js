@@ -179,16 +179,11 @@ parentPort.on("message", async (event) => {
     if (!m.cleanContent.trim().startsWith("!ig")) await storeString(result);
   });
 
-  history = history.filter(async (m) => {
-    checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
-      !m.cleanContent.trim().startsWith("!ig");
-  });
-
-  function zeroPad(num) {
-    return num < 10 ? "0" + num : num;
-  }
-
   history = history
+    .filter(async (m) => {
+      checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
+        !m.cleanContent.trim().startsWith("!ig");
+    })
     .map(async (m, i) => {
       await message.guild.members.fetch(m.author.id);
       let author;
