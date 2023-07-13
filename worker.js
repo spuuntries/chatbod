@@ -150,47 +150,39 @@ parentPort.on("message", async (event) => {
 
   const llamaTokenizer = (await import("llama-tokenizer-js")).default;
 
-  history = filterMessages(history)
-    .map((e) => {
-      const encoded = llamaTokenizer.encode(e.cleanContent);
+  history = filterMessages(history).map((e) => {
+    const encoded = llamaTokenizer.encode(e.cleanContent);
 
-      if (encoded.length > 112)
-        e.cleanContent = llamaTokenizer.decode(encoded.slice(0, 111)) + " ...";
-      return e;
-    })
-    .filter(async (m) => {
-      if (
-        checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
-        !m.cleanContent.trim().startsWith("!ig")
-      ) {
-        logger(checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp));
-        return true;
-      } else {
-        await message.guild.members.fetch(m.author.id);
-        let author;
-        if (m.author.id != placeholder)
-          if (m.member) author = m.member.displayName.replaceAll(" ", "_");
-          else author = m.author.username.replaceAll(" ", "_");
-        else author = "kekbot";
+    if (encoded.length > 112)
+      e.cleanContent = llamaTokenizer.decode(encoded.slice(0, 111)) + " ...";
+    return e;
+  });
 
-        const result = `${author}: ${extractEmotes(m.cleanContent)}${
-          m.attachments.some((a) => a.contentType.includes("gif"))
-            ? " [gif]"
-            : ""
-        }${
-          m.attachments.some((a) =>
-            ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
-          )
-            ? ` [image] (an image of ${await getCaption(
-                m.attachments.at(0).url
-              )})`
-            : ""
-        }`;
+  history.forEach(async (m) => {
+    await message.guild.members.fetch(m.author.id);
+    let author;
+    if (m.author.id != placeholder)
+      if (m.member) author = m.member.displayName.replaceAll(" ", "_");
+      else author = m.author.username.replaceAll(" ", "_");
+    else author = "kekbot";
 
-        if (!m.cleanContent.trim().startsWith("!ig")) await storeString(result);
-        return false;
-      }
-    });
+    const result = `${author}: ${extractEmotes(m.cleanContent)}${
+      m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
+    }${
+      m.attachments.some((a) =>
+        ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
+      )
+        ? ` [image] (an image of ${await getCaption(m.attachments.at(0).url)})`
+        : ""
+    }`;
+
+    if (!m.cleanContent.trim().startsWith("!ig")) await storeString(result);
+  });
+
+  history = history.filter(async (m) => {
+    checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
+      !m.cleanContent.trim().startsWith("!ig");
+  });
 
   function zeroPad(num) {
     return num < 10 ? "0" + num : num;
