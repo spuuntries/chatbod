@@ -137,7 +137,7 @@ parentPort.on("message", async (event) => {
     // compare intervals
     if (
       currentInterval === intervalFromTimestamp &&
-      dateFromTimestamp.toISOString() == new Date().toISOString()
+      dateFromTimestamp.toDateString() == new Date().toDateString()
     ) {
       return true;
     } else {
@@ -160,7 +160,7 @@ parentPort.on("message", async (event) => {
         checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
         !m.cleanContent.trim().startsWith("!ig")
       ) {
-        // logger(checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp));
+        logger(checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp));
         return true;
       }
 
