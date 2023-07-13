@@ -160,7 +160,7 @@ parentPort.on("message", async (event) => {
         checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
         !m.cleanContent.trim().startsWith("!ig")
       ) {
-        logger(checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp));
+        // logger(checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp));
         return true;
       }
 
