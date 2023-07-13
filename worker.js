@@ -136,12 +136,7 @@ parentPort.on("message", async (event) => {
     var intervalFromTimestamp = Math.floor(hourFromTimestamp / t);
 
     // compare intervals
-    if (
-      currentInterval === intervalFromTimestamp &&
-      dateFromTimestamp.toDateString() === new Date().toDateString()
-    ) {
-      logger(dateFromTimestamp.toDateString());
-      logger(new Date().toDateString());
+    if (currentInterval === intervalFromTimestamp) {
       return true;
     } else {
       return false;
@@ -180,6 +175,7 @@ parentPort.on("message", async (event) => {
   });
 
   history = history
+    .filter((m) => m.createdAt.toDateString() == new Date().toDateString())
     .filter(async (m) => {
       checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
         !m.cleanContent.trim().startsWith("!ig");
