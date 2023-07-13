@@ -135,13 +135,13 @@ parentPort.on("message", async (event) => {
     // calculate interval from timestamp
     var intervalFromTimestamp = Math.floor(hourFromTimestamp / t);
 
-    logger(dateFromTimestamp.toDateString());
-    logger(new Date().toDateString());
     // compare intervals
     if (
       currentInterval === intervalFromTimestamp &&
       dateFromTimestamp.toDateString() === new Date().toDateString()
     ) {
+      logger(dateFromTimestamp.toDateString());
+      logger(new Date().toDateString());
       return true;
     } else {
       return false;
