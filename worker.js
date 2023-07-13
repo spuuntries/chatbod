@@ -142,33 +142,45 @@ parentPort.on("message", async (event) => {
     }
   }
 
-  history = filterMessages(history).filter(async (m) => {
-    if (
-      checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
-      !m.cleanContent.trim().startsWith("!ig")
-    )
-      return true;
+  const llamaTokenizer = (await import("llama-tokenizer-js")).default;
 
-    await message.guild.members.fetch(m.author.id);
-    let author;
-    if (m.author.id != placeholder)
-      if (m.member) author = m.member.displayName.replaceAll(" ", "_");
-      else author = m.author.username.replaceAll(" ", "_");
-    else author = "kekbot";
+  history = filterMessages(history)
+    .map((e) => {
+      const encoded = llamaTokenizer.encode(e.cleanContent);
 
-    const result = `${author}: ${extractEmotes(m.cleanContent)}${
-      m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
-    }${
-      m.attachments.some((a) =>
-        ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
+      if (encoded.length > 112)
+        e.cleanContent = llamaTokenizer.decode(encoded.slice(0, 111)) + " ...";
+      return e;
+    })
+    .filter(async (m) => {
+      if (
+        checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
+        !m.cleanContent.trim().startsWith("!ig")
       )
-        ? ` [image] (an image of ${await getCaption(m.attachments.at(0).url)})`
-        : ""
-    }`;
+        return true;
 
-    if (!m.cleanContent.trim().startsWith("!ig")) await storeString(result);
-    return false;
-  });
+      await message.guild.members.fetch(m.author.id);
+      let author;
+      if (m.author.id != placeholder)
+        if (m.member) author = m.member.displayName.replaceAll(" ", "_");
+        else author = m.author.username.replaceAll(" ", "_");
+      else author = "kekbot";
+
+      const result = `${author}: ${extractEmotes(m.cleanContent)}${
+        m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
+      }${
+        m.attachments.some((a) =>
+          ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
+        )
+          ? ` [image] (an image of ${await getCaption(
+              m.attachments.at(0).url
+            )})`
+          : ""
+      }`;
+
+      if (!m.cleanContent.trim().startsWith("!ig")) await storeString(result);
+      return false;
+    });
 
   function zeroPad(num) {
     return num < 10 ? "0" + num : num;
