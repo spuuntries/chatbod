@@ -135,7 +135,10 @@ parentPort.on("message", async (event) => {
     var intervalFromTimestamp = Math.floor(hourFromTimestamp / t);
 
     // compare intervals
-    if (currentInterval === intervalFromTimestamp) {
+    if (
+      currentInterval === intervalFromTimestamp &&
+      dateFromTimestamp.getDate() == new Date().getDate()
+    ) {
       return true;
     } else {
       return false;
@@ -156,8 +159,10 @@ parentPort.on("message", async (event) => {
       if (
         checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
         !m.cleanContent.trim().startsWith("!ig")
-      )
+      ) {
+        logger(checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp));
         return true;
+      }
 
       await message.guild.members.fetch(m.author.id);
       let author;
