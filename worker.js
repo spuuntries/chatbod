@@ -177,7 +177,7 @@ parentPort.on("message", async (event) => {
   history = history
     .filter((m) => m.createdAt.toDateString() == new Date().toDateString()) // This makes sure everything is on the same day
     .filter(
-      async (m) =>
+      (m) =>
         checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
         !m.cleanContent.trim().startsWith("!ig")
     ) // This checks intervals
