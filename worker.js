@@ -17,6 +17,7 @@ const procenv = process.env,
   } = require("./llmutils"),
   { createStore, storeString, searchEmbeddings } = require("./storeutils"),
   typer = new Worker("./typeworker.js"),
+  _ = require("lodash"),
   logger = (m) => console.log(`[${new Date()}] ${m}`);
 
 /**
@@ -137,7 +138,7 @@ parentPort.on("message", async (event) => {
     // compare intervals
     if (
       currentInterval === intervalFromTimestamp &&
-      dateFromTimestamp.toDateString() == new Date().toDateString()
+      _.isEqual(dateFromTimestamp.toDateString(), new Date().toDateString())
     ) {
       return true;
     } else {
