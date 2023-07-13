@@ -165,29 +165,31 @@ parentPort.on("message", async (event) => {
       ) {
         logger(checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp));
         return true;
+      } else {
+        await message.guild.members.fetch(m.author.id);
+        let author;
+        if (m.author.id != placeholder)
+          if (m.member) author = m.member.displayName.replaceAll(" ", "_");
+          else author = m.author.username.replaceAll(" ", "_");
+        else author = "kekbot";
+
+        const result = `${author}: ${extractEmotes(m.cleanContent)}${
+          m.attachments.some((a) => a.contentType.includes("gif"))
+            ? " [gif]"
+            : ""
+        }${
+          m.attachments.some((a) =>
+            ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
+          )
+            ? ` [image] (an image of ${await getCaption(
+                m.attachments.at(0).url
+              )})`
+            : ""
+        }`;
+
+        if (!m.cleanContent.trim().startsWith("!ig")) await storeString(result);
+        return false;
       }
-
-      await message.guild.members.fetch(m.author.id);
-      let author;
-      if (m.author.id != placeholder)
-        if (m.member) author = m.member.displayName.replaceAll(" ", "_");
-        else author = m.author.username.replaceAll(" ", "_");
-      else author = "kekbot";
-
-      const result = `${author}: ${extractEmotes(m.cleanContent)}${
-        m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
-      }${
-        m.attachments.some((a) =>
-          ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
-        )
-          ? ` [image] (an image of ${await getCaption(
-              m.attachments.at(0).url
-            )})`
-          : ""
-      }`;
-
-      if (!m.cleanContent.trim().startsWith("!ig")) await storeString(result);
-      return false;
     });
 
   function zeroPad(num) {
