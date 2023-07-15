@@ -29,7 +29,8 @@ function extractEmotes(str) {
     matchArray = Array.from(str.matchAll(emoteRegex));
 
   matchArray.forEach((m) => {
-    const emoteName = m[2];
+    var emoteName = m[2];
+    if (emoteName.includes("_")) emoteName = emoteName.split("_").pop();
     mutate = mutate.replace(m[0], `:${emoteName}:`);
   });
 
@@ -153,26 +154,30 @@ parentPort.on("message", async (event) => {
     return e;
   });
 
-  history.forEach(async (m) => {
-    await message.guild.members.fetch(m.author.id);
-    let author;
-    if (m.author.id != placeholder)
-      if (m.member) author = m.member.displayName.replaceAll(" ", "_");
-      else author = m.author.username.replaceAll(" ", "_");
-    else author = "kekbot";
+  history
+    .filter((m) => !m.cleanContent.trim().startsWith("!ig"))
+    .forEach(async (m) => {
+      await message.guild.members.fetch(m.author.id);
+      let author;
+      if (m.author.id != placeholder)
+        if (m.member) author = m.member.displayName.replaceAll(" ", "_");
+        else author = m.author.username.replaceAll(" ", "_");
+      else author = "kekbot";
 
-    const result = `${author}: ${extractEmotes(m.cleanContent)}${
-      m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
-    }${
-      m.attachments.some((a) =>
-        ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
-      )
-        ? ` [image] (an image of ${await getCaption(m.attachments.at(0).url)})`
-        : ""
-    }`;
+      const result = `${author}: ${extractEmotes(m.cleanContent)}${
+        m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
+      }${
+        m.attachments.some((a) =>
+          ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
+        )
+          ? ` [image] (an image of ${await getCaption(
+              m.attachments.at(0).url
+            )})`
+          : ""
+      }`;
 
-    if (!m.cleanContent.trim().startsWith("!ig")) await storeString(result);
-  });
+      if (!m.cleanContent.trim().startsWith("!ig")) await storeString(result);
+    });
 
   history = history
     .filter((m) => m.createdAt.toDateString() == new Date().toDateString()) // This makes sure everything is on the same day
@@ -180,7 +185,9 @@ parentPort.on("message", async (event) => {
       (m) =>
         checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
         !m.cleanContent.trim().startsWith("!ig")
-    ) // This checks intervals
+    ); // This checks intervals
+
+  history = history
     .map(async (m, i) => {
       await message.guild.members.fetch(m.author.id);
       let author;
