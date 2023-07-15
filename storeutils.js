@@ -113,7 +113,7 @@ async function searchEmbeddings(query, max) {
 
   const clamped = await binder.clamp$(query, unrefined, {
     $timeout: Infinity,
-  }); // This clamps results to neighbors with p >= 0.3 similarity and down to the top 5
+  }); // This clamps results to neighbors with p >= 0.5 similarity and down to the top 5
 
   return JSON.parse(clamped);
 }
