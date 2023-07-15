@@ -244,11 +244,7 @@ kek: Wat u be doin anw?
 kekbot: Me jus chillin
 kek: Ic, ok
 kekbot: mmhm`,
-    newEntry = `${
-      message.member
-        ? message.member.displayName.replaceAll(" ", "_")
-        : message.author.username.replaceAll(" ", "_")
-    }: ${extractEmotes(message.cleanContent)}${
+    newEntry = `${extractEmotes(message.cleanContent)}${
       message.attachments.some((a) => a.contentType.includes("gif"))
         ? " [gif]"
         : ""
@@ -265,7 +261,11 @@ kekbot: mmhm`,
     dialog = `${history.length ? "\n" + history : ""}${
       context.length ? "\n" + context.join("\n") : ""
     }
-${newEntry}
+${
+  message.member
+    ? message.member.displayName.replaceAll(" ", "_")
+    : message.author.username.replaceAll(" ", "_")
+}: ${newEntry}
 kekbot:`,
     prefix = (persona + dialog).replace("<END>", "");
 
