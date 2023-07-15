@@ -257,7 +257,7 @@ kekbot: mmhm`,
           )})`
         : ""
     }`,
-    context = await searchEmbeddings(newEntry),
+    context = await searchEmbeddings(newEntry, 20),
     dialog = `${history.length ? "\n" + history : ""}${
       context.length ? "\n" + context.join("\n") : ""
     }
