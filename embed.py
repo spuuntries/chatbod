@@ -1,7 +1,7 @@
 from sentence_transformers import SentenceTransformer, util
 import json
 
-embedder = SentenceTransformer("all-MiniLM-L12-v2")
+embedder = SentenceTransformer("multi-qa-mpnet-base-dot-v1")
 
 
 def embed(prompt):
