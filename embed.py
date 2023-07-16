@@ -1,7 +1,8 @@
 from sentence_transformers import SentenceTransformer, util
 import json
 
-embedder = SentenceTransformer("multi-qa-mpnet-base-dot-v1")
+embedder = SentenceTransformer("all-MiniLM-L12-v2")
+clamper = SentenceTransformer("multi-qa-mpnet-base-dot-v1")
 
 
 def embed(prompt):
@@ -9,8 +10,8 @@ def embed(prompt):
 
 
 def clamp(query, docs):
-    query_emb = embedder.encode(query)
-    doc_emb = embedder.encode(docs)
+    query_emb = clamper.encode(query)
+    doc_emb = clamper.encode(docs)
 
     scores = util.dot_score(query_emb, doc_emb)[0].cpu().tolist()
 
