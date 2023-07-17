@@ -180,6 +180,24 @@ async function getClosestQA(query, arrSet) {
     .sort((a, b) => b[1] - a[1])[0][0];
 }
 
+/**
+ * @param {string} string - String to summarize
+ * @returns {Promise<string|undefined>}
+ */
+async function getSummary(string) {
+  const { client } = await import("@gradio/client"),
+    summarizer = await client("https://spuun-summarizer.hf.space/", {
+      hf_token: process.env.HF_TOKEN,
+    }),
+    res = (await summarizer.predict("/predict", [query]))["data"];
+
+  if (!res) {
+    console.log(`[WARN] [${new Date()}] summarizer failed to return a value.`);
+    return undefined;
+  }
+  return res;
+}
+
 module.exports = {
   setBindings,
   runPrompt,
@@ -187,5 +205,6 @@ module.exports = {
   getTopMatchingGif,
   nsfwProcess,
   generateImage,
+  getSummary,
   getClosestQA,
 };

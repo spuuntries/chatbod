@@ -4,11 +4,12 @@ import random
 llm = Llama(
     model_path="./models/13bpq/pyg.bin",
     seed=random.randint(1, 9999),
-    n_ctx=2048,
+    n_ctx=4096,
     n_batch=1024,
     n_threads=4,
     use_mlock=True,
     use_mmap=False,
+    rope_freq_scale=0.5,
 )
 cache = LlamaDiskCache()
 llm.set_cache(cache)

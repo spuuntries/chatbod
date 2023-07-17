@@ -13,12 +13,15 @@ const procenv = process.env,
     getTopMatchingGif,
     getCaption,
     getClosestQA,
+    getSummary,
     nsfwProcess,
   } = require("./llmutils"),
   { createStore, storeString, searchEmbeddings } = require("./storeutils"),
   typer = new Worker("./typeworker.js"),
   _ = require("lodash"),
   logger = (m) => console.log(`[${new Date()}] ${m}`);
+
+var contextCounter = {};
 
 /**
  * @param {string} str To extract from
@@ -104,6 +107,7 @@ parentPort.on("message", async (event) => {
       (
         await message.channel.messages.fetch({
           before: message.id,
+          after: contextCounter?.[message.channelId]?.["lastFetched"],
           limit: Number.parseInt(procenv.CTXWIN),
         })
       ).values()
@@ -119,6 +123,7 @@ parentPort.on("message", async (event) => {
     (
       await message.channel.messages.fetch({
         before: message.id,
+        after: contextCounter?.[message.channelId]?.["lastFetched"],
         limit: Number.parseInt(procenv.CTXWIN) + ignoredWindow,
       })
     ).values()
@@ -154,38 +159,15 @@ parentPort.on("message", async (event) => {
     return e;
   });
 
-  history
-    .filter((m) => !m.cleanContent.trim().startsWith("!ig"))
-    .forEach(async (m) => {
-      await message.guild.members.fetch(m.author.id);
-      let author;
-      if (m.author.id != placeholder)
-        if (m.member) author = m.member.displayName.replaceAll(" ", "_");
-        else author = m.author.username.replaceAll(" ", "_");
-      else author = "kekbot";
-
-      const result = `${author}: ${extractEmotes(m.cleanContent)}${
-        m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
-      }${
-        m.attachments.some((a) =>
-          ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
-        )
-          ? ` [image] (an image of ${await getCaption(
-              m.attachments.at(0).url
-            )})`
-          : ""
-      }`;
-
-      if (!m.cleanContent.trim().startsWith("!ig")) await storeString(result);
-    });
-
   history = history
     .filter((m) => m.createdAt.toDateString() == new Date().toDateString()) // This makes sure everything is on the same day
     .filter(
       (m) =>
         checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp) &&
         !m.cleanContent.trim().startsWith("!ig")
-    ); // This checks intervals
+    ); // This checks intervals and !igs
+
+  const interimHistory = history;
 
   history = history
     .map(async (m, i) => {
@@ -211,7 +193,19 @@ parentPort.on("message", async (event) => {
       return result;
     })
     .reverse();
-  history = (await Promise.all(history)).join("\n");
+  history = await Promise.all(history);
+
+  if (history.length >= procenv.CTXWIN) {
+    const historyToCommit = history.join("\n"),
+      summarizedHistory = await getSummary(historyToCommit);
+
+    await storeString(summarizedHistory);
+    contextCounter[message.channelId] = {
+      lastFetched: interimHistory.pop().id,
+    };
+  }
+
+  history = history.join("\n");
 
   await message.guild.members.fetch(message.author.id);
   const dateref = new Date();

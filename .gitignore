@@ -3,7 +3,7 @@ llama.cpp/
 models/
 .venv/
 tests/foo.dat
-json.sqlite
+*.sqlite
 __pycache__
 .env
 .pnpm-debug.log
