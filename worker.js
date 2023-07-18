@@ -124,7 +124,10 @@ parentPort.on("message", async (event) => {
       await message.channel.messages.fetch({
         before: message.id,
         after: contextCounter?.[message.channelId]?.["lastFetched"],
-        limit: Number.parseInt(procenv.CTXWIN) + ignoredWindow,
+        limit:
+          Number.parseInt(procenv.CTXWIN) + ignoredWindow > 100
+            ? 100
+            : Number.parseInt(procenv.CTXWIN) + ignoredWindow,
       })
     ).values()
   );
