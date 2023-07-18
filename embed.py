@@ -6,7 +6,7 @@ clamper = SentenceTransformer("multi-qa-mpnet-base-dot-v1")
 
 
 def embed(prompt):
-    return json.dumps(str(list(embedder.encode(prompt))))
+    return json.dumps(str(embedder.encode(prompt).tolist()))
 
 
 def clamp(query, docs):
