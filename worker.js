@@ -154,7 +154,7 @@ parentPort.on("message", async (event) => {
 
   const llamaTokenizer = (await import("llama-tokenizer-js")).default;
 
-  const untouchedHistory = filterMessages(history).map((e) => {
+  history = filterMessages(history).map((e) => {
     const encoded = llamaTokenizer.encode(e.cleanContent);
 
     if (encoded.length > 112)
@@ -162,7 +162,7 @@ parentPort.on("message", async (event) => {
     return e;
   });
 
-  history = untouchedHistory
+  history = history
     .filter((m) => m.createdAt.toDateString() == new Date().toDateString()) // This makes sure everything is on the same day
     .filter(
       (m) =>
@@ -198,7 +198,7 @@ parentPort.on("message", async (event) => {
     .reverse();
   history = await Promise.all(history);
 
-  if (untouchedHistory.length >= procenv.CTXWIN) {
+  if (history.length >= procenv.CTXWIN) {
     const historyToCommit = history.join("\n"),
       summarizedHistory = await getSummary(historyToCommit);
 
