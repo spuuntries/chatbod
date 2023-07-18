@@ -28,7 +28,7 @@ async function getEmbeddings(string) {
   const binder = await setBindings(),
     res = await binder.embed$(string, { $timeout: Infinity });
 
-  return JSON.parse(res);
+  return JSON.parse(JSON.parse(res));
 }
 
 /**
@@ -48,7 +48,7 @@ async function storeString(string) {
   const embed = await getEmbeddings(string);
   if ((await db.get("vecstore")).filter((e) => e["string"] == string).length)
     return await db.get("vecstore"); // Deduping entries
-  return await db.push("vecstore", { embed: [...embed], string: string });
+  return await db.push("vecstore", { embed: embed, string: string });
 }
 
 /**
