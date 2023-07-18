@@ -20,5 +20,5 @@ def clamp(query, docs):
     doc_score_pairs = sorted(doc_score_pairs, key=lambda x: x[1], reverse=True)
 
     return json.dumps(
-        [doc[0] for doc in list(filter(lambda x: x[1] >= 0.65, doc_score_pairs))][0:2]
+        [doc[0] for doc in list(filter(lambda x: x[1] >= 0.5, doc_score_pairs))][0:2]
     )
