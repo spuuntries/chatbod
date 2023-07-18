@@ -107,9 +107,9 @@ async function searchEmbeddings(query, max) {
             v["embed"].map((n) => n.toFixed(4)),
             e.map((n) => n.toFixed(4))
           )
-        ).string
+        )?.string
     ); // This maps each embedding to the first hit of the string equivalent on the vecstore, ensuring deduplication even if dedup on previous instances didn't work
-  //console.log(unrefined);
+  console.log(unrefined);
 
   const clamped = await binder.clamp$(query, unrefined, {
     $timeout: Infinity,
