@@ -28,7 +28,7 @@ async function getEmbeddings(string) {
   const binder = await setBindings(),
     res = await binder.embed$(string, { $timeout: Infinity });
 
-  return JSON.parse(JSON.parse(res));
+  return JSON.parse(res);
 }
 
 /**
