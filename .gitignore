@@ -7,3 +7,5 @@ tests/foo.dat
 __pycache__
 .env
 .pnpm-debug.log
+memory*
+bootstrapmemory

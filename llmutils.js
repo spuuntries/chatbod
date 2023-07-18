@@ -189,7 +189,7 @@ async function getSummary(string) {
     summarizer = await client("https://spuun-summarizer.hf.space/", {
       hf_token: process.env.HF_TOKEN,
     }),
-    res = (await summarizer.predict("/predict", [query]))["data"];
+    res = (await summarizer.predict("/predict", [string]))["data"];
 
   if (!res) {
     console.log(`[WARN] [${new Date()}] summarizer failed to return a value.`);

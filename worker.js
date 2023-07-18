@@ -249,7 +249,7 @@ kekbot: Me jus chillin
     }`,
     context = await searchEmbeddings(newEntry, 20),
     dialog = `${history.length ? "\n" + history : ""}${
-      context.length ? "\n" + context.join("\n") : ""
+      context.length ? "\n" + context.map((c) => `(${c})`).join("\n") : ""
     }
 ${
   message.member
