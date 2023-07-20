@@ -8,4 +8,4 @@ __pycache__
 .env
 .pnpm-debug.log
 memory*
-bootstrapmemory
+bootstrapmemory*

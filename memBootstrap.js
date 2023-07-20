@@ -1,7 +1,31 @@
+require("dotenv").config();
+
 (async () => {
-  const memory = require("./memory.json"),
+  const memory = require(process.env.MEMFILE),
     { getSummary, getCaption } = require("./llmutils"),
-    fs = require("fs");
+    fs = require("fs"),
+    chrono = require("chrono-node");
+
+  function removeDates(input) {
+    const parsedDates = chrono.parse(input);
+    let lastEndIndex = 0;
+    let output = "";
+
+    for (const result of parsedDates) {
+      const startIndex = result.index;
+      const endIndex = startIndex + result.text.length;
+
+      // Add the text from the end of the last date to the start of this date
+      output += input.slice(lastEndIndex, startIndex);
+
+      lastEndIndex = endIndex;
+    }
+
+    // Add the remaining text after the last date
+    output += input.slice(lastEndIndex);
+
+    return output.trim();
+  }
 
   /**
    * @param {string} str To extract from
@@ -41,7 +65,7 @@
     return chunks;
   }
 
-  const chunkedConvos = chunkArray(filteredMessages, 20);
+  const chunkedConvos = chunkArray(filteredMessages, 10);
 
   console.log(chunkedConvos.length);
 
@@ -71,7 +95,29 @@
 
   const summarizedConvos = await Promise.all(
     mappedConvos.map(async (c) => {
-      const summ = await getSummary(c.join("\n"));
+      let summ,
+        n = 1;
+
+      async function callSum() {
+        try {
+          summ = await getSummary(c.join("\n"));
+        } catch (e) {
+          if (n < 6) {
+            console.log(`Failed to get summary ${n} times, retrying...`);
+            await callSum();
+            n++;
+          } else
+            console.log(
+              `Failed to get summary of ${
+                c.join("\n").length > 256
+                  ? c.join("\n").slice(0, 256) + "..."
+                  : c.join("\n")
+              }`
+            );
+        }
+      }
+      await callSum();
+
       console.log(
         `[${summ}]: ${
           c.join("\n").length > 256
@@ -79,11 +125,21 @@
             : c.join("\n")
         }`
       );
+
+      try {
+        summ = removeDates(summ);
+      } catch (e) {
+        console.log(`Date removal for [${summ}] failed.`);
+      }
+
       return summ;
     })
   );
 
-  fs.writeFileSync("./bootstrapmemory", JSON.stringify(summarizedConvos));
+  fs.writeFileSync(
+    `./bootstrapmemory (${new Date().toISOString().replaceAll(":", "_")})`,
+    JSON.stringify(summarizedConvos.flat())
+  );
 
   console.log("Bootstrap written");
 })();

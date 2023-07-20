@@ -7,6 +7,27 @@ const logger = (m) => console.log(`[${new Date()}] ${m}`),
   _ = require("lodash");
 var bindings, siginter;
 
+function removeDates(input) {
+  const parsedDates = chrono.parse(input);
+  let lastEndIndex = 0;
+  let output = "";
+
+  for (const result of parsedDates) {
+    const startIndex = result.index;
+    const endIndex = startIndex + result.text.length;
+
+    // Add the text from the end of the last date to the start of this date
+    output += input.slice(lastEndIndex, startIndex);
+
+    lastEndIndex = endIndex;
+  }
+
+  // Add the remaining text after the last date
+  output += input.slice(lastEndIndex);
+
+  return output.trim();
+}
+
 /**
  * Set up bindings
  */
@@ -43,6 +64,12 @@ async function storeString(string) {
   if (!(await db.has("vecstore"))) {
     logger(`[WARN] vecstore not created when storing, creating one`);
     await createStore();
+  }
+
+  try {
+    string = removeDates(string);
+  } catch (e) {
+    logger(`Failed to sanitize dates on ${string.slice(0, 127)}`);
   }
 
   const embed = await getEmbeddings(string);
@@ -87,7 +114,7 @@ async function searchEmbeddings(query, max) {
    * }[]>}
    */
   const vecstore = await createStore(),
-    index = new HierarchicalNSW("l2", 384);
+    index = new HierarchicalNSW("cosine", 384);
   index.initIndex(vecstore.length);
 
   for (let i = 0; i < vecstore.length; i++) {
