@@ -1,8 +1,12 @@
 from llama_cpp import Llama, LlamaDiskCache
+from dotenv import load_dotenv
 import random
+import os
+
+load_dotenv()
 
 llm = Llama(
-    model_path="./models/13bpq/pyg.bin",
+    model_path=os.environ["MODELPATH"],
     seed=random.randint(1, 9999),
     n_ctx=4096,
     n_batch=1024,
