@@ -40,6 +40,16 @@ function extractEmotes(str) {
   return mutate;
 }
 
+function chunkArray(array, size) {
+  var chunks = [];
+
+  for (var i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+
+  return chunks;
+}
+
 parentPort.on("message", async (event) => {
   // await createStore();
   const task = event,
@@ -199,10 +209,18 @@ parentPort.on("message", async (event) => {
   history = await Promise.all(history);
 
   if (history.length >= procenv.CTXWIN) {
-    const historyToCommit = history.join("\n"),
-      summarizedHistory = await getSummary(historyToCommit);
+    const memoryToCommit = chunkArray(
+      history,
+      Number.parseInt(procenv.SLICEWIN)
+    );
 
-    await storeString(summarizedHistory);
+    for (const convoChunk of memoryToCommit) {
+      const historyToCommit = convoChunk.join("\n"),
+        summarizedHistory = await getSummary(historyToCommit);
+
+      await storeString(summarizedHistory);
+    }
+
     contextCounter[message.channelId] = {
       lastFetched: interimHistory.pop().id,
     };
