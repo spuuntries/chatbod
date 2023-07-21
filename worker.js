@@ -209,6 +209,7 @@ parentPort.on("message", async (event) => {
   history = await Promise.all(history);
 
   if (history.length >= procenv.CTXWIN) {
+    logger("Performing summarization");
     const memoryToCommit = chunkArray(
       history,
       Number.parseInt(procenv.SLICEWIN)
@@ -224,6 +225,7 @@ parentPort.on("message", async (event) => {
     contextCounter[message.channelId] = {
       lastFetched: interimHistory.pop().id,
     };
+    logger("Success");
   }
 
   history = history.join("\n");
