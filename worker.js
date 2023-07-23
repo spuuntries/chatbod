@@ -237,7 +237,6 @@ parentPort.on("message", async (event) => {
       message.channel.name
     }), today is ${dateref.toDateString()} GMT+0.
 
-<START>
 Trol: Hi! 
 kekbot: Enlooo 😃 Watsup? [gif]
 Trol: Not much, you?

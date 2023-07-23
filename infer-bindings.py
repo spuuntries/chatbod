@@ -22,10 +22,10 @@ llm.set_cache(cache)
 def generate(prompt):
     output = llm(
         prompt,
-        max_tokens=48,
+        max_tokens=32,
         temperature=0.9,
         mirostat_mode=2,
-        repeat_penalty=1.08,
+        repeat_penalty=1.2,
     )
     if output["choices"][0]["finish_reason"] == "length":
         output["choices"][0]["text"] = output["choices"][0]["text"] + "—"
