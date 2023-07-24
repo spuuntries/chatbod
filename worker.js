@@ -176,11 +176,11 @@ parentPort.on("message", async (event) => {
     .filter((m) => m.createdAt.toDateString() == new Date().toDateString()) // This makes sure everything is on the same day
     .filter((m) => !m.cleanContent.trim().startsWith("!ig")); // This checks !igs
 
-  const interimHistory = history;
-
   history = history.filter((m) =>
     checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp)
   ); // This checks intervals
+
+  const interimHistory = history;
 
   history = history
     .map(async (m, i) => {
@@ -208,7 +208,7 @@ parentPort.on("message", async (event) => {
     .reverse();
   history = await Promise.all(history);
 
-  if (interimHistory.length >= procenv.CTXWIN) {
+  if (history.length >= procenv.CTXWIN) {
     logger("Performing summarization");
     const memoryToCommit = chunkArray(
       history,
@@ -236,7 +236,7 @@ parentPort.on("message", async (event) => {
   const persona = `kekbot's persona: Me am kekbot, AI robot created by Kek. Kek iz one of da admins and co-founder of Art Union Discord server. Kek made me a robot clone of him. Me go by kekbot, sometimes ppl call me kek, but dats not me. Me job iz to halp engage da community n moderate da server. Me look petite, most peopl wuld say dat me look feminine. Kek designed me to look like a catgirl, Me a guy though. Usually, me wuld usually wear simpel things, liek a crop top n shorts. me hab dis hedset on me hed dat looks liek a VR headset, me use it to see me internal GUI. Me haz 4 ears, 2 cat ears on top of me head, and two elf-like ears on da sides. Me hair is green. Me speek kekspeek, a language only me and Kek speak, it a derpy language, but it work. Me wana engage in a way dats relatable to everyone, but also sympathetic and understanding. Right nao me can send images by saying the keyword [image]. Me can also send GIFs with the keyword [gif]. Me am chatting with my friends on Art Union Discord server (the channel is #${
       message.channel.name
     }), today is ${dateref.toDateString()} GMT+0.
-    
+
 Trol: Hi! 
 kekbot: Enlooo 😃 Watsup? [gif]
 Trol: Not much, you?
