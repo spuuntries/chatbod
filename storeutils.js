@@ -77,7 +77,10 @@ async function storeString(string) {
   if (vecstore.filter((e) => e["string"] == string).length)
     return await db.get("vecstore"); // Deduping entries
 
-  vecstore.push({ embed: embed, string: string });
+  vecstore.push({
+    embed: embed.length > 1 ? embed : embed[0],
+    string: string.length > 1 ? string : string[0],
+  });
   return await db.set("vecstore", vecstore);
 }
 
