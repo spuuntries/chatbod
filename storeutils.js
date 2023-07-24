@@ -72,10 +72,13 @@ async function storeString(string) {
     logger(`Failed to sanitize dates on ${string.slice(0, 127)}`);
   }
 
-  const embed = await getEmbeddings(string);
-  if ((await db.get("vecstore")).filter((e) => e["string"] == string).length)
+  const embed = await getEmbeddings(string),
+    vecstore = await db.get("vecstore");
+  if (vecstore.filter((e) => e["string"] == string).length)
     return await db.get("vecstore"); // Deduping entries
-  return await db.push("vecstore", { embed: embed, string: string });
+
+  vecstore.push({ embed: embed, string: string });
+  return await db.set("vecstore", vecstore);
 }
 
 /**
