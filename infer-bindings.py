@@ -25,7 +25,8 @@ def generate(prompt):
         max_tokens=48,
         temperature=0.9,
         mirostat_mode=2,
-        repeat_penalty=1.08,
+        repeat_penalty=1.2,
+        frequency_penalty=1,
     )
     if output["choices"][0]["finish_reason"] == "length":
         output["choices"][0]["text"] = output["choices"][0]["text"] + "—"
