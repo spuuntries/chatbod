@@ -119,7 +119,7 @@ parentPort.on("message", async (event) => {
   var history = Array.from(
       (
         await message.channel.messages.fetch({
-          after: contextCounter[message.channelId],
+          before: message.id,
           limit: Number.parseInt(procenv.CTXWIN),
         })
       ).values()
@@ -134,7 +134,7 @@ parentPort.on("message", async (event) => {
   history = Array.from(
     (
       await message.channel.messages.fetch({
-        after: contextCounter[message.channelId],
+        before: message.id,
         limit:
           Number.parseInt(procenv.CTXWIN) + ignoredWindow > 100
             ? 100
@@ -143,7 +143,15 @@ parentPort.on("message", async (event) => {
     ).values()
   ).reverse();
 
-  const llamaTokenizer = (await import("llama-tokenizer-js")).default;
+  const llamaTokenizer = (await import("llama-tokenizer-js")).default,
+    afterMessage = history.findIndex(
+      (m) => m.id === contextCounter[message.channelId]
+    );
+
+  if (afterMessage != -1) {
+    // The +1 is to start slicing from the message *after* the found message.
+    history = history.slice(history + 1);
+  }
 
   history = filterMessages(history);
 
