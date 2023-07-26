@@ -101,22 +101,15 @@ parentPort.on("message", async (event) => {
 
   /**
    *
-   * @param {Message[]} messages
+   * @param {Discord.Message[]} messages
    * @returns
    */
   function filterMessages(messages) {
-    let index = messages.length - 1; // Start from the end of the array
-
-    // Iterate over array from end to beginning
-    while (index >= 0) {
+    let index = 0;
+    while (index < messages.length) {
       if (messages[index].content.includes("!hig")) break;
-      index--;
+      index++;
     }
-
-    // If "!hig" was not found, return the whole array
-    if (index < 0) return messages;
-
-    // Return a new array with all messages up to the last occurrence of "!hig"
     return messages.slice(0, index);
   }
 
@@ -148,7 +141,7 @@ parentPort.on("message", async (event) => {
             : Number.parseInt(procenv.CTXWIN) + ignoredWindow,
       })
     ).values()
-  ).reverse();
+  );
 
   const llamaTokenizer = (await import("llama-tokenizer-js")).default,
     afterMessage = history.findIndex(
@@ -174,26 +167,30 @@ parentPort.on("message", async (event) => {
 
   const interimHistory = history;
 
-  history = history.map(async (m, i) => {
-    await message.guild.members.fetch(m.author.id);
-    let author;
-    if (m.author.id != placeholder)
-      if (m.member) author = m.member.displayName.replaceAll(" ", "_");
-      else author = m.author.username.replaceAll(" ", "_");
-    else author = "kekbot";
+  history = history
+    .map(async (m, i) => {
+      await message.guild.members.fetch(m.author.id);
+      let author;
+      if (m.author.id != placeholder)
+        if (m.member) author = m.member.displayName.replaceAll(" ", "_");
+        else author = m.author.username.replaceAll(" ", "_");
+      else author = "kekbot";
 
-    const result = `${author}: ${extractEmotes(m.cleanContent)}${
-      m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
-    }${
-      m.attachments.some((a) =>
-        ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
-      )
-        ? ` [image] (an image of ${await getCaption(m.attachments.at(0).url)})`
-        : ""
-    }`;
+      const result = `${author}: ${extractEmotes(m.cleanContent)}${
+        m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
+      }${
+        m.attachments.some((a) =>
+          ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
+        )
+          ? ` [image] (an image of ${await getCaption(
+              m.attachments.at(0).url
+            )})`
+          : ""
+      }`;
 
-    return result;
-  });
+      return result;
+    })
+    .reverse();
   history = await Promise.all(history);
 
   if (history.length >= procenv.CTXWIN) {
