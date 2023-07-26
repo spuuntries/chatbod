@@ -142,26 +142,6 @@ parentPort.on("message", async (event) => {
     ).values()
   );
 
-  function checkIfInCurrentInterval(t, unixTimestamp) {
-    // get current hour
-    var currentHour = new Date().getHours();
-    // calculate current interval
-    var currentInterval = Math.floor(currentHour / t);
-
-    // convert timestamp to hour
-    var dateFromTimestamp = new Date(unixTimestamp);
-    var hourFromTimestamp = dateFromTimestamp.getHours();
-    // calculate interval from timestamp
-    var intervalFromTimestamp = Math.floor(hourFromTimestamp / t);
-
-    // compare intervals
-    if (currentInterval === intervalFromTimestamp) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   const llamaTokenizer = (await import("llama-tokenizer-js")).default;
 
   history = filterMessages(history).map((e) => {
@@ -175,10 +155,6 @@ parentPort.on("message", async (event) => {
   history = history
     .filter((m) => m.createdAt.toDateString() == new Date().toDateString()) // This makes sure everything is on the same day
     .filter((m) => !m.cleanContent.trim().startsWith("!ig")); // This checks !igs
-
-  history = history.filter((m) =>
-    checkIfInCurrentInterval(procenv.TLIMIT, m.createdTimestamp)
-  ); // This checks intervals
 
   const interimHistory = history;
 
