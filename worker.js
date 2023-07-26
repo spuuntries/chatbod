@@ -6,6 +6,8 @@ const procenv = process.env,
   client = new Discord.Client({
     intents: ["Guilds", "GuildMessages", "MessageContent", "GuildMembers"],
   }),
+  { QuickDB } = require("quick.db"),
+  db = new QuickDB(),
   placeholder = procenv.PLACEHOLDER,
   {
     runPrompt,
@@ -20,8 +22,6 @@ const procenv = process.env,
   typer = new Worker("./typeworker.js"),
   _ = require("lodash"),
   logger = (m) => console.log(`[${new Date()}] ${m}`);
-
-var contextCounter = {};
 
 /**
  * @param {string} str To extract from
@@ -113,11 +113,14 @@ parentPort.on("message", async (event) => {
     return messages.slice(0, index);
   }
 
+  if (!(await db.get("contextCounter"))) await db.set("contextCounter", {});
+  const contextCounter = await db.get("contextCounter");
+
   var history = Array.from(
       (
         await message.channel.messages.fetch({
           before: message.id,
-          after: contextCounter?.[message.channelId]?.["lastFetched"],
+          after: contextCounter[message.channelId],
           limit: Number.parseInt(procenv.CTXWIN),
         })
       ).values()
@@ -133,7 +136,7 @@ parentPort.on("message", async (event) => {
     (
       await message.channel.messages.fetch({
         before: message.id,
-        after: contextCounter?.[message.channelId]?.["lastFetched"],
+        after: contextCounter[message.channelId],
         limit:
           Number.parseInt(procenv.CTXWIN) + ignoredWindow > 100
             ? 100
@@ -152,9 +155,7 @@ parentPort.on("message", async (event) => {
     return e;
   });
 
-  history = history
-    .filter((m) => m.createdAt.toDateString() == new Date().toDateString()) // This makes sure everything is on the same day
-    .filter((m) => !m.cleanContent.trim().startsWith("!ig")); // This checks !igs
+  history = history.filter((m) => !m.cleanContent.trim().startsWith("!ig")); // This checks !igs
 
   const interimHistory = history;
 
@@ -198,10 +199,15 @@ parentPort.on("message", async (event) => {
       await storeString(summarizedHistory);
     }
 
-    contextCounter[message.channelId] = {
-      lastFetched: interimHistory.pop().id,
-    };
-    logger("Success");
+    await db.set(
+      `contextCounter.${message.channelId}`,
+      interimHistory.pop().id
+    );
+    logger(
+      `Success, set lastFetched to ${await db.get(
+        `contextCounter.${message.channelId}`
+      )}`
+    );
   }
 
   history = history.join("\n");

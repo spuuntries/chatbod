@@ -9,3 +9,4 @@ __pycache__
 .pnpm-debug.log
 memory*
 bootstrapmemory*
+sandbox/
