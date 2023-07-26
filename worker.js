@@ -143,7 +143,7 @@ parentPort.on("message", async (event) => {
     ).values()
   );
 
-  history.shift();
+  history = history.filter((m) => m.id != message.id);
 
   const llamaTokenizer = (await import("llama-tokenizer-js")).default;
 
