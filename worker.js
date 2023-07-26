@@ -141,7 +141,7 @@ parentPort.on("message", async (event) => {
             : Number.parseInt(procenv.CTXWIN) + ignoredWindow,
       })
     ).values()
-  );
+  ).reverse();
 
   const llamaTokenizer = (await import("llama-tokenizer-js")).default;
 
@@ -159,30 +159,26 @@ parentPort.on("message", async (event) => {
 
   const interimHistory = history;
 
-  history = history
-    .map(async (m, i) => {
-      await message.guild.members.fetch(m.author.id);
-      let author;
-      if (m.author.id != placeholder)
-        if (m.member) author = m.member.displayName.replaceAll(" ", "_");
-        else author = m.author.username.replaceAll(" ", "_");
-      else author = "kekbot";
+  history = history.map(async (m, i) => {
+    await message.guild.members.fetch(m.author.id);
+    let author;
+    if (m.author.id != placeholder)
+      if (m.member) author = m.member.displayName.replaceAll(" ", "_");
+      else author = m.author.username.replaceAll(" ", "_");
+    else author = "kekbot";
 
-      const result = `${author}: ${extractEmotes(m.cleanContent)}${
-        m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
-      }${
-        m.attachments.some((a) =>
-          ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
-        )
-          ? ` [image] (an image of ${await getCaption(
-              m.attachments.at(0).url
-            )})`
-          : ""
-      }`;
+    const result = `${author}: ${extractEmotes(m.cleanContent)}${
+      m.attachments.some((a) => a.contentType.includes("gif")) ? " [gif]" : ""
+    }${
+      m.attachments.some((a) =>
+        ["png", "jpeg", "jpg"].includes(a.contentType.split("/")[1])
+      )
+        ? ` [image] (an image of ${await getCaption(m.attachments.at(0).url)})`
+        : ""
+    }`;
 
-      return result;
-    })
-    .reverse();
+    return result;
+  });
   history = await Promise.all(history);
 
   if (history.length >= procenv.CTXWIN) {
