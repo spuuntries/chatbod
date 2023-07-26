@@ -101,15 +101,22 @@ parentPort.on("message", async (event) => {
 
   /**
    *
-   * @param {Discord.Message[]} messages
+   * @param {Message[]} messages
    * @returns
    */
   function filterMessages(messages) {
-    let index = 0;
-    while (index < messages.length) {
+    let index = messages.length - 1; // Start from the end of the array
+
+    // Iterate over array from end to beginning
+    while (index >= 0) {
       if (messages[index].content.includes("!hig")) break;
-      index++;
+      index--;
     }
+
+    // If "!hig" was not found, return the whole array
+    if (index < 0) return messages;
+
+    // Return a new array with all messages up to the last occurrence of "!hig"
     return messages.slice(0, index);
   }
 
