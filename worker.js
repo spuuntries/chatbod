@@ -145,7 +145,9 @@ parentPort.on("message", async (event) => {
 
   const llamaTokenizer = (await import("llama-tokenizer-js")).default;
 
-  history = filterMessages(history).map((e) => {
+  history = filterMessages(history);
+
+  history = history.map((e) => {
     const encoded = llamaTokenizer.encode(e.cleanContent);
 
     if (encoded.length > 112)
