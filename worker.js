@@ -201,7 +201,7 @@ parentPort.on("message", async (event) => {
 
     await db.set(
       `contextCounter.${message.channelId}`,
-      interimHistory.pop().id
+      interimHistory.shift().id
     );
     logger(
       `Success, set lastFetched to ${await db.get(
