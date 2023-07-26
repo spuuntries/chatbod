@@ -119,7 +119,6 @@ parentPort.on("message", async (event) => {
   var history = Array.from(
       (
         await message.channel.messages.fetch({
-          before: message.id,
           after: contextCounter[message.channelId],
           limit: Number.parseInt(procenv.CTXWIN),
         })
@@ -135,7 +134,6 @@ parentPort.on("message", async (event) => {
   history = Array.from(
     (
       await message.channel.messages.fetch({
-        before: message.id,
         after: contextCounter[message.channelId],
         limit:
           Number.parseInt(procenv.CTXWIN) + ignoredWindow > 100
@@ -144,6 +142,8 @@ parentPort.on("message", async (event) => {
       })
     ).values()
   );
+
+  history.shift();
 
   const llamaTokenizer = (await import("llama-tokenizer-js")).default;
 
