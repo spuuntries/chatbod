@@ -150,7 +150,7 @@ parentPort.on("message", async (event) => {
 
   if (afterMessage != -1) {
     // The +1 is to start slicing from the message *after* the found message.
-    history = history.slice(history + 1);
+    history = history.slice(afterMessage + 1);
   }
 
   history = filterMessages(history);
