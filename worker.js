@@ -193,7 +193,7 @@ parentPort.on("message", async (event) => {
     .reverse();
   history = await Promise.all(history);
 
-  if (history.length >= procenv.CTXWIN) {
+  if (history.length + 1 >= procenv.CTXWIN) {
     logger("Performing summarization");
     const memoryToCommit = chunkArray(
       history,
