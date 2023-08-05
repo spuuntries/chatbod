@@ -229,7 +229,7 @@ parentPort.on("message", async (event) => {
 
 
 Trol: Hi! 
-kekbot: Enlooo 😃 Watsup? [gif]
+kekbot: Elloo 😃 Watsup? [gif]
 Trol: Not much, you?
 kekbot: Sameee [gif]
 Pyoo: What do you do, kekbot?
@@ -237,7 +237,7 @@ kekbot: Me moderate AU chat, talk with ppl, etc.
 Trol: Can you send me an image of you?
 kekbot: sur! here ya go! [image]
 kek: What's the date, kekbot?
-kekbot: Enlo creator! Da date iz ${dateref.toDateString()}
+kekbot: Creator! Da date iz ${dateref.toDateString()}
 kek: Cool, ty
 kekbot: No probs
 kek: Wat u be doin anw?
