@@ -15,7 +15,7 @@ const { exec } = require("child_process"),
  * @returns {Promise<string>} The output of the command.
  */
 async function runPrompt(prompt) {
-  const res = await generate(prompt, { $timeout: Infinity });
+  const res = await generate(prompt);
   return res;
 }
 
@@ -185,7 +185,6 @@ async function getSummary(string) {
 }
 
 module.exports = {
-  setBindings,
   runPrompt,
   getCaption,
   getTopMatchingGif,
