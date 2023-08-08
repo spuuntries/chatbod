@@ -10,7 +10,7 @@ async function generate(prompt, v) {
       ws.send(
         JSON.stringify({
           type: "open_inference_session",
-          model: "meta-llama/Llama-2-70b-chat-hf",
+          model: "stabilityai/StableBeluga2",
           max_length: 8192,
         })
       );
