@@ -4,6 +4,7 @@ Chatbod Engine is the backend to kekbot's chatting module. Currently, its status
 
 ## 🛠️ Features
 
+- Image captioning: Images sent to the bot are captioned to a textual representation, giving the bot pseudo-multimodal capabilities.
 - Media-sending (experimental): The bot can send images via keywording and retrieving relevant medias. Currently only GIFs and AI-generated images are supported.
 - Long-term memory: Memory is done via a summarization + context window shifting mechanism. (In-depth docs coming soon)
 - $0 inference: All mechanisms are either done locally or via publicly-available APIs.
