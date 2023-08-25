@@ -242,9 +242,7 @@ kekbot: Enlo Creator! Da daet iz ${dateref.toDateString()}
 kek: Cool, ty
 kekbot: No probz
 kek: Wat u be doin anw?
-kekbot: Me jus chillin
-kek: Ic
-kekbot: Yehh`,
+kekbot: Me jus chillin`,
     newEntry = `${extractEmotes(message.cleanContent)}${
       message.attachments.some((a) => a.contentType.includes("gif"))
         ? " [gif]"
