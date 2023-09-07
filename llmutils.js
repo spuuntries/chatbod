@@ -2,11 +2,26 @@ require("dotenv").config();
 const { exec } = require("child_process"),
   { HfInference } = require("@huggingface/inference"),
   axios = require("axios"),
-  { generate } = require("./infer-bindings"),
+  { python } = require("pythonia"),
+  // { generate } = require("./infer-bindings"),
   { QuickDB } = require("quick.db"),
   db = new QuickDB(),
   hf = new HfInference(process.env.HF_TOKEN),
   { randomInt } = require("crypto");
+
+var bindings, siginter;
+
+/**
+ * Set up bindings
+ */
+async function setBindings() {
+  if (!bindings) bindings = await python("./infer-bindings.py");
+  if (!siginter)
+    siginter = process.on("SIGINT", () => {
+      bindings.exit();
+    });
+  return bindings;
+}
 
 /**
  * Runs a prompt using the binary.
@@ -15,7 +30,9 @@ const { exec } = require("child_process"),
  * @returns {Promise<string>} The output of the command.
  */
 async function runPrompt(prompt) {
-  const res = await generate(prompt);
+  // const res = await generate(prompt);
+  const binder = await setBindings(),
+    res = await binder.generate$(prompt, { $timeout: Infinity });
   return res;
 }
 
