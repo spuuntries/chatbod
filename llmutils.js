@@ -2,7 +2,7 @@ require("dotenv").config();
 const { exec } = require("child_process"),
   { HfInference } = require("@huggingface/inference"),
   axios = require("axios"),
-  { generate } = require("./infer-petals"),
+  { generate } = require("./infer-bindings"),
   { QuickDB } = require("quick.db"),
   db = new QuickDB(),
   hf = new HfInference(process.env.HF_TOKEN),
