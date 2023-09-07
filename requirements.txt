@@ -1,3 +1,6 @@
-llama-cpp-python==0.1.72
+ctranslate2==3.17.1
+hnswlib==0.7.0
+llama-cpp-python==0.1.83
 pip-chill==1.0.3
+python-dotenv==1.0.0
 sentence-transformers==2.2.2
