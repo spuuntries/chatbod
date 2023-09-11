@@ -3,7 +3,7 @@ const { exec } = require("child_process"),
   { HfInference } = require("@huggingface/inference"),
   axios = require("axios"),
   { python } = require("pythonia"),
-  // { generate } = require("./infer-bindings"),
+  { generate } = require("./infer-petals"),
   { QuickDB } = require("quick.db"),
   db = new QuickDB(),
   hf = new HfInference(process.env.HF_TOKEN),
@@ -30,9 +30,19 @@ async function setBindings() {
  * @returns {Promise<string>} The output of the command.
  */
 async function runPrompt(prompt) {
-  // const res = await generate(prompt);
   const binder = await setBindings(),
     res = await binder.generate$(prompt, { $timeout: Infinity });
+  return res;
+}
+
+/**
+ * Runs a prompt through the auxilliary provider, currently petals public net.
+ * @async
+ * @param {string} prompt - Prompt to run
+ * @returns {Promise<string>} The output of the command.
+ */
+async function runAux(prompt) {
+  const res = await generate(prompt);
   return res;
 }
 
@@ -56,17 +66,21 @@ async function getCaption(img) {
   return res;
 }
 
-async function summarize(query) {
-  const { client } = await import("@gradio/client"),
-    dialogsum = await client("https://spuun-dialogsum.hf.space/", {
-      hf_token: process.env.HF_TOKEN,
-    }),
-    res = (await dialogsum.predict("/predict", [query])).data;
+async function keyword(input) {
+  const prompt = `### System:
+You are keyworder, a bot that summarizes a text into topic keywords delimited by commas.
+### User:
+${input}
+### Assistant:
+topics: [`;
 
-  if (!res) {
-    console.log(`[WARN] [${new Date()}] dialogsum failed to return a value.`);
-    return undefined;
-  }
+  let res = (await runAux(prompt))
+    .trim()
+    .split(",")
+    .map((e) => {
+      return e.replaceAll("[", "").replaceAll("]", "").trim();
+    });
+
   return res;
 }
 
@@ -98,7 +112,7 @@ async function nsfwProcess(image) {
  * @returns {Promise<ArrayBuffer | undefined>} The GIF data as an ArrayBuffer or undefined.
  */
 async function getTopMatchingGif(query) {
-  const keywords = await summarize(query);
+  const keywords = await keyword(query);
   if (!keywords) return undefined;
 
   const url = `https://tenor.googleapis.com/v2/search?q=${keywords}&key=${process.env.TENOR_API_KEY}&client_key=kekbot&limit=1&media_filter=gif`;
@@ -137,7 +151,7 @@ async function generateImage(query) {
         inputs: query.slice(-128),
       })
     ).shift().label,
-    keywords = await summarize(query);
+    keywords = await keyword(query);
 
   console.log(`[${new Date()}] ${keywords} | ${emotion}`);
 
@@ -187,22 +201,24 @@ async function getClosestQA(query, arrSet) {
  * @param {string} string - String to summarize
  * @returns {Promise<string|undefined>}
  */
-async function getSummary(string) {
-  const { client } = await import("@gradio/client"),
-    summarizer = await client("https://spuun-summarizer.hf.space/", {
-      hf_token: process.env.HF_TOKEN,
-    }),
-    res = (await summarizer.predict("/predict", [string]))["data"];
+async function getSummary(input) {
+  const prompt = `### System:
+You are summarizer, a bot that summarizes a text into a digestible third-person interpretation. This interpretation must be easy to understand and concise, like you're explaining it to someone else. If the text mentions people's names, refer to them by their names.
 
-  if (!res) {
-    console.log(`[WARN] [${new Date()}] summarizer failed to return a value.`);
-    return undefined;
-  }
+### User:
+${input}
+
+### Assistant:
+Summary: `;
+
+  let res = (await runAux(prompt)).trim();
   return res;
 }
 
 module.exports = {
   runPrompt,
+  runAux,
+  keyword,
   getCaption,
   getTopMatchingGif,
   nsfwProcess,

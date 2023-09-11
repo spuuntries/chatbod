@@ -1,7 +1,7 @@
 const { WebSocket } = require("ws"),
   { performance } = require("perf_hooks");
 
-async function generate(prompt, v) {
+async function generate(prompt, v, model) {
   performance.mark("start");
   const ws = new WebSocket(`wss://chat.petals.dev/api/v2/generate`);
 
@@ -10,7 +10,7 @@ async function generate(prompt, v) {
       ws.send(
         JSON.stringify({
           type: "open_inference_session",
-          model: "stabilityai/StableBeluga2",
+          model: model ? model : "stabilityai/StableBeluga2",
           max_length: 8192,
         })
       );
