@@ -49,7 +49,7 @@ setInterval(async () => {
     if (!(await summarizer.predict("/predict", [query])).data)
       throw new Error("summarizer failed");
 
-    image.stage = 0;
+    stage = 0;
   } catch (e) {
     logger(
       `Failed to warm up models, (${e.message}) [${
