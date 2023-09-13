@@ -13,11 +13,11 @@ const procenv = process.env,
   queue = [],
   triggers = procenv.TRIGGERS.split("|");
 
-  /**
-   * 
-   * @param {string} s 
-   * @returns {string}
-   */
+/**
+ *
+ * @param {string} s
+ * @returns {string}
+ */
 function removeRepeatedChars(s) {
   let words = s.split(/\s+/);
   let newWords = words.map((word) => word.replace(/(.)\1+/g, "$1"));
@@ -49,7 +49,10 @@ client.on("messageCreate", async (message) => {
     (!message.createdTimestamp - lastTrigger <= procenv.TRIGTIME && // Check for time between triggers
       !triggers.some(
         (t) =>
-          removeRepeatedChars(message.cleanContent).split(/ +/g).includes(t) // Look for triggers
+          removeRepeatedChars(message.cleanContent)
+            .toLowerCase()
+            .split(/ +/g)
+            .includes(t) // Look for triggers
       ) &&
       !referenced.author.id == client.user.id) // Check for reply trigger
   )
