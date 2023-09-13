@@ -8,23 +8,49 @@ const procenv = process.env,
   { Worker } = require("worker_threads"),
   worker = new Worker("./worker.js"),
   warmer = new Worker("./warmer.js"),
-  queue = [];
+  { QuickDB } = require("quick.db"),
+  db = new QuickDB(),
+  queue = [],
+  triggers = procenv.TRIGGERS.split("|");
+
+function removeRepeatedChars(s) {
+  let words = s.split(/\s+/);
+  let newWords = words.map((word) => word.replace(/(.)\1+/g, "$1"));
+  return newWords.join(" ");
+}
 
 var isProcessingQueue = false;
 
-client.on("messageCreate", (message) => {
+client.on("messageCreate", async (message) => {
   if (procenv.CHANNELS) {
     if (!procenv.CHANNELS.split("|").includes(message.channelId)) return;
   }
+
+  let lastTrigger = (await db.has("lastTrigger"))
+      ? await db.get("lastTrigger")
+      : 0,
+    referenced = message.reference
+      ? await message.fetchReference()
+      : { author: { id: false } };
+
   if (
     !message.cleanContent ||
     !message.author.id ||
     message.author.id == client.user.id ||
     message.cleanContent.trim().includes("!hig") ||
     message.cleanContent.trim().startsWith("!ig") ||
-    message.channel.type == Discord.ChannelType.DM
+    message.channel.type == Discord.ChannelType.DM ||
+    // NOTE: This checks for triggers.
+    (!message.createdTimestamp - lastTrigger <= procenv.TRIGTIME && // Check for time between triggers
+      !triggers.some(
+        (t) =>
+          removeRepeatedChars(message.cleanContent).split(/ +/g).includes(t) // Look for triggers
+      ) &&
+      !referenced.author.id == client.user.id) // Check for reply trigger
   )
     return;
+
+  await db.set("lastTrigger", message.createdTimestamp);
 
   queue.push([message.channelId, message.id]);
   logger(queue.toString());
