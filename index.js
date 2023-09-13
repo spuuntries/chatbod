@@ -13,6 +13,11 @@ const procenv = process.env,
   queue = [],
   triggers = procenv.TRIGGERS.split("|");
 
+  /**
+   * 
+   * @param {string} s 
+   * @returns {string}
+   */
 function removeRepeatedChars(s) {
   let words = s.split(/\s+/);
   let newWords = words.map((word) => word.replace(/(.)\1+/g, "$1"));
