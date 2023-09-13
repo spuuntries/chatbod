@@ -31,8 +31,8 @@ client.on("messageCreate", async (message) => {
     if (!procenv.CHANNELS.split("|").includes(message.channelId)) return;
   }
 
-  let lastTrigger = (await db.has("lastTrigger"))
-      ? await db.get("lastTrigger")
+  let lastTrigger = (await db.has(`lastTrigger.${message.channelId}`))
+      ? await db.get(`lastTrigger.${message.channelId}`)
       : 0,
     referenced = message.reference
       ? await message.fetchReference()
@@ -58,7 +58,7 @@ client.on("messageCreate", async (message) => {
   )
     return;
 
-  await db.set("lastTrigger", message.createdTimestamp);
+  await db.set(`lastTrigger.${message.channelId}`, message.createdTimestamp);
 
   queue.push([message.channelId, message.id]);
   logger(queue.toString());
