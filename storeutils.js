@@ -4,7 +4,8 @@ const logger = (m) => console.log(`[${new Date()}] ${m}`),
   { python } = require("pythonia"),
   db = new QuickDB(),
   { HierarchicalNSW } = require("hnswlib-node"),
-  _ = require("lodash");
+  _ = require("lodash"),
+  chrono = require("chrono-node");
 var bindings, siginter;
 
 function removeDates(str) {
