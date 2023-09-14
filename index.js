@@ -54,7 +54,7 @@ client.on("messageCreate", async (message) => {
             .split(/ +/g)
             .includes(t) // Look for triggers
       ) &&
-      !referenced.author.id == client.user.id) // Check for reply trigger
+      referenced.author.id != client.user.id) // Check for reply target trigger
   )
     return;
 
