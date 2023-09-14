@@ -7,25 +7,14 @@ const logger = (m) => console.log(`[${new Date()}] ${m}`),
   _ = require("lodash");
 var bindings, siginter;
 
-function removeDates(input) {
-  const parsedDates = chrono.parse(input);
-  let lastEndIndex = 0;
-  let output = "";
+function removeDates(str) {
+  let results = chrono.parse(str);
 
-  for (const result of parsedDates) {
-    const startIndex = result.index;
-    const endIndex = startIndex + result.text.length;
-
-    // Add the text from the end of the last date to the start of this date
-    output += input.slice(lastEndIndex, startIndex);
-
-    lastEndIndex = endIndex;
+  for (let i = 0; i < results.length; i++) {
+    str = str.replace(results[i].text, "");
   }
 
-  // Add the remaining text after the last date
-  output += input.slice(lastEndIndex);
-
-  return output.trim();
+  return str;
 }
 
 /**
