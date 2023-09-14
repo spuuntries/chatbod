@@ -22,8 +22,8 @@ llm.set_cache(cache)
 def generate(prompt):
     output = llm(
         prompt,
-        max_tokens=48,
-        temperature=0.9,
+        max_tokens=64,
+        temperature=0.7,
         mirostat_mode=2,
         repeat_penalty=1.08,
     )
