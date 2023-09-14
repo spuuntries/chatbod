@@ -46,7 +46,7 @@ client.on("messageCreate", async (message) => {
     message.cleanContent.trim().startsWith("!ig") ||
     message.channel.type == Discord.ChannelType.DM ||
     // NOTE: This checks for triggers.
-    (!message.createdTimestamp - lastTrigger <= procenv.TRIGTIME && // Check for time between triggers
+    (!(message.createdTimestamp - lastTrigger <= procenv.TRIGTIME) && // Check for time between triggers
       !triggers.some(
         (t) =>
           removeRepeatedChars(message.cleanContent)
