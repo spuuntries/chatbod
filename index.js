@@ -47,12 +47,13 @@ client.on("messageCreate", async (message) => {
     message.channel.type == Discord.ChannelType.DM ||
     // NOTE: This checks for triggers.
     (!(message.createdTimestamp - lastTrigger <= procenv.TRIGTIME) && // Check for time between triggers
-      !triggers.some(
-        (t) =>
-          removeRepeatedChars(message.cleanContent)
-            .toLowerCase()
-            .split(/ +/g)
-            .includes(t) // Look for triggers
+      !triggers.some((t) =>
+        removeRepeatedChars(message.cleanContent)
+          .toLowerCase()
+          .split(/ +/g)
+          .some(
+            (k) => k.toLowerCase().includes(t) // Look for triggers
+          )
       ) &&
       referenced.author.id != client.user.id) // Check for reply target trigger
   )
