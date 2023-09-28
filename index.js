@@ -55,6 +55,7 @@ client.on("messageCreate", async (message) => {
             (k) => k.toLowerCase().includes(t) // Look for triggers
           )
       ) &&
+      message.mentions.users.find((u) => u.id == client.user.id) && // Check if bot is mentioned
       referenced.author.id != client.user.id) // Check for reply target trigger
   )
     return;
