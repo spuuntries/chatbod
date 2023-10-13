@@ -6,10 +6,10 @@
   "license": "MIT",
   "dependencies": {
     "@gradio/client": "^0.1.4",
-    "@huggingface/inference": "^2.6.1",
-    "axios": "^1.5.0",
-    "better-sqlite3": "^8.6.0",
-    "chrono-node": "^2.6.6",
+    "@huggingface/inference": "^2.6.3",
+    "axios": "^1.5.1",
+    "better-sqlite3": "^8.7.0",
+    "chrono-node": "^2.7.0",
     "discord.js": "^14.13.0",
     "dotenv": "^16.3.1",
     "hnswlib-node": "^2.0.0",
@@ -17,8 +17,8 @@
     "lodash": "^4.17.21",
     "nanoid": "^3.3.6",
     "niceware": "^4.0.0",
-    "pythonia": "^1.0.3",
+    "pythonia": "^1.0.4",
     "quick.db": "^9.1.7",
-    "ws": "^8.14.0"
+    "ws": "^8.14.2"
   }
 }
