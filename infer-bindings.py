@@ -22,7 +22,7 @@ def generate(prompt):
         llm_config = tomllib.load(f)
     output = llm(
         **llm_config["gen"],
-        prompt,
+        prompt=prompt,
     )
     if output["choices"][0]["finish_reason"] == "length":
         output["choices"][0]["text"] = output["choices"][0]["text"] + "—"
