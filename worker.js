@@ -300,11 +300,20 @@ kekbot:`,
   response = response.replaceAll(/\(\S[^):]+$/gim, "");
   response = response.replaceAll(/\[.+\]/gim, "");
 
-  await message.reply({
-    content: response,
-    files: attFiles,
-    allowedMentions: { repliedUser: false },
-  });
+  try {
+    await message.reply({
+      content: response,
+      files: attFiles,
+      allowedMentions: { repliedUser: false },
+    });
+  } catch (error) {
+    logger(`Failed to reply, attempting normal message.`);
+    try {
+      await message.channel.send({ content: response, files: attFiles });
+    } catch (error) {
+      logger(`Failed to reply with both methods, cancelling entirely`);
+    }
+  }
   typer.postMessage([message.channelId]);
 
   client.user.setPresence({
