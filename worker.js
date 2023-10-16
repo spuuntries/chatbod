@@ -209,8 +209,11 @@ parentPort.on("message", async (event) => {
     );
 
     for (const convoChunk of memoryToCommit) {
-      const historyToCommit = convoChunk.join("\n"),
-        summarizedHistory = await getSummary(historyToCommit);
+      const historyToCommit = convoChunk.join("\n");
+
+      logger(`Summarizing ... ${historyToCommit.slice(-1024)}`);
+
+      const summarizedHistory = await getSummary(historyToCommit);
 
       await storeString(summarizedHistory);
     }
