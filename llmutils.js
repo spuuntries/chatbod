@@ -27,11 +27,12 @@ async function setBindings() {
  * Runs a prompt using the binary.
  * @async
  * @param {string} prompt - The prompt to run.
+ * @param {string} cid - Channel ID, for caching
  * @returns {Promise<string>} The output of the command.
  */
-async function runPrompt(prompt) {
+async function runPrompt(prompt, cid) {
   const binder = await setBindings(),
-    res = await binder.generate$(prompt, { $timeout: Infinity });
+    res = await binder.generate$(prompt, cid, { $timeout: Infinity });
   return res;
 }
 

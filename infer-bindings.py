@@ -13,11 +13,12 @@ llm = Llama(
     model_path=os.environ["MODELPATH"],
     seed=random.randint(1, 9999),
 )
-cache = LlamaDiskCache()
-llm.set_cache(cache)
 
 
-def generate(prompt):
+def generate(prompt, cid):
+    cache = LlamaDiskCache(cache_dir=f".cache/llm_cache/{cid}")
+    llm.set_cache(cache)
+
     with open(os.environ["LLMCONFIG"], "rb") as f:
         llm_config = tomllib.load(f)
     output = llm(

@@ -256,7 +256,10 @@ kekbot:`,
   //  logger(supplement, fixSupp);
 
   /** @type {string} */
-  var response = (await runPrompt(prefix)).replace("<END>", ""),
+  var response = (await runPrompt(prefix, message.channelId)).replace(
+      "<END>",
+      ""
+    ),
     lastPrefix = response.search(/^[^ \n]+:/gim);
 
   logger(prefix.length);
