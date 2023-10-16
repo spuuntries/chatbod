@@ -24,7 +24,6 @@ const procenv = process.env,
   _ = require("lodash"),
   toml = require("toml"),
   fs = require("fs"),
-  generationConfig = toml.parse(fs.readFileSync(procenv.LLMCONFIG).toString()),
   logger = (m) => console.log(`[${new Date()}] ${m}`);
 
 /**
@@ -148,6 +147,9 @@ parentPort.on("message", async (event) => {
   );
 
   const llamaTokenizer = (await import("llama-tokenizer-js")).default,
+    generationConfig = toml.parse(
+      fs.readFileSync(procenv.LLMCONFIG).toString()
+    ),
     afterMessage = history.findIndex(
       (m) => m.id === contextCounter[message.channelId]
     );
@@ -195,7 +197,7 @@ parentPort.on("message", async (event) => {
     if (encoded.length > generationConfig["gen"]["max_tokens"])
       return (
         llamaTokenizer.decode(
-          encoded.slice(0, generationConfig["gen"]["max_tokens"] - 1)
+          encoded.slice(0, generationConfig["gen"]["max_tokens"])
         ) + " ... (message too long)"
       );
     return m;
