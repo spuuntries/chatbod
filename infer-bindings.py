@@ -24,6 +24,8 @@ def generate(prompt):
         **llm_config["gen"],
         prompt=prompt,
     )
+
+    # NOTE: Continue inference if we got cut off
     if output["choices"][0]["finish_reason"] == "length":
-        output["choices"][0]["text"] = output["choices"][0]["text"] + "—"
+        return generate(prompt + output["choices"][0]["text"])
     return output["choices"][0]["text"]
