@@ -156,14 +156,6 @@ parentPort.on("message", async (event) => {
 
   history = filterMessages(history);
 
-  history = history.map((e) => {
-    const encoded = llamaTokenizer.encode(e.cleanContent);
-
-    if (encoded.length > 112)
-      e.cleanContent = llamaTokenizer.decode(encoded.slice(0, 111)) + " ...";
-    return e;
-  });
-
   history = history.filter((m) => !m.cleanContent.trim().startsWith("!ig")); // This checks !igs
 
   const interimHistory = history;
@@ -193,6 +185,14 @@ parentPort.on("message", async (event) => {
     })
     .reverse();
   history = await Promise.all(history);
+
+  history = history.map((m) => {
+    let encoded = llamaTokenizer.encode(m);
+
+    if (encoded.length > 112)
+      return llamaTokenizer.decode(encoded.slice(0, 111)) + " ...";
+    return m;
+  });
 
   if (interimHistory.length + 1 >= procenv.CTXWIN) {
     logger("Performing summarization");
