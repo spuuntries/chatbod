@@ -22,6 +22,9 @@ const procenv = process.env,
   { createStore, storeString, searchEmbeddings } = require("./storeutils"),
   typer = new Worker("./typeworker.js"),
   _ = require("lodash"),
+  toml = require("toml"),
+  fs = require("fs"),
+  generationConfig = toml.parse(fs.readFileSync(procenv.LLMCONFIG).toString()),
   logger = (m) => console.log(`[${new Date()}] ${m}`);
 
 /**
@@ -189,8 +192,12 @@ parentPort.on("message", async (event) => {
   history = history.map((m) => {
     let encoded = llamaTokenizer.encode(m);
 
-    if (encoded.length > 112)
-      return llamaTokenizer.decode(encoded.slice(0, 111)) + " ...";
+    if (encoded.length > generationConfig["gen"]["max_tokens"])
+      return (
+        llamaTokenizer.decode(
+          encoded.slice(0, generationConfig["gen"]["max_tokens"] - 1)
+        ) + " ... (message too long)"
+      );
     return m;
   });
 
