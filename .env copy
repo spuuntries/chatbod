@@ -1,0 +1,13 @@
+TOKEN=bot token
+CTXWIN=size of history before memorization occurs
+SLICEWIN=size of memory summaries, in number of turns
+PLACEHOLDER=ID of bot account
+TENOR_API_KEY=tenor api key
+HF_TOKEN=huggingface token
+CHANNELS=channels to listen from, delimited by "|", optional, if needs to be locked down
+TRIGGERS=trigger words, delimited by "|"
+TRIGTIME=amount of time each trigger lasts, in miliseconds
+PYTHON_BIN=preferably an absolute path, path to the virtualenv binary, optional, if run under a virtualenv
+MODELPATH=preferably an absolute path, path to the model's .bin
+LLMCONFIG=preferably an absolute path, path to the generation config file, e.g. see llm_config.toml
+PROMPTFILE=preferably an absolute path, path to the prompt file, e.g. see promptfile

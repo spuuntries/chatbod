@@ -1,4 +1,4 @@
-from llama_cpp import Llama, LlamaRAMCache
+from llama_cpp import Llama, LlamaDiskCache
 from dotenv import load_dotenv
 import random
 import tomllib
@@ -13,7 +13,7 @@ llm = Llama(
     model_path=os.environ["MODELPATH"],
     seed=random.randint(1, 9999),
 )
-cache = LlamaRAMCache()
+cache = LlamaDiskCache()
 llm.set_cache(cache)
 
 
