@@ -197,8 +197,12 @@ parentPort.on("message", async (event) => {
     if (encoded.length > generationConfig["gen"]["max_tokens"])
       return (
         llamaTokenizer.decode(
-          encoded.slice(0, generationConfig["gen"]["max_tokens"])
-        ) + " ... (message too long)"
+          encoded.slice(
+            0,
+            generationConfig["gen"]["max_tokens"] -
+              llamaTokenizer.encode(" ... (too long, truncated)").length
+          )
+        ) + " ... (too long, truncated)"
       );
     return m;
   });
