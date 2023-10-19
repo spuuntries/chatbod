@@ -40,7 +40,11 @@ async function generate(prompt, v, model) {
           ws.close();
           if (!response.outputs) resolve(await generate(prompt, v));
 
-          resolve(response.outputs.replaceAll("</s>", ""));
+          try {
+            resolve(response.outputs.replaceAll("</s>", ""));
+          } catch (error) {
+            resolve(await generate(prompt, v));
+          }
         });
       });
     });
