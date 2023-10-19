@@ -68,19 +68,11 @@ async function getCaption(img) {
 }
 
 async function keyword(input) {
-  const prompt = `### System:
-You are keyworder, a bot that summarizes a text into topic keywords delimited by commas.
-### User:
-${input}
-### Assistant:
-topics: [`;
-
-  let res = (await runAux(prompt))
-    .trim()
-    .split(",")
-    .map((e) => {
-      return e.replaceAll("[", "").replaceAll("]", "").trim();
-    });
+  const { client } = await import("@gradio/client"),
+    dialogsum = await client("https://spuun-dialogsum.hf.space/", {
+      hf_token: process.env.HF_TOKEN,
+    }),
+    res = (await dialogsum.predict("/predict", [input])).data;
 
   return res;
 }
@@ -203,16 +195,12 @@ async function getClosestQA(query, arrSet) {
  * @returns {Promise<string|undefined>}
  */
 async function getSummary(input) {
-  const prompt = `### System:
-You are summarizer, a bot that summarizes a text into a digestible third-person interpretation. This interpretation must be easy to understand and concise, like you're explaining it to someone else. If the text mentions people's names, refer to them by their names.
+  const { client } = await import("@gradio/client"),
+    summarizer = await client("https://spuun-summarizer.hf.space/", {
+      hf_token: process.env.HF_TOKEN,
+    }),
+    res = (await summarizer.predict("/predict", [input]))["data"];
 
-### User:
-${input}
-
-### Assistant:
-Summary: `;
-
-  let res = (await runAux(prompt)).trim();
   return res;
 }
 
