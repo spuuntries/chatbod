@@ -16,7 +16,7 @@ llm = Llama(
 
 
 def generate(prompt, cid):
-    cache = LlamaDiskCache(cache_dir=f".cache/llm_cache/{cid}")
+    cache = LlamaDiskCache(cache_dir=f".cache/llm_cache/{cid}", capacity_bytes=7 << 30)
     llm.set_cache(cache)
 
     with open(os.environ["LLMCONFIG"], "rb") as f:
