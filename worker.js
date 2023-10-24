@@ -161,6 +161,17 @@ parentPort.on("message", async (event) => {
 
   history = filterMessages(history);
 
+  history = history.map((e) => {
+    const encoded = llamaTokenizer.encode(e.cleanContent);
+
+    if (encoded.length > generationConfig["gen"]["max_tokens"])
+      e.cleanContent =
+        llamaTokenizer.decode(
+          encoded.slice(0, generationConfig["gen"]["max_tokens"] - 1)
+        ) + " ...";
+    return e;
+  });
+
   history = history.filter((m) => !m.cleanContent.trim().startsWith("!ig")); // This checks !igs
 
   const interimHistory = history;
@@ -190,22 +201,6 @@ parentPort.on("message", async (event) => {
     })
     .reverse();
   history = await Promise.all(history);
-
-  history = history.map((m) => {
-    let encoded = llamaTokenizer.encode(m);
-
-    if (encoded.length > generationConfig["gen"]["max_tokens"])
-      return (
-        llamaTokenizer.decode(
-          encoded.slice(
-            0,
-            generationConfig["gen"]["max_tokens"] -
-              llamaTokenizer.encode(" ... (too long, truncated)").length
-          )
-        ) + " ... (too long, truncated)"
-      );
-    return m;
-  });
 
   if (interimHistory.length + 1 >= procenv.CTXWIN) {
     logger("Performing summarization");
@@ -295,7 +290,7 @@ kekbot:`,
     response.includes("[pic]") ||
     response.includes("[img]")
   ) {
-    img = await generateImage(dialog + response);
+    img = await generateImage(`kekbot:${response}`);
     attFiles.push(
       new Discord.AttachmentBuilder(Buffer.from(img), {
         name: `${
@@ -306,7 +301,7 @@ kekbot:`,
   }
 
   if (response.includes("[gif]")) {
-    gif = await getTopMatchingGif(dialog + response);
+    gif = await getTopMatchingGif(`kekbot:${response}`);
     if (gif)
       attFiles.push(
         new Discord.AttachmentBuilder(Buffer.from(gif), {
