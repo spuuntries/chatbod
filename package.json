@@ -6,8 +6,8 @@
   "license": "MIT",
   "dependencies": {
     "@gradio/client": "^0.1.4",
-    "@huggingface/inference": "^2.6.3",
-    "axios": "^1.5.1",
+    "@huggingface/inference": "^2.6.4",
+    "axios": "^1.6.0",
     "better-sqlite3": "^8.7.0",
     "chrono-node": "^2.7.0",
     "discord.js": "^14.13.0",

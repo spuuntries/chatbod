@@ -11,3 +11,4 @@ PYTHON_BIN=preferably an absolute path, path to the virtualenv binary, optional,
 MODELPATH=preferably an absolute path, path to the model's .bin
 LLMCONFIG=preferably an absolute path, path to the generation config file, e.g. see llm_config.toml
 PROMPTFILE=preferably an absolute path, path to the prompt file, e.g. see promptfile
+REQ_TIMEOUT=2147483647
