@@ -4,6 +4,7 @@ const { exec } = require("child_process"),
   axios = require("axios"),
   { python } = require("pythonia"),
   { generate } = require("./infer-petals"),
+  genPaid = require("./infer-paid").generate,
   { QuickDB } = require("quick.db"),
   db = new QuickDB(),
   hf = new HfInference(process.env.HF_TOKEN),
@@ -31,9 +32,12 @@ async function setBindings() {
  * @returns {Promise<string>} The output of the command.
  */
 async function runPrompt(prompt, cid) {
+  /**
   const binder = await setBindings(),
     res = await binder.generate$(prompt, { $timeout: Infinity });
   return res;
+  */
+  return await genPaid(prompt);
 }
 
 /**
