@@ -20,7 +20,7 @@ async function generate(prompt) {
           max_new_tokens: 256,
           prompt_template: "<s>{prompt}",
           presence_penalty: 0,
-          frequency_penalty: 0,
+          frequency_penalty: 1.1,
         },
       }
     )
