@@ -81,7 +81,7 @@ You are keyworder, a bot that summarizes a text into topic keywords delimited by
 ### User:
 ${input}
 ### Assistant:
-topics: `;
+topics: [`;
 
   let res = (await runAux(prompt))
     .split("\n")[0]
