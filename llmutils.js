@@ -79,7 +79,6 @@ async function keyword(input) {
   const prompt = `### System:
 You are keyworder, a bot that summarizes a text into topic keywords delimited by commas.
 ### User:
-Here's the text:
 ${input}
 ### Assistant:
 topics: [`;
