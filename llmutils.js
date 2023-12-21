@@ -84,6 +84,7 @@ ${input}
 topics: [`;
 
   let res = (await runAux(prompt))
+    .split("\n")[0]
     .trim()
     .split(",")
     .map((e) => {
