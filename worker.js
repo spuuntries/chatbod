@@ -287,7 +287,9 @@ kekbot:`,
     response.includes("[pic]") ||
     response.includes("[img]")
   ) {
-    img = await generateImage(`${dialog}${response}`);
+    img = await generateImage(
+      `${dialog.split("\n").slice(-8).join("\n")}${response}`
+    );
     attFiles.push(
       new Discord.AttachmentBuilder(Buffer.from(img), {
         name: `${
