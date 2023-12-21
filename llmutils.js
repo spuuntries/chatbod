@@ -191,7 +191,8 @@ async function generateImage(query) {
     await (
       await imgPaid(
         `${keywords ? `${keywords},` : ""} ${emotion}, ${emotion}, ${emotion},${
-          query.replaceAll(/^[^ \n]+:/gim, "").includes("kekbot")
+          query.replaceAll(/^[^ \n]+:/gim, "").includes("kekbot") ||
+          keywords?.include("kekbot")
             ? " catgirl, cat_ears, green_hair, loli, femboy, looking_at_viewer, crop_top,"
             : ""
         } masterpiece, best_quality`,
