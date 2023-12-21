@@ -10,7 +10,7 @@ const procenv = process.env,
 async function generate(prompt) {
   return (
     await replicate.run(
-      "mistralai/mixtral-8x7b-instruct-v0.1:2b56576fcfbe32fa0526897d8385dd3fb3d36ba6fd0dbe033c72886b81ade93e",
+      "mistralai/mistral-7b-instruct-v0.2:f5701ad84de5715051cb99d550539719f8a7fbcf65e0e62a3d1eb3f94720764e",
       {
         input: {
           top_k: 50,
