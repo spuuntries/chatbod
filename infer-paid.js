@@ -27,4 +27,21 @@ async function generate(prompt) {
   ).join("");
 }
 
-module.exports = { generate };
+async function generateImage(prompt, neg) {
+  return await fetch(
+    await replicate.run(
+      "playgroundai/playground-v2-1024px-aesthetic:42fe626e41cc811eaf02c94b892774839268ce1994ea778eba97103fe1ef51b8",
+      {
+        input: {
+          prompt: prompt,
+          negative_prompt: neg,
+          num_inference_steps: 40,
+          disable_safety_checker: true,
+          guidance_scale: 6,
+        },
+      }
+    )[0]
+  );
+}
+
+module.exports = { generate, generateImage };

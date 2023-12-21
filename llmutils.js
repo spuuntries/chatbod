@@ -5,6 +5,7 @@ const { exec } = require("child_process"),
   { python } = require("pythonia"),
   { generate } = require("./infer-petals"),
   genPaid = require("./infer-paid").generate,
+  imgPaid = require("./infer-paid").generateImage,
   { QuickDB } = require("quick.db"),
   db = new QuickDB(),
   hf = new HfInference(process.env.HF_TOKEN),
@@ -47,8 +48,11 @@ async function runPrompt(prompt, cid) {
  * @returns {Promise<string>} The output of the command.
  */
 async function runAux(prompt) {
+  /** 
   const res = await generate(prompt);
   return res;
+  */
+  return await genPaid(prompt);
 }
 
 async function getCaption(img) {
@@ -160,6 +164,7 @@ async function generateImage(query) {
 
   console.log(`[${new Date()}] ${keywords} | ${emotion}`);
 
+  /*
   const res = Buffer.from(
     await (
       await hf.textToImage({
@@ -177,6 +182,20 @@ async function generateImage(query) {
             "nsfw, breasts, large_breast, boobs, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
         },
       })
+    ).arrayBuffer()
+  );
+  */
+
+  const res = Buffer.from(
+    await (
+      await imgPaid(
+        `${keywords ? `${keywords},` : ""} ${emotion}, ${emotion}, ${emotion},${
+          query.replaceAll(/^[^ \n]+:/gim, "").includes("kekbot")
+            ? " catgirl, cat_ears, green_hair, loli, femboy, looking_at_viewer, crop_top,"
+            : ""
+        } masterpiece, best_quality`,
+        "nsfw, breasts, large_breast, boobs, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry"
+      )
     ).arrayBuffer()
   );
   return res;
