@@ -31,14 +31,13 @@ async function generateImage(prompt, neg) {
   return await fetch(
     (
       await replicate.run(
-        "playgroundai/playground-v2-1024px-aesthetic:42fe626e41cc811eaf02c94b892774839268ce1994ea778eba97103fe1ef51b8",
+        "asiryan/blue-pencil-xl-v2:06db33e3cd56700e2b0de541e65e2fc377604bebc97eb87b40e1d190fafa7ef4",
         {
           input: {
             prompt: prompt,
             negative_prompt: neg,
             num_inference_steps: 40,
-            disable_safety_checker: true,
-            guidance_scale: 6,
+            guidance_scale: 7,
           },
         }
       )
