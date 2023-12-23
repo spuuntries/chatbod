@@ -193,7 +193,7 @@ async function generateImage(query) {
         `${keywords ? `${keywords},` : ""} ${emotion}, ${emotion}, ${emotion},${
           query.replaceAll(/^[^ \n]+:/gim, "").includes("kekbot") ||
           keywords?.includes("kekbot")
-            ? " catgirl, cat_ears, green_hair, loli, femboy, looking_at_viewer, crop_top,"
+            ? " catgirl, cat_ears, green_hair, loli, femboy, looking_at_viewer,"
             : ""
         } masterpiece, best_quality`,
         "nsfw, breasts, large_breast, boobs, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry"
