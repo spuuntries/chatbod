@@ -51,7 +51,10 @@ async function generateImage(prompt, neg) {
   return await fetch(
     (
       await replicate.run(
-        "asiryan/blue-pencil-xl-v2:06db33e3cd56700e2b0de541e65e2fc377604bebc97eb87b40e1d190fafa7ef4",
+        [
+          "asiryan/blue-pencil-xl-v2:06db33e3cd56700e2b0de541e65e2fc377604bebc97eb87b40e1d190fafa7ef4",
+          "asiryan/counterfeit-xl-v2:ecf81c8a283dee9629e20c782e1874f876be52cb0b207873cdde873209c4a172",
+        ][new Date().getTime() % 2],
         {
           input: {
             prompt: prompt,
