@@ -2,10 +2,10 @@ const Replicate = require("replicate"),
   dotenv = require("dotenv");
 
 dotenv.config();
-const procenv = process.env;
-// replicate = new Replicate({
-//   auth: procenv.REPTOKEN,
-// });
+const procenv = process.env,
+  replicate = new Replicate({
+    auth: procenv.REPTOKEN,
+  });
 
 async function generate(prompt) {
   return (
