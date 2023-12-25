@@ -65,7 +65,15 @@ async function getCaption(img) {
   if (await db.has(image)) return await db.get(image);
   var res;
   try {
-    res = (await blip.predict("/predict", [blob])).data[0];
+    await Promise.race([
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error("Time out waiting for caption")),
+          60000
+        )
+      ),
+      blip.predict("/predict", [blob]),
+    ]);
   } catch (e) {
     console.log(`[${new Date()}] blip: ${e}`);
     return "failed to get caption.";
