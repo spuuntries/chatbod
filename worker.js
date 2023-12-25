@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const procenv = process.env,
   { parentPort, Worker } = require("worker_threads"),
+  childProcess = require("child_process"),
   Discord = require("discord.js"),
   client = new Discord.Client({
     intents: ["Guilds", "GuildMessages", "MessageContent", "GuildMembers"],
@@ -236,7 +237,11 @@ parentPort.on("message", async (event) => {
   const dateref = new Date();
 
   // ANCHOR: Persona Prompt.
-  const persona = setPrompt([message.channel.name, dateref.toDateString()]),
+  const persona = setPrompt([
+      message.channel.name,
+      dateref.toDateString(),
+      childProcess.execSync("git log -3 --pretty=%B").toString().trim(),
+    ]),
     newEntry = `${extractEmotes(message.cleanContent)}${
       message.attachments.some((a) => a.contentType.includes("gif"))
         ? " [gif]"
