@@ -65,7 +65,7 @@ async function getCaption(img) {
   if (await db.has(image)) return await db.get(image);
   var res;
   try {
-    await Promise.race([
+    res = await Promise.race([
       new Promise((_, reject) =>
         setTimeout(
           () => reject(new Error("Time out waiting for caption")),
