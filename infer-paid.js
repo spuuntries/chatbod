@@ -18,7 +18,7 @@ async function generate(prompt, count = 0) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "ehartford/dolphin-2.5-mixtral-8x7b",
+            model: "mistralai/mixtral-8x7b-instruct",
             prompt: prompt,
             max_tokens: 256,
             top_k: 50,
