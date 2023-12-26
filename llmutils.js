@@ -73,13 +73,16 @@ async function getCaption(img) {
             60000
           )
         ),
-        blip.predict("/predict", [blob]),
+        blip.predict("/predict", [blob]).catch((e) => {
+          throw e;
+        }),
       ])
     ).data[0];
   } catch (e) {
     console.log(`[${new Date()}] blip: ${e}`);
     return "failed to get caption.";
   }
+
   if (!res) return "failed to get caption.";
   await db.set(image, res);
   return res;
