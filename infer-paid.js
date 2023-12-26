@@ -23,8 +23,8 @@ async function generate(prompt, count = 0) {
             max_tokens: 256,
             top_k: 50,
             top_p: 0.9,
-            frequency_penalty: 1.1,
-            temperature: 0.6,
+            frequency_penalty: 1.5,
+            temperature: 0.8,
           }),
         })
       ).json()
