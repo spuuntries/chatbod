@@ -25,8 +25,6 @@ async function generate(prompt, count = 0) {
             top_p: 0.9,
             frequency_penalty: 1.1,
             temperature: 0.6,
-            models: ["mistralai/mixtral-8x7b-instruct", "gryphe/mythomist-7b"],
-            route: "fallback",
           }),
         })
       ).json()
