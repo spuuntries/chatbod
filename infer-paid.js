@@ -7,44 +7,52 @@ const procenv = process.env,
     auth: procenv.REPTOKEN,
   });
 
-async function generate(prompt) {
-  return (
-    await (
-      await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${procenv.ORTOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "mistralai/mixtral-8x7b-instruct",
-          prompt: prompt,
-          max_tokens: 256,
-          top_k: 50,
-          top_p: 0.9,
-          frequency_penalty: 1.1,
-          temperature: 0.6,
-        }),
-      })
-    ).json()
-  ).choices[0].text;
-  // return (
-  //   await replicate.run(
-  //     "mistralai/mistral-7b-instruct-v0.2:f5701ad84de5715051cb99d550539719f8a7fbcf65e0e62a3d1eb3f94720764e",
-  //     {
-  //       input: {
-  //         top_k: 50,
-  //         top_p: 0.9,
-  //         prompt: prompt,
-  //         temperature: 0.6,
-  //         max_new_tokens: 256,
-  //         prompt_template: "<s>{prompt}",
-  //         presence_penalty: 0,
-  //         frequency_penalty: 1.1,
-  //       },
-  //     }
-  //   )
-  // ).join("");
+async function generate(prompt, count = 0) {
+  try {
+    return (
+      await (
+        await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${procenv.ORTOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "ehartford/dolphin-2.5-mixtral-8x7b",
+            prompt: prompt,
+            max_tokens: 256,
+            top_k: 50,
+            top_p: 0.9,
+            frequency_penalty: 1.1,
+            temperature: 0.6,
+            models: ["mistralai/mixtral-8x7b-instruct", "gryphe/mythomist-7b"],
+            route: "fallback",
+          }),
+        })
+      ).json()
+    ).choices[0].text;
+    // return (
+    //   await replicate.run(
+    //     "mistralai/mistral-7b-instruct-v0.2:f5701ad84de5715051cb99d550539719f8a7fbcf65e0e62a3d1eb3f94720764e",
+    //     {
+    //       input: {
+    //         top_k: 50,
+    //         top_p: 0.9,
+    //         prompt: prompt,
+    //         temperature: 0.6,
+    //         max_new_tokens: 256,
+    //         prompt_template: "<s>{prompt}",
+    //         presence_penalty: 0,
+    //         frequency_penalty: 1.1,
+    //       },
+    //     }
+    //   )
+    // ).join("");
+  } catch (e) {
+    if (count > 3) return "";
+    console.log(`[${new Date()}] backend host failed, retrying (${count + 1})`);
+    return await generate(prompt, count + 1);
+  }
 }
 
 async function generateImage(prompt, neg) {
