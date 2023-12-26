@@ -56,27 +56,24 @@ async function runAux(prompt) {
 }
 
 async function getCaption(img) {
-  const { client } = await import("@gradio/client"),
-    blob = await (await fetch(img)).blob(),
-    blip = await client("https://spuun-blip-api.hf.space/", {
-      hf_token: process.env.HF_TOKEN,
-    }),
-    image = img.split("/").pop().split(".")[0];
+  const { client } = await import("@gradio/client");
+  const blob = await (await fetch(img)).blob();
+  const blip = await client("https://spuun-blip-api.hf.space/", {
+    hf_token: process.env.HF_TOKEN,
+  });
+  const image = img.split("/").pop().split(".")[0];
+
   if (await db.has(image)) return await db.get(image);
+
   var res;
   try {
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error("Request timed out"));
+      }, 60000);
+    });
     res = (
-      await Promise.race([
-        new Promise((_, reject) =>
-          setTimeout(
-            () => reject(new Error("Time out waiting for caption")),
-            60000
-          )
-        ),
-        blip.predict("/predict", [blob]).catch((e) => {
-          throw e;
-        }),
-      ])
+      await Promise.race([blip.predict("/predict", [blob]), timeoutPromise])
     ).data[0];
   } catch (e) {
     console.log(`[${new Date()}] blip: ${e}`);
