@@ -77,10 +77,10 @@ async function getCaption(img) {
     ).data[0];
   } catch (e) {
     console.log(`[${new Date()}] blip: ${e}`);
-    return "failed to get caption.";
+    return "<ERROR: vision module failure>";
   }
 
-  if (!res) return "failed to get caption.";
+  if (!res) return "<ERROR: vision module failure>";
   await db.set(image, res);
   return res;
 }

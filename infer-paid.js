@@ -21,10 +21,11 @@ async function generate(prompt, count = 0) {
             model: "mistralai/mixtral-8x7b-instruct",
             prompt: prompt,
             max_tokens: 256,
-            top_k: 50,
-            top_p: 0.9,
+            top_k: 100,
+            top_p: 0.7,
             frequency_penalty: 1.5,
-            temperature: 0.8,
+            presence_penalty: 1,
+            temperature: 0.85,
           }),
         })
       ).json()
