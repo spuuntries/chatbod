@@ -1,4 +1,6 @@
 const Replicate = require("replicate"),
+  toml = require("toml"),
+  fs = require("fs"),
   dotenv = require("dotenv");
 
 dotenv.config();
@@ -8,6 +10,9 @@ const procenv = process.env,
   });
 
 async function generate(prompt, count = 0) {
+  const generationConfig = toml.parse(
+    fs.readFileSync(procenv.LLMCONFIG).toString()
+  );
   try {
     return (
       await (
@@ -25,7 +30,8 @@ async function generate(prompt, count = 0) {
             top_p: 0.7,
             frequency_penalty: 1.5,
             presence_penalty: 1,
-            temperature: 0.85,
+            temperature: 0.6,
+            ...(generationConfig?.paid ? { ...generationConfig.paid } : {}),
           }),
         })
       ).json()

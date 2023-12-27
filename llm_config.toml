@@ -8,3 +8,11 @@ max_tokens = 64
 temperature = 0.85
 mirostat_mode = 2
 repeat_penalty = 1.08
+
+[paid]
+max_tokens = 256
+top_k = 100
+top_p = 0.7
+frequency_penalty = 1.5
+presence_penalty = 1
+temperature = 0.6
