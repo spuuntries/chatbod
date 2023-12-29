@@ -241,6 +241,9 @@ parentPort.on("message", async (event) => {
       message.channel.name,
       dateref.toDateString(),
       childProcess.execSync("git log -3 --pretty=%B").toString().trim(),
+      context.length
+        ? "\n" + context.map((c) => `- ${c}`).join("\n")
+        : "No relevant long-term memory found.",
     ]),
     newEntry = `${extractEmotes(message.cleanContent)}${
       message.attachments.some((a) => a.contentType.includes("gif"))
@@ -256,9 +259,7 @@ parentPort.on("message", async (event) => {
         : ""
     }`,
     context = await searchEmbeddings(newEntry, 20),
-    dialog = `${history.length ? "\n" + history : ""}${
-      context.length ? "\n" + context.map((c) => `(${c})`).join("\n") : ""
-    }
+    dialog = `${history.length ? "\n" + history : ""}
 ${
   message.member
     ? message.member.displayName.replaceAll(" ", "_")
