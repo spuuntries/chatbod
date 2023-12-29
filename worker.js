@@ -237,15 +237,7 @@ parentPort.on("message", async (event) => {
   const dateref = new Date();
 
   // ANCHOR: Persona Prompt.
-  const persona = setPrompt([
-      message.channel.name,
-      dateref.toDateString(),
-      childProcess.execSync("git log -3 --pretty=%B").toString().trim(),
-      context.length
-        ? "\n" + context.map((c) => `- ${c}`).join("\n")
-        : "No relevant long-term memory found.",
-    ]),
-    newEntry = `${extractEmotes(message.cleanContent)}${
+  const newEntry = `${extractEmotes(message.cleanContent)}${
       message.attachments.some((a) => a.contentType.includes("gif"))
         ? " [gif]"
         : ""
@@ -259,6 +251,14 @@ parentPort.on("message", async (event) => {
         : ""
     }`,
     context = await searchEmbeddings(newEntry, 20),
+    persona = setPrompt([
+      message.channel.name,
+      dateref.toDateString(),
+      childProcess.execSync("git log -3 --pretty=%B").toString().trim(),
+      context.length
+        ? "\n" + context.map((c) => `- ${c}`).join("\n")
+        : "No relevant long-term memory found.",
+    ]),
     dialog = `${history.length ? "\n" + history : ""}
 ${
   message.member
