@@ -16,4 +16,10 @@ top_k = 250
 top_p = 0.7
 frequency_penalty = 1.1
 presence_penalty = 1.1
-temperature = 1.4
+temperature = 0.8
+models = [
+    "lizpreciatior/lzlv-70b-fp16-hf",
+    "undi95/toppy-m-7b",
+    "alpindale/goliath-120b",
+    "gryphe/mythomax-l2-13b-8k",
+]
