@@ -55,7 +55,11 @@ async function generate(prompt, count = 0) {
     // ).join("");
   } catch (e) {
     if (count > 3) return "";
-    console.log(`[${new Date()}] backend host failed, retrying (${count + 1})`);
+    console.log(
+      `[${new Date()}] backend host failed [${e.slice(0, 128)}...], retrying (${
+        count + 1
+      })`
+    );
     return await generate(prompt, count + 1);
   }
 }
