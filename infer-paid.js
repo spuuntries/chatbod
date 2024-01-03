@@ -23,7 +23,6 @@ async function generate(prompt, count = 0) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "mistralai/mixtral-8x7b-instruct",
             prompt: prompt,
             max_tokens: 256,
             top_k: 100,
