@@ -23,3 +23,4 @@ models = [
     "alpindale/goliath-120b",
     "gryphe/mythomax-l2-13b-8k",
 ]
+route = "fallback"
