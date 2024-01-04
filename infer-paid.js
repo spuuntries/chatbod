@@ -9,6 +9,10 @@ const procenv = process.env,
     auth: procenv.REPTOKEN,
   });
 
+async function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function generate(prompt, count = 0) {
   const generationConfig = toml.parse(
     fs.readFileSync(procenv.LLMCONFIG).toString()
@@ -57,6 +61,7 @@ async function generate(prompt, count = 0) {
     console.log(
       `[${new Date()}] backend host failed [${e}...], retrying (${count + 1})`
     );
+    await sleep(5000);
     return await generate(prompt, count + 1);
   }
 }
