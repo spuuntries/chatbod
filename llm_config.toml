@@ -18,7 +18,7 @@ presence_penalty = 1.1
 temperature = 0.8
 models = [
     "neversleep/noromaid-mixtral-8x7b-instruct",
-    "lizpreciatior/lzlv-70b-fp16-hf",
+    "koboldai/psyfighter-13b-2",
     "alpindale/goliath-120b",
 ]
 route = "fallback"
