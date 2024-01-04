@@ -258,6 +258,7 @@ parentPort.on("message", async (event) => {
       context.length
         ? "\n" + context.map((c) => `- ${c}`).join("\n")
         : "No relevant long-term memory found.",
+      message.guild.name,
     ]),
     dialog = `${history.length ? "\n" + history : ""}
 ${
