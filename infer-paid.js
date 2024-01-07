@@ -70,16 +70,14 @@ async function generateImage(prompt, neg) {
   return await fetch(
     (
       await replicate.run(
-        [
-          "asiryan/blue-pencil-xl-v2:06db33e3cd56700e2b0de541e65e2fc377604bebc97eb87b40e1d190fafa7ef4",
-          "asiryan/counterfeit-xl-v2:ecf81c8a283dee9629e20c782e1874f876be52cb0b207873cdde873209c4a172",
-        ][new Date().getTime() % 2],
+        "lucataco/dreamshaper-xl-turbo:0a1710e0187b01a255302738ca0158ff02a22f4638679533e111082f9dd1b615",
         {
           input: {
             prompt: prompt,
             negative_prompt: neg,
-            num_inference_steps: 40,
+            num_inference_steps: 35,
             guidance_scale: 7,
+            disable_safety_checker: true,
           },
         }
       )

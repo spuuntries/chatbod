@@ -171,6 +171,7 @@ async function generateImage(query) {
         inputs: query.slice(-128),
       })
     ).shift().label,
+    /** @type {string[]} */
     keywords = await keyword(query);
 
   console.log(`[${new Date()}] ${keywords} | ${emotion}`);
@@ -200,10 +201,23 @@ async function generateImage(query) {
   const res = Buffer.from(
     await (
       await imgPaid(
-        `${keywords ? `${keywords},` : ""} ${emotion}, ${emotion}, ${emotion},${
-          query.replaceAll(/^[^ \n]+:/gim, "").includes("kekbot") ||
+        `${
+          keywords
+            ? `${keywords.map((s) =>
+                s.toLowerCase().replaceAll("kekbot", "").replaceAll("kek", "")
+              )},`
+            : ""
+        } ${emotion}, ${emotion}, ${emotion},${
+          query
+            .replaceAll(/^[^ \n]+:/gim, "")
+            .toLowerCase()
+            .includes("kekbot") ||
+          query
+            .replaceAll(/^[^ \n]+:/gim, "")
+            .toLowerCase()
+            .includes("kek") ||
           keywords?.includes("kekbot")
-            ? " catgirl, cat_ears, green_hair, loli, femboy, looking_at_viewer, crop_top,"
+            ? " catgirl, cat_ears, green_hair, loli, femboy, looking_at_viewer, crop top,"
             : ""
         } masterpiece, best_quality`,
         "nsfw, breasts, large_breast, boobs, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry"
