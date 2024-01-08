@@ -1,7 +1,7 @@
 require("dotenv").config();
 const Replicate = require("replicate"),
   toml = require("toml"),
-  axios = require("axios"),
+  axios = require("axios").default,
   fs = require("fs");
 
 const procenv = process.env,
@@ -84,7 +84,10 @@ async function generateImage(prompt, neg) {
             }
           )
         )[0],
-        { headers: { "Content-Type": "application/octet-stream" } }
+        {
+          headers: { "Content-Type": "application/octet-stream" },
+          responseType: "arraybuffer",
+        }
       )
     ).data
   );
