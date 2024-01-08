@@ -110,7 +110,7 @@ topics: [`;
  */
 async function nsfwProcess(image) {
   const { client } = await import("@gradio/client"),
-    blob = new Blob([image]),
+    blob = new Blob([image], { type: "image/png" }),
     nsfwdet = await client("https://spuun-nsfw-det.hf.space/", {
       hf_token: process.env.HF_TOKEN,
     }),
