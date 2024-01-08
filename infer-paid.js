@@ -1,9 +1,9 @@
+require("dotenv").config();
 const Replicate = require("replicate"),
   toml = require("toml"),
-  fs = require("fs"),
-  dotenv = require("dotenv");
+  axios = require("axios"),
+  fs = require("fs");
 
-dotenv.config();
 const procenv = process.env,
   replicate = new Replicate({
     auth: procenv.REPTOKEN,
@@ -67,8 +67,8 @@ async function generate(prompt, count = 0) {
 }
 
 async function generateImage(prompt, neg) {
-  return await (
-    await fetch(
+  return (
+    await axios.get(
       (
         await replicate.run(
           "lucataco/dreamshaper-xl-turbo:0a1710e0187b01a255302738ca0158ff02a22f4638679533e111082f9dd1b615",
@@ -85,7 +85,7 @@ async function generateImage(prompt, neg) {
       )[0],
       { headers: { "Content-Type": "application/octet-stream" } }
     )
-  ).arrayBuffer();
+  ).data;
 }
 
 module.exports = { generate, generateImage };
