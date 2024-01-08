@@ -67,25 +67,27 @@ async function generate(prompt, count = 0) {
 }
 
 async function generateImage(prompt, neg) {
-  return (
-    await axios.get(
-      (
-        await replicate.run(
-          "lucataco/dreamshaper-xl-turbo:0a1710e0187b01a255302738ca0158ff02a22f4638679533e111082f9dd1b615",
-          {
-            input: {
-              prompt: prompt,
-              negative_prompt: neg,
-              num_inference_steps: 8,
-              guidance_scale: 7,
-              disable_safety_checker: true,
-            },
-          }
-        )
-      )[0],
-      { headers: { "Content-Type": "application/octet-stream" } }
-    )
-  ).data;
+  return Buffer.from(
+    (
+      await axios.get(
+        (
+          await replicate.run(
+            "lucataco/dreamshaper-xl-turbo:0a1710e0187b01a255302738ca0158ff02a22f4638679533e111082f9dd1b615",
+            {
+              input: {
+                prompt: prompt,
+                negative_prompt: neg,
+                num_inference_steps: 8,
+                guidance_scale: 7,
+                disable_safety_checker: true,
+              },
+            }
+          )
+        )[0],
+        { headers: { "Content-Type": "application/octet-stream" } }
+      )
+    ).data
+  );
 }
 
 module.exports = { generate, generateImage };
