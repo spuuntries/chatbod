@@ -75,7 +75,7 @@ async function generateImage(prompt, neg) {
           input: {
             prompt: prompt,
             negative_prompt: neg,
-            num_inference_steps: 35,
+            num_inference_steps: 8,
             guidance_scale: 7,
             disable_safety_checker: true,
           },
