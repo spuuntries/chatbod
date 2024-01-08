@@ -82,7 +82,8 @@ async function generateImage(prompt, neg) {
             },
           }
         )
-      )[0]
+      )[0],
+      { headers: { "Content-Type": "application/octet-stream" } }
     )
   ).arrayBuffer();
 }
