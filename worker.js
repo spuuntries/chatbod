@@ -284,7 +284,7 @@ kekbot:`,
    * @returns
    */
   async function catchRep(resp, mIndex = 0) {
-    if (mIndex >= 2) return resp;
+    if (mIndex >= 2) return;
     if (
       interimHistory.find(
         (m) =>
@@ -306,7 +306,7 @@ kekbot:`,
       lastPrefix = response.search(/^[^ \n]+:/gim);
       return catchRep(resp, mIndex++);
     }
-    return resp;
+    return;
   }
 
   logger(prefix.length);
