@@ -262,11 +262,6 @@ parentPort.on("message", async (event) => {
       message.guild.name,
     ]),
     dialog = `${history.length ? "\n" + history : ""}
-${
-  message.member
-    ? message.member.displayName.replaceAll(" ", "_")
-    : message.author.username.replaceAll(" ", "_")
-}: ${newEntry}
 kekbot:`,
     prefix = (persona + dialog).replace("<END>", "");
 
