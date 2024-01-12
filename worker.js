@@ -37,7 +37,8 @@ function extractEmotes(str) {
 
   matchArray.forEach((m) => {
     var emoteName = m[2];
-    if (emoteName.includes("_")) emoteName = emoteName.split("_").pop();
+    if (emoteName.includes("_"))
+      emoteName = emoteName.split("_").slice(1).join("_");
     mutate = mutate.replace(m[0], `:${emoteName}:`);
   });
 
@@ -123,7 +124,6 @@ parentPort.on("message", async (event) => {
   var history = Array.from(
       (
         await message.channel.messages.fetch({
-          before: message.id,
           limit: Number.parseInt(procenv.CTXWIN),
         })
       ).values()
@@ -138,7 +138,6 @@ parentPort.on("message", async (event) => {
   history = Array.from(
     (
       await message.channel.messages.fetch({
-        before: message.id,
         limit:
           Number.parseInt(procenv.CTXWIN) + ignoredWindow > 100
             ? 100
