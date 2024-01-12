@@ -13,7 +13,7 @@ async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function generate(prompt, count = 0) {
+async function generate(prompt, count = 0, additional_conf = {}) {
   const generationConfig = toml.parse(
     fs.readFileSync(procenv.LLMCONFIG).toString()
   );
@@ -35,6 +35,7 @@ async function generate(prompt, count = 0) {
             presence_penalty: 1,
             temperature: 0.6,
             ...(generationConfig?.paid ? { ...generationConfig.paid } : {}),
+            ...(additional_conf ? { ...additional_conf } : {}),
           }),
         })
       ).json()

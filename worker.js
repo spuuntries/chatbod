@@ -19,6 +19,8 @@ const procenv = process.env,
     getSummary,
     nsfwProcess,
   } = require("./llmutils"),
+  levDis = require("natural/lib/natural/distance/levenshtein_distance"),
+  generatePaid = require("./infer-paid").generate,
   setPrompt = require("./prompt"),
   { createStore, storeString, searchEmbeddings } = require("./storeutils"),
   typer = new Worker("./typeworker.js"),
@@ -276,8 +278,41 @@ kekbot:`,
   var response = (await runPrompt(prefix)).replace("<END>", ""),
     lastPrefix = response.search(/^[^ \n]+:/gim);
 
+  /**
+   * @param {string} resp
+   * @param {number} mIndex
+   * @returns
+   */
+  async function catchRep(resp, mIndex = 0) {
+    if (mIndex >= 2) return resp;
+    if (
+      interimHistory.find(
+        (m) =>
+          levDis.DamerauLevenshteinDistanceSearch(resp, m.cleanContent)
+            .distance < 5
+      )
+    ) {
+      response = (
+        await generatePaid(prefix, 0, {
+          models: (generationConfig?.paid?.models
+            ? generationConfig?.paid?.models
+            : [
+                "neversleep/noromaid-mixtral-8x7b-instruct",
+                "alpindale/goliath-120b",
+                "koboldai/psyfighter-13b-2",
+              ])[mIndex],
+        })
+      ).replace("<END>", "");
+      lastPrefix = response.search(/^[^ \n]+:/gim);
+      return catchRep(resp, mIndex++);
+    }
+    return resp;
+  }
+
   logger(prefix.length);
   logger(response);
+
+  await catchRep(response);
 
   if (lastPrefix >= 0) response = response.slice(0, lastPrefix);
   logger(lastPrefix);
