@@ -18,45 +18,43 @@ async function generate(prompt, count = 0, additional_conf = {}) {
     fs.readFileSync(procenv.LLMCONFIG).toString()
   );
   try {
+    // return (
+    //   await (
+    //     await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    //       method: "POST",
+    //       headers: {
+    //         Authorization: `Bearer ${procenv.ORTOKEN}`,
+    //         "Content-Type": "application/json",
+    //       },
+    //       body: JSON.stringify({
+    //         prompt: prompt,
+    //         max_tokens: 256,
+    //         top_k: 100,
+    //         top_p: 0.7,
+    //         frequency_penalty: 1.5,
+    //         presence_penalty: 1,
+    //         temperature: 0.6,
+    //         ...(generationConfig?.paid ? { ...generationConfig.paid } : {}),
+    //         ...(additional_conf ? { ...additional_conf } : {}),
+    //       }),
+    //     })
+    //   ).json()
+    // ).choices[0].text;
     return (
-      await (
-        await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${procenv.ORTOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
+      await replicate.run(
+        "spuuntries/flatdolphinmaid-8x7b-gguf:0e6e20d4e3fbdbdc5f00a03129dbcacc55c84b572e4916e34e8ae02ae2a3e2ba",
+        {
+          input: {
             prompt: prompt,
-            max_tokens: 256,
-            top_k: 100,
-            top_p: 0.7,
-            frequency_penalty: 1.5,
-            presence_penalty: 1,
-            temperature: 0.6,
+            max_new_tokens: 256,
+            prompt_template: "{prompt}",
+            mirostat_mode: "Mirostat 2.0",
             ...(generationConfig?.paid ? { ...generationConfig.paid } : {}),
             ...(additional_conf ? { ...additional_conf } : {}),
-          }),
-        })
-      ).json()
-    ).choices[0].text;
-    // return (
-    //   await replicate.run(
-    //     "mistralai/mistral-7b-instruct-v0.2:f5701ad84de5715051cb99d550539719f8a7fbcf65e0e62a3d1eb3f94720764e",
-    //     {
-    //       input: {
-    //         top_k: 50,
-    //         top_p: 0.9,
-    //         prompt: prompt,
-    //         temperature: 0.6,
-    //         max_new_tokens: 256,
-    //         prompt_template: "<s>{prompt}",
-    //         presence_penalty: 0,
-    //         frequency_penalty: 1.1,
-    //       },
-    //     }
-    //   )
-    // ).join("");
+          },
+        }
+      )
+    ).join("");
   } catch (e) {
     if (count > 3) return "";
     console.log(
