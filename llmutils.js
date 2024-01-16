@@ -113,17 +113,30 @@ async function nsfwProcess(image) {
     blob = new Blob([image], { type: "image/png" }),
     nsfwdet = await client("https://spuun-nsfw-det.hf.space/", {
       hf_token: process.env.HF_TOKEN,
-    }),
-    res = (await nsfwdet.predict("/predict", [blob])).data[0];
+    });
 
-  if (!res) {
-    console.log(
-      `[WARN] [${new Date()}] nsfw failed to return a value, defaulting to false.`
-    );
-    return false;
+  let retries = 3;
+  while (retries > 0) {
+    try {
+      const res = (await nsfwdet.predict("/predict", [blob])).data[0];
+      if (!res) {
+        console.log(
+          `[WARN] [${new Date()}] nsfw failed to return a value, defaulting to false.`
+        );
+        return false;
+      }
+      return JSON.parse(res.toLowerCase());
+    } catch (e) {
+      console.log(`[${new Date()}] nsfw: ${e}`);
+      retries--;
+      if (retries === 0) {
+        console.log(
+          `[${new Date()}] NSFW retry limit reached, returning fallback value`
+        );
+        return true;
+      }
+    }
   }
-
-  return JSON.parse(res.toLowerCase());
 }
 
 /**
