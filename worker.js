@@ -183,8 +183,7 @@ parentPort.on("message", async (event) => {
       await message.guild.members.fetch(m.author.id);
       let author;
       if (m.author.id != placeholder)
-        if (m.member) author = m.member.displayName.replaceAll(" ", "_");
-        else author = m.author.username.replaceAll(" ", "_");
+        author = m.author.username.replaceAll(" ", "_");
       else author = "kekbot";
 
       const result = `${author}: ${extractEmotes(m.cleanContent)}${
