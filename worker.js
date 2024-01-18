@@ -311,7 +311,7 @@ kekbot:`,
               ])[mIndex],
         ].toString()}`
       );
-      return catchRep(response, mIndex++);
+      return await catchRep(response, ++mIndex);
     }
     return;
   }
