@@ -223,12 +223,7 @@ async function generateImage(query) {
         query
           .replaceAll(/^[^ \n]+:/gim, "")
           .toLowerCase()
-          .includes("kekbot") ||
-        query
-          .replaceAll(/^[^ \n]+:/gim, "")
-          .toLowerCase()
-          .includes("kek") ||
-        keywords?.includes("kekbot")
+          .includes("kekbot") || keywords?.includes("kekbot")
           ? " catgirl, cat_ears, green_hair, loli, femboy, looking_at_viewer, crop top,"
           : ""
       } masterpiece, best_quality`,
