@@ -300,6 +300,7 @@ kekbot:`,
         })
       ).replace("<END>", "");
       lastPrefix = response.search(/^[^ \n]+:/gim);
+      if (lastPrefix >= 0) response = response.slice(0, lastPrefix);
       logger(
         `Caught repetition, regenerated with ${[
           (generationConfig?.paid?.models
@@ -311,7 +312,8 @@ kekbot:`,
               ])[mIndex],
         ].toString()}`
       );
-      if (lastPrefix >= 0) response = response.slice(0, lastPrefix);
+      logger(lastPrefix);
+      logger(response);
       return await catchRep(response, ++mIndex);
     }
     return;
