@@ -311,6 +311,7 @@ kekbot:`,
               ])[mIndex],
         ].toString()}`
       );
+      if (lastPrefix >= 0) response = response.slice(0, lastPrefix);
       return await catchRep(response, ++mIndex);
     }
     return;
@@ -319,11 +320,11 @@ kekbot:`,
   logger(prefix.length);
   logger(response);
 
-  await catchRep(response);
-
   if (lastPrefix >= 0) response = response.slice(0, lastPrefix);
   logger(lastPrefix);
   logger(response);
+
+  await catchRep(response);
 
   response = response.replace("<START>", "");
 
