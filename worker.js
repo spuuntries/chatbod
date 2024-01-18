@@ -288,17 +288,30 @@ kekbot:`,
     ) {
       response = (
         await generatePaid(prefix, 0, {
-          models: (generationConfig?.paid?.models
+          models: [
+            (generationConfig?.paid?.models
+              ? generationConfig?.paid?.models
+              : [
+                  "neversleep/noromaid-mixtral-8x7b-instruct",
+                  "alpindale/goliath-120b",
+                  "koboldai/psyfighter-13b-2",
+                ])[mIndex],
+          ],
+        })
+      ).replace("<END>", "");
+      lastPrefix = response.search(/^[^ \n]+:/gim);
+      logger(
+        `Caught repetition, regenerated with ${[
+          (generationConfig?.paid?.models
             ? generationConfig?.paid?.models
             : [
                 "neversleep/noromaid-mixtral-8x7b-instruct",
                 "alpindale/goliath-120b",
                 "koboldai/psyfighter-13b-2",
               ])[mIndex],
-        })
-      ).replace("<END>", "");
-      lastPrefix = response.search(/^[^ \n]+:/gim);
-      return catchRep(resp, mIndex++);
+        ].toString()}`
+      );
+      return catchRep(response, mIndex++);
     }
     return;
   }
