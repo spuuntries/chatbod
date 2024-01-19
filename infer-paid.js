@@ -18,6 +18,7 @@ async function generate(prompt, count = 0, additional_conf = {}) {
     fs.readFileSync(procenv.LLMCONFIG).toString()
   );
   try {
+    /*
     return (
       await (
         await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -40,21 +41,21 @@ async function generate(prompt, count = 0, additional_conf = {}) {
         })
       ).json()
     ).choices[0].text;
-    // return (
-    //   await replicate.run(
-    //     "spuuntries/flatdolphinmaid-8x7b-gguf:0e6e20d4e3fbdbdc5f00a03129dbcacc55c84b572e4916e34e8ae02ae2a3e2ba",
-    //     {
-    //       input: {
-    //         prompt: prompt,
-    //         max_new_tokens: 256,
-    //         prompt_template: "{prompt}",
-    //         mirostat_mode: "Mirostat 2.0",
-    //         ...(generationConfig?.paid ? { ...generationConfig.paid } : {}),
-    //         ...(additional_conf ? { ...additional_conf } : {}),
-    //       },
-    //     }
-    //   )
-    // ).join("");
+    */
+    return (
+      await replicate.run(
+        "spuuntries/flatdolphinmaid-8x7b-gguf:1510dd7e9dc7142cca0c8bb899b9eb2f339d686d9ded0e33720ecaeccdfb3146",
+        {
+          input: {
+            prompt: prompt,
+            max_new_tokens: 256,
+            prompt_template: "{prompt}",
+            ...(generationConfig?.paid ? { ...generationConfig.paid } : {}),
+            ...(additional_conf ? { ...additional_conf } : {}),
+          },
+        }
+      )
+    ).join("");
   } catch (e) {
     if (count > 3) return "";
     console.log(
