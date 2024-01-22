@@ -4,6 +4,8 @@ const { exec } = require("child_process"),
   axios = require("axios"),
   { python } = require("pythonia"),
   { generate } = require("./infer-petals"),
+  genPaid = require("./infer-paid").generate,
+  imgPaid = require("./infer-paid").generateImage,
   { QuickDB } = require("quick.db"),
   db = new QuickDB(),
   hf = new HfInference(process.env.HF_TOKEN),
@@ -27,12 +29,16 @@ async function setBindings() {
  * Runs a prompt using the binary.
  * @async
  * @param {string} prompt - The prompt to run.
+ * @param {string} cid - Channel ID, for caching
  * @returns {Promise<string>} The output of the command.
  */
-async function runPrompt(prompt) {
+async function runPrompt(prompt, cid) {
+  /**
   const binder = await setBindings(),
     res = await binder.generate$(prompt, { $timeout: Infinity });
   return res;
+  */
+  return await genPaid(prompt);
 }
 
 /**
@@ -42,39 +48,53 @@ async function runPrompt(prompt) {
  * @returns {Promise<string>} The output of the command.
  */
 async function runAux(prompt) {
+  /** 
   const res = await generate(prompt);
   return res;
+  */
+  return await genPaid(prompt);
 }
 
 async function getCaption(img) {
-  const { client } = await import("@gradio/client"),
-    blob = await (await fetch(img)).blob(),
-    blip = await client("https://spuun-blip-api.hf.space/", {
-      hf_token: process.env.HF_TOKEN,
-    }),
-    image = img.split("/").pop().split(".")[0];
+  const { client } = await import("@gradio/client");
+  const blob = await (await fetch(img)).blob();
+  const blip = await client("https://spuun-blip-api.hf.space/", {
+    hf_token: process.env.HF_TOKEN,
+  });
+  const image = img.split("/").pop().split(".")[0];
+
   if (await db.has(image)) return await db.get(image);
+
   var res;
   try {
-    res = (await blip.predict("/predict", [blob])).data[0];
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error("Request timed out"));
+      }, 60000);
+    });
+    res = (
+      await Promise.race([blip.predict("/predict", [blob]), timeoutPromise])
+    ).data[0];
   } catch (e) {
     console.log(`[${new Date()}] blip: ${e}`);
-    return "failed to get caption.";
+    return "<ERROR: vision module failure>";
   }
-  if (!res) return "failed to get caption.";
+
+  if (!res) return "<ERROR: vision module failure>";
   await db.set(image, res);
   return res;
 }
 
 async function keyword(input) {
   const prompt = `### System:
-You are keyworder, a bot that summarizes a text into topic keywords delimited by commas.
+You are keyworder, a bot that summarizes a text into keywords delimited by commas.
 ### User:
 ${input}
 ### Assistant:
 topics: [`;
 
   let res = (await runAux(prompt))
+    .split("\n")[0]
     .trim()
     .split(",")
     .map((e) => {
@@ -90,20 +110,33 @@ topics: [`;
  */
 async function nsfwProcess(image) {
   const { client } = await import("@gradio/client"),
-    blob = new Blob([image]),
+    blob = new Blob([image], { type: "image/png" }),
     nsfwdet = await client("https://spuun-nsfw-det.hf.space/", {
       hf_token: process.env.HF_TOKEN,
-    }),
-    res = (await nsfwdet.predict("/predict", [blob])).data[0];
+    });
 
-  if (!res) {
-    console.log(
-      `[WARN] [${new Date()}] nsfw failed to return a value, defaulting to false.`
-    );
-    return false;
+  let retries = 3;
+  while (retries > 0) {
+    try {
+      const res = (await nsfwdet.predict("/predict", [blob])).data[0];
+      if (!res) {
+        console.log(
+          `[WARN] [${new Date()}] nsfw failed to return a value, defaulting to false.`
+        );
+        return false;
+      }
+      return JSON.parse(res.toLowerCase());
+    } catch (e) {
+      console.log(`[${new Date()}] nsfw: ${e}`);
+      retries--;
+      if (retries === 0) {
+        console.log(
+          `[${new Date()}] NSFW retry limit reached, returning fallback value`
+        );
+        return true;
+      }
+    }
   }
-
-  return JSON.parse(res.toLowerCase());
 }
 
 /**
@@ -151,10 +184,12 @@ async function generateImage(query) {
         inputs: query.slice(-128),
       })
     ).shift().label,
+    /** @type {string[]} */
     keywords = await keyword(query);
 
   console.log(`[${new Date()}] ${keywords} | ${emotion}`);
 
+  /*
   const res = Buffer.from(
     await (
       await hf.textToImage({
@@ -173,6 +208,27 @@ async function generateImage(query) {
         },
       })
     ).arrayBuffer()
+  );
+  */
+
+  const res = Buffer.from(
+    await imgPaid(
+      `${
+        keywords
+          ? `${keywords.map((s) =>
+              s.toLowerCase().replaceAll("kekbot", "").replaceAll("kek", "")
+            )},`
+          : ""
+      } ${emotion}, ${emotion}, ${emotion},${
+        query
+          .replaceAll(/^[^ \n]+:/gim, "")
+          .toLowerCase()
+          .includes("kekbot") || keywords?.includes("kekbot")
+          ? " catgirl, cat_ears, green_hair, loli, femboy, looking_at_viewer, crop top,"
+          : ""
+      } masterpiece, best_quality`,
+      "nsfw, breasts, large_breast, boobs, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry"
+    )
   );
   return res;
 }
@@ -204,10 +260,8 @@ async function getClosestQA(query, arrSet) {
 async function getSummary(input) {
   const prompt = `### System:
 You are summarizer, a bot that summarizes a text into a digestible third-person interpretation. This interpretation must be easy to understand and concise, like you're explaining it to someone else. If the text mentions people's names, refer to them by their names.
-
 ### User:
 ${input}
-
 ### Assistant:
 Summary: `;
 

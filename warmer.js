@@ -15,6 +15,9 @@ setInterval(async () => {
     blip = await client("https://spuun-blip-api.hf.space/", {
       hf_token: process.env.HF_TOKEN,
     }),
+    petals = await client("https://spuun-petals.hf.space/", {
+      hf_token: process.env.HF_TOKEN,
+    }),
     summarizer = await client("https://spuun-summarizer.hf.space/", {
       hf_token: process.env.HF_TOKEN,
     });
@@ -26,6 +29,10 @@ setInterval(async () => {
           "My name is " + niceware.generatePassphrase(4).join(" ") + " and I",
       })
     ).generated_text;
+
+    stage++;
+    if (!(await petals.predict("/predict", [query])).data)
+      throw new Error("petals failed");
 
     stage++;
     if (!(await dialogsum.predict("/predict", [query])).data)
@@ -53,7 +60,9 @@ setInterval(async () => {
   } catch (e) {
     logger(
       `Failed to warm up models, (${e.message}) [${
-        ["gpt2", "dialogsum", "counterfeit", "blip", "summarizer"][stage]
+        ["gpt2", "petals", "dialogsum", "counterfeit", "blip", "summarizer"][
+          stage
+        ]
       }]`
     );
   }

@@ -1,0 +1,24 @@
+[init]
+n_ctx = 8192
+n_batch = 2048
+n_threads = 4
+
+[gen]
+max_tokens = 64
+temperature = 0.85
+mirostat_mode = 2
+repeat_penalty = 1.08
+
+[paid]
+max_tokens = 256
+top_k = 250
+top_p = 0.7
+frequency_penalty = 1.1
+presence_penalty = 1.1
+temperature = 0.8
+models = [
+    "neversleep/noromaid-mixtral-8x7b-instruct",
+    "alpindale/goliath-120b",
+    "koboldai/psyfighter-13b-2",
+]
+route = "fallback"

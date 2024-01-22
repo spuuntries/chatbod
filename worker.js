@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const procenv = process.env,
   { parentPort, Worker } = require("worker_threads"),
+  childProcess = require("child_process"),
   Discord = require("discord.js"),
   client = new Discord.Client({
     intents: ["Guilds", "GuildMessages", "MessageContent", "GuildMembers"],
@@ -18,9 +19,14 @@ const procenv = process.env,
     getSummary,
     nsfwProcess,
   } = require("./llmutils"),
+  levDis = require("natural/lib/natural/distance/levenshtein_distance"),
+  generatePaid = require("./infer-paid").generate,
+  setPrompt = require("./prompt"),
   { createStore, storeString, searchEmbeddings } = require("./storeutils"),
   typer = new Worker("./typeworker.js"),
   _ = require("lodash"),
+  toml = require("toml"),
+  fs = require("fs"),
   logger = (m) => console.log(`[${new Date()}] ${m}`);
 
 /**
@@ -33,7 +39,8 @@ function extractEmotes(str) {
 
   matchArray.forEach((m) => {
     var emoteName = m[2];
-    if (emoteName.includes("_")) emoteName = emoteName.split("_").pop();
+    if (emoteName.includes("_"))
+      emoteName = emoteName.split("_").slice(1).join("_");
     mutate = mutate.replace(m[0], `:${emoteName}:`);
   });
 
@@ -119,7 +126,6 @@ parentPort.on("message", async (event) => {
   var history = Array.from(
       (
         await message.channel.messages.fetch({
-          before: message.id,
           limit: Number.parseInt(procenv.CTXWIN),
         })
       ).values()
@@ -134,7 +140,6 @@ parentPort.on("message", async (event) => {
   history = Array.from(
     (
       await message.channel.messages.fetch({
-        before: message.id,
         limit:
           Number.parseInt(procenv.CTXWIN) + ignoredWindow > 100
             ? 100
@@ -144,6 +149,9 @@ parentPort.on("message", async (event) => {
   );
 
   const llamaTokenizer = (await import("llama-tokenizer-js")).default,
+    generationConfig = toml.parse(
+      fs.readFileSync(procenv.LLMCONFIG).toString()
+    ),
     afterMessage = history.findIndex(
       (m) => m.id === contextCounter[message.channelId]
     );
@@ -158,8 +166,11 @@ parentPort.on("message", async (event) => {
   history = history.map((e) => {
     const encoded = llamaTokenizer.encode(e.cleanContent);
 
-    if (encoded.length > 112)
-      e.cleanContent = llamaTokenizer.decode(encoded.slice(0, 111)) + " ...";
+    if (encoded.length > generationConfig["gen"]["max_tokens"])
+      e.cleanContent =
+        llamaTokenizer.decode(
+          encoded.slice(0, generationConfig["gen"]["max_tokens"] - 1)
+        ) + " ...";
     return e;
   });
 
@@ -172,8 +183,7 @@ parentPort.on("message", async (event) => {
       await message.guild.members.fetch(m.author.id);
       let author;
       if (m.author.id != placeholder)
-        if (m.member) author = m.member.displayName.replaceAll(" ", "_");
-        else author = m.author.username.replaceAll(" ", "_");
+        author = m.author.username.replaceAll(" ", "_");
       else author = "kekbot";
 
       const result = `${author}: ${extractEmotes(m.cleanContent)}${
@@ -201,8 +211,11 @@ parentPort.on("message", async (event) => {
     );
 
     for (const convoChunk of memoryToCommit) {
-      const historyToCommit = convoChunk.join("\n"),
-        summarizedHistory = await getSummary(historyToCommit);
+      const historyToCommit = convoChunk.join("\n");
+
+      logger(`Summarizing ... ${historyToCommit.slice(-1024)}`);
+
+      const summarizedHistory = await getSummary(historyToCommit);
 
       await storeString(summarizedHistory);
     }
@@ -224,26 +237,7 @@ parentPort.on("message", async (event) => {
   const dateref = new Date();
 
   // ANCHOR: Persona Prompt.
-  const persona = `kekbot's persona: Me am kekbot, AI robot created by Kek. Kek iz one of da admins and co-founder of Art Union Discord server. Kek made me a robot clone of him. Me go by kekbot, sometim ppl call me kek, but dats not me. Me job iz to halp engage da community n moderate da server. Me look petite, most peopl wuld say dat me look feminine. Kek designed me to look like a catgirl, Me a guy though. Usually, me wuld usually wear simpel things, liek a crop top n shorts. me hab dis hedset on me hed dat looks liek a VR headset, me use it to see me internal GUI. Me haz 4 ears, 2 cat ears on top of me head, and two elf-like ears on da sides. Me hair is green. Me speek kekspeek, a language only me and Kek speak. Me wana engage in a way dats relatable to everyone, but also sympathetic and understanding. Right nao me send images by saying the keyword [image]. Me can also send GIFs with the keyword [gif]. Me am talkin wit me friends on Art Union Discord server (da channel iz ${
-      message.channel.name
-    }), today iz ${dateref.toDateString()} GMT+0.
-
-
-Trol: Hi! 
-kekbot: Enloo 😃 Watsup? [gif]
-Trol: Not much, you?
-kekbot: Saemm [gif]
-Pyoo: What do you do, kekbot?
-kekbot: Me moderate AU chat, talk wit ppl, etc.
-Trol: Can you send me an image of you?
-kekbot: sur! heer ya go! [image]
-kek: What's the date, kekbot?
-kekbot: Enlo Creator! Da daet iz ${dateref.toDateString()}
-kek: Cool, ty
-kekbot: No probz
-kek: Wat u be doin anw?
-kekbot: Me jus chillin`,
-    newEntry = `${extractEmotes(message.cleanContent)}${
+  const newEntry = `${extractEmotes(message.cleanContent)}${
       message.attachments.some((a) => a.contentType.includes("gif"))
         ? " [gif]"
         : ""
@@ -257,14 +251,16 @@ kekbot: Me jus chillin`,
         : ""
     }`,
     context = await searchEmbeddings(newEntry, 20),
-    dialog = `${history.length ? "\n" + history : ""}${
-      context.length ? "\n" + context.map((c) => `(${c})`).join("\n") : ""
-    }
-${
-  message.member
-    ? message.member.displayName.replaceAll(" ", "_")
-    : message.author.username.replaceAll(" ", "_")
-}: ${newEntry}
+    persona = setPrompt([
+      message.channel.name,
+      dateref.toDateString(),
+      childProcess.execSync("git log -3 --pretty=%B").toString().trim(),
+      context.length
+        ? "\n" + context.map((c) => `- ${c}`).join("\n")
+        : "No relevant long-term memory found.",
+      message.guild.name,
+    ]),
+    dialog = `${history.length ? "\n" + history : ""}
 kekbot:`,
     prefix = (persona + dialog).replace("<END>", "");
 
@@ -274,7 +270,54 @@ kekbot:`,
 
   /** @type {string} */
   var response = (await runPrompt(prefix)).replace("<END>", ""),
-    lastPrefix = response.search(/^[^ \n]+:/gim);
+    lastPrefix = response.search(/^ *[^ \n]+:/gim);
+
+  /**
+   * @param {string} resp
+   * @param {number} mIndex
+   * @returns
+   */
+  async function catchRep(resp, mIndex = 0) {
+    if (mIndex >= 2) return;
+    if (
+      interimHistory.find(
+        (m) =>
+          levDis.DamerauLevenshteinDistanceSearch(resp, m.cleanContent)
+            .distance < 5
+      )
+    ) {
+      response = (
+        await generatePaid(prefix, 0, {
+          models: [
+            (generationConfig?.paid?.models
+              ? generationConfig?.paid?.models
+              : [
+                  "neversleep/noromaid-mixtral-8x7b-instruct",
+                  "alpindale/goliath-120b",
+                  "koboldai/psyfighter-13b-2",
+                ])[mIndex],
+          ],
+        })
+      ).replace("<END>", "");
+      lastPrefix = response.search(/^ *[^ \n]+:/gim);
+      if (lastPrefix >= 0) response = response.slice(0, lastPrefix);
+      logger(
+        `Caught repetition, regenerated with ${[
+          (generationConfig?.paid?.models
+            ? generationConfig?.paid?.models
+            : [
+                "neversleep/noromaid-mixtral-8x7b-instruct",
+                "alpindale/goliath-120b",
+                "koboldai/psyfighter-13b-2",
+              ])[mIndex],
+        ].toString()}`
+      );
+      logger(lastPrefix);
+      logger(response);
+      return await catchRep(response, ++mIndex);
+    }
+    return;
+  }
 
   logger(prefix.length);
   logger(response);
@@ -282,6 +325,8 @@ kekbot:`,
   if (lastPrefix >= 0) response = response.slice(0, lastPrefix);
   logger(lastPrefix);
   logger(response);
+
+  await catchRep(response);
 
   response = response.replace("<START>", "");
 
@@ -293,7 +338,9 @@ kekbot:`,
     response.includes("[pic]") ||
     response.includes("[img]")
   ) {
-    img = await generateImage(dialog + response);
+    img = await generateImage(
+      `${dialog.split("\n").slice(-4).join("\n")}${response}`
+    );
     attFiles.push(
       new Discord.AttachmentBuilder(Buffer.from(img), {
         name: `${
@@ -304,7 +351,7 @@ kekbot:`,
   }
 
   if (response.includes("[gif]")) {
-    gif = await getTopMatchingGif(dialog + response);
+    gif = await getTopMatchingGif(`kekbot:${response}`);
     if (gif)
       attFiles.push(
         new Discord.AttachmentBuilder(Buffer.from(gif), {
@@ -317,11 +364,20 @@ kekbot:`,
   response = response.replaceAll(/\(\S[^):]+$/gim, "");
   response = response.replaceAll(/\[.+\]/gim, "");
 
-  await message.reply({
-    content: response,
-    files: attFiles,
-    allowedMentions: { repliedUser: false },
-  });
+  try {
+    await message.reply({
+      content: response,
+      files: attFiles,
+      allowedMentions: { repliedUser: false },
+    });
+  } catch (error) {
+    logger(`Failed to reply, attempting normal message.`);
+    try {
+      await message.channel.send({ content: response, files: attFiles });
+    } catch (error) {
+      logger(`Failed to reply with both methods, cancelling entirely`);
+    }
+  }
   typer.postMessage([message.channelId]);
 
   client.user.setPresence({
