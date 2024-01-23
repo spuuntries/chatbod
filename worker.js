@@ -270,7 +270,7 @@ kekbot:`,
 
   /** @type {string} */
   var response = (await runPrompt(prefix)).replace("<END>", ""),
-    lastPrefix = response.search(/^ *[^ \n]+:/gim);
+    lastPrefix = response.search(/^ *[^ \n]+:|^ *\[[^\]]*\]:/gim);
 
   /**
    * @param {string} resp
@@ -299,7 +299,7 @@ kekbot:`,
           ],
         })
       ).replace("<END>", "");
-      lastPrefix = response.search(/^ *[^ \n]+:/gim);
+      lastPrefix = response.search(/^ *[^ \n]+:|^ *\[[^\]]*\]:/gim);
       if (lastPrefix >= 0) response = response.slice(0, lastPrefix);
       logger(
         `Caught repetition, regenerated with ${[
@@ -339,7 +339,7 @@ kekbot:`,
     response.includes("[img]")
   ) {
     img = await generateImage(
-      `${dialog.split("\n").slice(-4).join("\n")}${response}`
+      `${dialog.split("\n").slice(-2).join("\n")}${response}`
     );
     attFiles.push(
       new Discord.AttachmentBuilder(Buffer.from(img), {
