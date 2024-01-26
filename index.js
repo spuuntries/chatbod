@@ -39,9 +39,7 @@ client.on("messageCreate", async (message) => {
       : 0,
     referenced = message.reference
       ? await message.fetchReference()
-      : { author: { id: false } },
-    lastMessageTime = lastUserMessage[message.author.id],
-    now = Date.now();
+      : { author: { id: false } };
 
   if (
     message.cleanContent.trim().includes("!kig") &&
@@ -65,7 +63,6 @@ client.on("messageCreate", async (message) => {
     message.cleanContent.trim().includes("!hig") ||
     message.cleanContent.trim().startsWith("!ig") ||
     message.channel.type == Discord.ChannelType.DM ||
-    (lastMessageTime && now - lastMessageTime < procenv.WAITTIME) ||
     !(message.createdTimestamp - lastTrigger > procenv.COOLTIME) ||
     // NOTE: This checks for triggers.
     (!(message.createdTimestamp - lastTrigger <= procenv.TRIGTIME) && // Check for time between triggers
@@ -82,7 +79,6 @@ client.on("messageCreate", async (message) => {
   )
     return;
 
-  lastUserMessage[message.author.id] = now;
   await db.set(`lastTrigger.${message.channelId}`, message.createdTimestamp);
 
   queue.push([message.channelId, message.id]);
