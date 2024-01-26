@@ -39,7 +39,7 @@ function extractEmotes(str) {
 
   matchArray.forEach((m) => {
     var emoteName = m[2];
-    if (emoteName.includes("_"))
+    if (emoteName.includes("_") && emoteName.split("_").length > 2)
       emoteName = emoteName.split("_").slice(1).join("_");
     mutate = mutate.replace(m[0], `:${emoteName}:`);
   });
@@ -243,7 +243,14 @@ parentPort.on("message", async (event) => {
   history = history.join("\n");
 
   await message.guild.members.fetch(message.author.id);
-  const dateref = new Date();
+  const dateref = new Date(),
+    emojis = (
+      await Promise.all(
+        client.guilds.cache.map(async (g) =>
+          Array.from((await g.emojis.fetch()).values())
+        )
+      )
+    ).flat();
 
   // ANCHOR: Persona Prompt.
   const newEntry = `${extractEmotes(message.cleanContent)}${
@@ -268,6 +275,7 @@ parentPort.on("message", async (event) => {
         ? "\n" + context.map((c) => `- ${c}`).join("\n")
         : "No relevant long-term memory found.",
       message.guild.name,
+      [...new Set(emojis.map((e) => `:${e.name}:`))].join(", "),
     ]),
     dialog = `${history.length ? "\n" + history : ""}
 kekbot:`,
@@ -367,6 +375,16 @@ kekbot:`,
           name: `${response.replaceAll(" ", "_").slice(0, 1024)}.gif`,
         })
       );
+  }
+
+  if (response.match(/:[\w\d]+:/gim)) {
+    let respEmotes = response.match(/:[\w\d]+:/gim);
+
+    respEmotes.map((e) => {
+      let emote = emojis.find((em) => e.includes(em.name));
+      if (emote)
+        response.replace(e, `<${emote.animated}:${emote.name}:${emote.id}>`);
+    });
   }
 
   response = response.replaceAll(/\(\D*\)/gim, "");
