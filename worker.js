@@ -85,6 +85,7 @@ parentPort.on("message", async (event) => {
     message.author.id == client.user.id ||
     message.cleanContent.trim().includes("!hig") ||
     message.cleanContent.trim().startsWith("!ig") ||
+    message.cleanContent.trim().startsWith("!kig") ||
     message.channel.type == Discord.ChannelType.DM
   )
     return;
@@ -133,7 +134,11 @@ parentPort.on("message", async (event) => {
     ignoredWindow = 0;
 
   history.forEach((e) => {
-    if (e.cleanContent.includes("!ig") || e.cleanContent.includes("!hig"))
+    if (
+      e.cleanContent.includes("!ig") ||
+      e.cleanContent.includes("!hig") ||
+      e.cleanContent.includes("!kig")
+    )
       ignoredWindow++;
   });
 
@@ -174,7 +179,11 @@ parentPort.on("message", async (event) => {
     return e;
   });
 
-  history = history.filter((m) => !m.cleanContent.trim().startsWith("!ig")); // This checks !igs
+  history = history.filter(
+    (m) =>
+      !m.cleanContent.trim().startsWith("!ig") &&
+      !m.cleanContent.trim().startsWith("!kig")
+  ); // This checks !igs and !kigs
 
   const interimHistory = history;
 
