@@ -6,7 +6,11 @@ const procenv = process.env,
   }),
   logger = (m) => console.log(`[${new Date()}] ${m}`),
   { Worker } = require("worker_threads"),
-  worker = new Worker("./worker.js"),
+  workers = Array.from({ length: Number.parseInt(procenv.NUMWORKER) ?? 1 }).map(
+    () => {
+      return { flag: false, worker: new Worker("./worker.js") };
+    }
+  ),
   warmer = new Worker("./warmer.js"),
   { QuickDB } = require("quick.db"),
   db = new QuickDB(),
@@ -25,16 +29,9 @@ function removeRepeatedChars(s) {
   return newWords.join(" ");
 }
 
-var isProcessingQueue = false;
-
 client.on("messageCreate", async (message) => {
   if (procenv.CHANNELS) {
     if (!procenv.CHANNELS.split("|").includes(message.channelId)) return;
-  }
-
-  if (message.cleanContent.trim().includes("!kig")) {
-    await db.set(`lastTrigger.${message.channelId}`, 0);
-    return;
   }
 
   let lastTrigger = (await db.has(`lastTrigger.${message.channelId}`))
@@ -45,6 +42,21 @@ client.on("messageCreate", async (message) => {
       : { author: { id: false } },
     lastMessageTime = lastUserMessage[message.author.id],
     now = Date.now();
+
+  if (
+    message.cleanContent.trim().includes("!kig") &&
+    message.createdTimestamp - lastTrigger <= procenv.TRIGTIME
+  ) {
+    await db.set(`lastTrigger.${message.channelId}`, 0);
+    let kRep = await message.reply({
+      content: "Detected kill keyword. Alrighty then, bye!",
+    });
+    setTimeout(async () => {
+      if (message.deletable()) await message.delete();
+      if (kRep.deletable()) await kRep.delete();
+    }, 2000);
+    return;
+  }
 
   if (
     !message.cleanContent ||
@@ -78,11 +90,13 @@ client.on("messageCreate", async (message) => {
 });
 
 setInterval(() => {
-  if (isProcessingQueue || queue.length == 0) return;
+  let workerObj = workers.filter((w) => !w["flag"])[0],
+    worker = workerObj["worker"];
+  if (workerObj["flag"] || queue.length == 0) return;
 
   worker.postMessage(queue.shift());
-  isProcessingQueue = true;
-}, 2000);
+  workerObj["flag"] = true;
+}, 500);
 
 client.once("ready", () => {
   client.user.setPresence({
@@ -95,19 +109,21 @@ client.once("ready", () => {
     ],
   });
 
-  worker.on("message", (m) => {
-    if (m == "ready") {
-      logger(`[v${require("./package.json").version}] ready`);
+  workers.map((worker) =>
+    worker["worker"].on("message", (m) => {
+      if (m == "ready") {
+        logger(`[v${require("./package.json").version}] ready`);
 
-      process.on("SIGTERM", async () => await warmer.terminate());
-      process.on("SIGINT", async () => await warmer.terminate());
-    } else {
-      if (m.length > 1) {
-        logger(`handled ${m[0]} by ${m[1]}`);
-        isProcessingQueue = false;
-      } else logger(m);
-    }
-  });
+        process.on("SIGTERM", async () => await warmer.terminate());
+        process.on("SIGINT", async () => await warmer.terminate());
+      } else {
+        if (m.length > 1) {
+          logger(`handled ${m[0]} by ${m[1]}`);
+          worker["flag"] = false;
+        } else logger(m);
+      }
+    })
+  );
 });
 
 client.login(procenv.TOKEN);
