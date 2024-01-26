@@ -49,9 +49,9 @@ client.on("messageCreate", async (message) => {
     let kRep = await message.reply({
       content: "Detected kill keyword. Alrighty then, bye!",
     });
-    setTimeout(async () => {
-      if (message.deletable()) await message.delete();
-      if (kRep.deletable()) await kRep.delete();
+    setTimeout(() => {
+      if (message.deletable) message.delete();
+      if (kRep.deletable) kRep.delete();
     }, 2000);
     return;
   }
