@@ -109,10 +109,10 @@ client.once("ready", () => {
     ],
   });
 
-  workers.map((worker) =>
+  workers.map((worker, i) =>
     worker["worker"].on("message", (m) => {
       if (m == "ready") {
-        logger(`[v${require("./package.json").version}] ready`);
+        logger(`[v${require("./package.json").version}] Worker #${i} ready`);
 
         process.on("SIGTERM", async () => await warmer.terminate());
         process.on("SIGINT", async () => await warmer.terminate());
