@@ -105,10 +105,17 @@ client.once("ready", () => {
     ],
   });
 
+  let workerCounter = 0;
+
   workers.map((worker, i) =>
     worker["worker"].on("message", (m) => {
       if (m == "ready") {
-        logger(`[v${require("./package.json").version}] Worker #${i} ready`);
+        logger(
+          `[v${require("./package.json").version}] Worker #${i + 1} ready`
+        );
+        workerCounter++;
+        if (workerCounter == workers.length)
+          logger(`[v${require("./package.json").version}] All workers ready`);
 
         process.on("SIGTERM", async () => await warmer.terminate());
         process.on("SIGINT", async () => await warmer.terminate());
