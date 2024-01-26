@@ -385,7 +385,7 @@ kekbot:`,
       if (emote)
         response = response.replace(
           e,
-          `<${emote.animated}:${emote.name}:${emote.id}>`
+          `<${emote.animated ? "a" : ""}:${emote.name}:${emote.id}>`
         );
     });
   }
