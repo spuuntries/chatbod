@@ -383,7 +383,10 @@ kekbot:`,
     respEmotes.map((e) => {
       let emote = emojis.find((em) => e.includes(em.name));
       if (emote)
-        response.replace(e, `<${emote.animated}:${emote.name}:${emote.id}>`);
+        response = response.replace(
+          e,
+          `<${emote.animated}:${emote.name}:${emote.id}>`
+        );
     });
   }
 
