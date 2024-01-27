@@ -220,10 +220,7 @@ async function generateImage(query) {
             )},`
           : ""
       } ${emotion}, ${emotion}, ${emotion},${
-        query
-          .replaceAll(/^[^ \n]+:/gim, "")
-          .toLowerCase()
-          .includes("kekbot") || keywords?.includes("kekbot")
+        keywords?.includes("kekbot")
           ? " catgirl, cat_ears, green_hair, loli, femboy, looking_at_viewer, crop top,"
           : ""
       } masterpiece, best_quality`,
