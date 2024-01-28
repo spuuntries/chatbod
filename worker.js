@@ -377,6 +377,55 @@ kekbot:`,
       );
   }
 
+  if (response.match(/\[[\w]+=[\w]+]/gim)) {
+    let respCommands = response.match(/\[[\w]+=[\w]+]/gim);
+
+    respCommands.map(async (e) => {
+      let cmd = e.split("="),
+        users = history.map((m) => m.member),
+        command = cmd[0].toLowerCase().trim(),
+        arg = cmd[1].toLowerCase().trim();
+
+      switch (command) {
+        case "mute":
+          if (users.map((u) => u.user.username).includes(arg)) {
+            let reason;
+
+            async function generateReasonMute(arg, dialog, rmIndex = 0) {
+              let res = await generatePaid(
+                `### Instruction:
+Given a chatlog, provide a reason why ${arg} needs to be muted in one sentence. Enclose your responses with quotation marks.
+
+### Input:
+${dialog}
+
+### Response:
+${arg} needs to be muted because: "`,
+                0
+              );
+
+              if (!res.includes('"')) {
+                if (rmIndex > 1) return res.split('"')[0];
+                return generateReasonMute(arg, dialog, ++rmIndex);
+              }
+              return res.split('"')[0];
+            }
+
+            reason = generateReasonMute(arg, dialog);
+
+            users
+              .find((u) => u.user.username == arg)
+              .timeout(Number.parseInt(procenv.TIMEOUTDUR), reason);
+          }
+          break;
+
+        default:
+          break;
+      }
+      response = response.replace(e, "");
+    });
+  }
+
   if (response.match(/:[\w\d]+:/gim)) {
     let respEmotes = response.match(/:[\w\d]+:/gim);
 
