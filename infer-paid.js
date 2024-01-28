@@ -13,6 +13,12 @@ async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * @param {string} prompt
+ * @param {number} count
+ * @param {object} additional_conf
+ * @returns {Promise<string>}
+ */
 async function generate(prompt, count = 0, additional_conf = {}) {
   const generationConfig = toml.parse(
     fs.readFileSync(procenv.LLMCONFIG).toString()
