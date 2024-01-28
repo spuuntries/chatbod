@@ -78,7 +78,7 @@ async function generateImage(prompt, neg) {
       await axios.get(
         (
           await replicate.run(
-            "lucataco/dreamshaper-xl-turbo:0a1710e0187b01a255302738ca0158ff02a22f4638679533e111082f9dd1b615",
+            "fofr/latent-consistency-model:683d19dc312f7a9f0428b04429a9ccefd28dbf7785fef083ad5cf991b65f406f",
             {
               input: {
                 prompt: prompt,
