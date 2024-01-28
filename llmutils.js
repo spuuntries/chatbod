@@ -221,7 +221,7 @@ async function generateImage(query) {
           : ""
       } ${emotion}, ${emotion}, ${emotion},${
         keywords?.includes("kekbot")
-          ? " catgirl, cat_ears, green_hair, loli, femboy, looking_at_viewer, crop top,"
+          ? " portrait, catgirl, cat_ears, green_hair, petite, petite, short, slim, small, oversized_shirt, oversized_clothes, vr, head-mounted_display, virtual_reality,"
           : ""
       } masterpiece, best_quality`,
       "nsfw, breasts, large_breast, boobs, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry"
