@@ -109,7 +109,7 @@ async function generate(
       `[${new Date()}] backend host failed [${e}...], retrying (${count + 1})`
     );
     if (
-      additional_conf?.backend == "replicate" &&
+      (additional_conf?.backend == "replicate" || !additional_conf) &&
       JSON.stringify(e).toLowerCase().includes("limit")
     ) {
       console.log(
