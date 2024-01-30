@@ -16,59 +16,110 @@ async function sleep(ms) {
 /**
  * @param {string} prompt
  * @param {number} count
- * @param {object} additional_conf
+ * @param {{backend: string}} additional_conf
  * @returns {Promise<string>}
  */
-async function generate(prompt, count = 0, additional_conf = {}) {
+async function generate(
+  prompt,
+  count = 0,
+  additional_conf = { backend: "replicate" }
+) {
   const generationConfig = toml.parse(
     fs.readFileSync(procenv.LLMCONFIG).toString()
   );
   try {
-    /*
-    return (
-      await (
-        await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${procenv.ORTOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            prompt: prompt,
-            max_tokens: 256,
-            top_k: 100,
-            top_p: 0.7,
-            frequency_penalty: 1.5,
-            presence_penalty: 1,
-            temperature: 0.6,
-            ...(generationConfig?.paid ? { ...generationConfig.paid } : {}),
-            ...(additional_conf ? { ...additional_conf } : {}),
-          }),
-        })
-      ).json()
-    ).choices[0].text;
-    */
-    return (
-      await replicate.run(
-        "spuuntries/flatdolphinmaid-8x7b-gguf:1510dd7e9dc7142cca0c8bb899b9eb2f339d686d9ded0e33720ecaeccdfb3146",
-        {
-          input: {
-            prompt: prompt,
-            max_new_tokens: 256,
-            prompt_template: "{prompt}",
-            ...(generationConfig?.paid ? { ...generationConfig.paid } : {}),
-            ...(additional_conf ? { ...additional_conf } : {}),
-          },
-        }
-      )
-    ).join("");
+    if (additional_conf && additional_conf?.backend) {
+      switch (additional_conf.backend) {
+        case "replicate":
+          return (
+            await replicate.run(
+              "spuuntries/flatdolphinmaid-8x7b-gguf:1510dd7e9dc7142cca0c8bb899b9eb2f339d686d9ded0e33720ecaeccdfb3146",
+              {
+                input: {
+                  prompt: prompt,
+                  max_new_tokens: 256,
+                  prompt_template: "{prompt}",
+                  ...(generationConfig?.paid
+                    ? { ...generationConfig.paid }
+                    : {}),
+                  ...(additional_conf ? { ...additional_conf } : {}),
+                },
+              }
+            )
+          ).join("");
+
+        case "openrouter":
+          return (
+            await (
+              await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${procenv.ORTOKEN}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  prompt: prompt,
+                  max_tokens: 256,
+                  ...(generationConfig?.paid
+                    ? { ...generationConfig.paid }
+                    : {}),
+                  ...(additional_conf ? { ...additional_conf } : {}),
+                }),
+              })
+            ).json()
+          ).choices[0].text;
+
+        default:
+          return (
+            await replicate.run(
+              "spuuntries/flatdolphinmaid-8x7b-gguf:1510dd7e9dc7142cca0c8bb899b9eb2f339d686d9ded0e33720ecaeccdfb3146",
+              {
+                input: {
+                  prompt: prompt,
+                  max_new_tokens: 256,
+                  prompt_template: "{prompt}",
+                  ...(generationConfig?.paid
+                    ? { ...generationConfig.paid }
+                    : {}),
+                  ...(additional_conf ? { ...additional_conf } : {}),
+                },
+              }
+            )
+          ).join("");
+      }
+    } else {
+      return (
+        await replicate.run(
+          "spuuntries/flatdolphinmaid-8x7b-gguf:1510dd7e9dc7142cca0c8bb899b9eb2f339d686d9ded0e33720ecaeccdfb3146",
+          {
+            input: {
+              prompt: prompt,
+              max_new_tokens: 256,
+              prompt_template: "{prompt}",
+              ...(generationConfig?.paid ? { ...generationConfig.paid } : {}),
+              ...(additional_conf ? { ...additional_conf } : {}),
+            },
+          }
+        )
+      ).join("");
+    }
   } catch (e) {
     if (count > 3) return "";
     console.log(
       `[${new Date()}] backend host failed [${e}...], retrying (${count + 1})`
     );
+    if (
+      additional_conf?.backend == "replicate" &&
+      JSON.stringify(e).toLowerCase().includes("limits")
+    ) {
+      console.log(
+        `[${new Date()}] caught replicate limiter! Retrying with openrouter...`
+      );
+      additional_conf["backend"] = "openrouter";
+      return await generate(prompt, 0, additional_conf);
+    }
     await sleep(5000);
-    return await generate(prompt, count + 1);
+    return await generate(prompt, count + 1, additional_conf);
   }
 }
 
