@@ -275,7 +275,6 @@ parentPort.on("message", async (event) => {
         ? "\n" + context.map((c) => `- ${c}`).join("\n")
         : "No relevant long-term memory found.",
       message.guild.name,
-      [...new Set(emojis.map((e) => `:${e.name}:`))].join(", "),
     ]),
     dialog = `${history.length ? "\n" + history : ""}
 kekbot:`,
