@@ -126,7 +126,9 @@ async function generate(
     );
     if (
       (additional_conf?.backend == "replicate" || !additional_conf) &&
-      jsonFriendlyErrorReplacer(e).toLowerCase().includes("limit")
+      JSON.stringify(e, jsonFriendlyErrorReplacer)
+        .toLowerCase()
+        .includes("limit")
     ) {
       console.log(
         `[${new Date()}] caught replicate limiter! Retrying with openrouter...`
