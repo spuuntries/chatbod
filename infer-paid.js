@@ -13,6 +13,22 @@ async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// https://stackoverflow.com/a/53624454
+function jsonFriendlyErrorReplacer(key, value) {
+  if (value instanceof Error) {
+    return {
+      // Pull all enumerable properties, supporting properties on custom Errors
+      ...value,
+      // Explicitly pull Error's non-enumerable properties
+      name: value.name,
+      message: value.message,
+      stack: value.stack,
+    };
+  }
+
+  return value;
+}
+
 /**
  * @param {string} prompt
  * @param {number} count
@@ -110,7 +126,7 @@ async function generate(
     );
     if (
       (additional_conf?.backend == "replicate" || !additional_conf) &&
-      JSON.stringify(e).toLowerCase().includes("limit")
+      jsonFriendlyErrorReplacer(e).toLowerCase().includes("limit")
     ) {
       console.log(
         `[${new Date()}] caught replicate limiter! Retrying with openrouter...`
