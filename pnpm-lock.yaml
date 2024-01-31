@@ -20,6 +20,12 @@ dependencies:
   chrono-node:
     specifier: ^2.7.0
     version: 2.7.0
+  compromise:
+    specifier: ^14.11.2
+    version: 14.11.2
+  compromise-speech:
+    specifier: ^0.1.0
+    version: 0.1.0(compromise@14.11.2)
   discord.js:
     specifier: ^14.13.0
     version: 14.13.0
@@ -321,6 +327,23 @@ packages:
       delayed-stream: 1.0.0
     dev: false
 
+  /compromise-speech@0.1.0(compromise@14.11.2):
+    resolution: {integrity: sha512-+2KS/8T3SH5Hcd6tsCBVfxrkdi7sbJfKAeXGYimQdKGgweDMt0FT03wVCDZ6EgLYxReftkRKp1pxLx2pQLj4Kg==}
+    peerDependencies:
+      compromise: '>=14.0.0'
+    dependencies:
+      compromise: 14.11.2
+    dev: false
+
+  /compromise@14.11.2:
+    resolution: {integrity: sha512-7KZgYlu9Lp+qju9CjEhDi1PcbkGZfjTuDA80pZIXxsP/+QzRyfts5H20EzHrxas4P5O4NOtaydS6gmD6YkLlHg==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      efrt: 2.7.0
+      grad-school: 0.0.5
+      suffix-thumb: 5.0.2
+    dev: false
+
   /dayjs@1.11.10:
     resolution: {integrity: sha512-vjAczensTgRcqDERK0SR2XMwsF/tSvnvlv6VcF2GIhg6Sx4yOIt/irsr1RDJsKiIyBzJDpCoXiWWq28MqH2cnQ==}
     dev: false
@@ -379,6 +402,11 @@ packages:
     engines: {node: '>=12'}
     dev: false
 
+  /efrt@2.7.0:
+    resolution: {integrity: sha512-/RInbCy1d4P6Zdfa+TMVsf/ufZVotat5hCw3QXmWtjU+3pFEOvOQ7ibo3aIxyCJw2leIeAMjmPj+1SLJiCpdrQ==}
+    engines: {node: '>=12.0.0'}
+    dev: false
+
   /end-of-stream@1.4.4:
     resolution: {integrity: sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q==}
     dependencies:
@@ -435,6 +463,11 @@ packages:
 
   /github-from-package@0.0.0:
     resolution: {integrity: sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw==}
+    dev: false
+
+  /grad-school@0.0.5:
+    resolution: {integrity: sha512-rXunEHF9M9EkMydTBux7+IryYXEZinRk6g8OBOGDBzo/qWJjhTxy86i5q7lQYpCLHN8Sqv1XX3OIOc7ka2gtvQ==}
+    engines: {node: '>=8.0.0'}
     dev: false
 
   /has-flag@4.0.0:
@@ -713,6 +746,10 @@ packages:
   /strip-json-comments@2.0.1:
     resolution: {integrity: sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==}
     engines: {node: '>=0.10.0'}
+    dev: false
+
+  /suffix-thumb@5.0.2:
+    resolution: {integrity: sha512-I5PWXAFKx3FYnI9a+dQMWNqTxoRt6vdBdb0O+BJ1sxXCWtSoQCusc13E58f+9p4MYx/qCnEMkD5jac6K2j3dgA==}
     dev: false
 
   /supports-color@7.2.0:
