@@ -433,7 +433,11 @@ ${arg} needs to be muted because: "`,
       let emote = emojis.find(
         (em) =>
           e.trim().toLowerCase().includes(em.name.toLowerCase()) ||
-          em.name.toLowerCase().includes(e.trim().toLowerCase())
+          em.name.toLowerCase().includes(e.trim().toLowerCase()) ||
+          levDis.DamerauLevenshteinDistance(
+            e.trim().toLowerCase(),
+            em.name.toLowerCase()
+          ).distance <= 4
       );
       if (emote)
         response = response.replace(
