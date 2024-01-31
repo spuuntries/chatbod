@@ -4,7 +4,7 @@ const nlp = require("compromise");
 nlp.plugin(require("compromise-speech"));
 
 function transform(str) {
-  let res = nlp(str).toLowerCase();
+  let res = nlp(str);
 
   res.contractions().expand();
 
@@ -14,11 +14,11 @@ function transform(str) {
     (() => {
       let result = "";
 
-      const matches = res.text().match(/(\w+)|(\s+)|([.,!?])/g);
+      const matches = res.text().match(/(\w+)|(\s+)|([!-\/:-@[-`{-~])/gi);
       for (let i = 0; i < matches.length; i++) {
         if (matches[i].trim() !== "") {
           let old = matches[i].trim(),
-            inter = nlp(matches[i].trim());
+            inter = nlp(matches[i].trim().toLowerCase());
           inter = inter.replace("not", "nut", { keepTags: false });
           inter = inter.text().replaceAll(/ight$/g, "ite");
           inter = nlp(inter).soundsLike()[0][0];
@@ -31,7 +31,6 @@ function transform(str) {
             .replaceAll(/ork$/g, "oek")
             .replaceAll("that", "dat")
             .replaceAll(/air$/g, "aer")
-            .replaceAll(/^me$/g, "meh")
             .replaceAll(/^the$/g, "da")
             .replaceAll(/([a])the/g, "$1thu")
             .replaceAll(/([io])the/g, "$1de")
@@ -46,15 +45,17 @@ function transform(str) {
               )
               .join("");
           }
-          if (old.match(/[^aiueo]+y$/g)) inter += "i";
-          if (old.match(/[aiueo]+y$/g)) inter += "e";
-          if (old.match(/day$/g))
+          if (old.match(/[^aiueo]+y$/gi)) inter += "i";
+          if (old.match(/[aiueo]+y$/gi)) inter += "e";
+          if (old.match(/day$/gi))
             inter = inter.slice(0, inter.length - 3) + "dae";
-          if (old.match(/[aiueo]ve$/g))
+          if (old.match(/[aiueo]ve$/gi))
             inter = inter.slice(0, inter.length - 2) + "be";
-          if (old.match(/[y]+s$/g))
+          if (old.match(/[y]+s$/gi))
             inter = inter.slice(0, inter.length - 1) + "es";
           if (old == "does") inter = "doez";
+          if (old.at(0).toUpperCase() == old.at(0))
+            inter = inter.at(0).toUpperCase() + inter.slice(1);
           result += inter;
         } else {
           result += matches[i];
@@ -66,6 +67,14 @@ function transform(str) {
   );
 
   res.pronouns().replace("i", "me");
+
+  res = nlp(
+    res
+      .text()
+      .split("\n")
+      .map((l) => (l ? l.at(0).toUpperCase() + l.slice(1) : l))
+      .join("\n")
+  );
 
   return res.text();
 }

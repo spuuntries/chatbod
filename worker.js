@@ -426,23 +426,28 @@ ${arg} needs to be muted because: "`,
     });
   }
 
-  if (response.match(/:[\w\d]+:/gim)) {
-    let respEmotes = response.match(/:[\w\d]+:/gim);
+  if (response.match(/:[\w\d ]+:/gim)) {
+    let respEmotes = response.match(/:[\w\d ]+:/gim);
 
     respEmotes.map((e) => {
-      let emote = emojis.find((em) => e.includes(em.name));
+      let emote = emojis.find(
+        (em) =>
+          e.trim().toLowerCase().includes(em.name.toLowerCase()) ||
+          em.name.toLowerCase().includes(e.trim().toLowerCase())
+      );
       if (emote)
         response = response.replace(
           e,
           `<${emote.animated ? "a" : ""}:${emote.name}:${emote.id}>`
         );
+      else response = response.replace(e, "");
     });
   }
 
   response = response.replaceAll(/\(\D*\)/gim, "");
   response = response.replaceAll(/\(\S[^):]+$/gim, "");
   response = response.replaceAll(/\[.+\]/gim, "");
-  response = modulator.transform(response);
+  if (Math.random() < 0.5) response = modulator.transform(response);
   logger(response);
 
   try {
