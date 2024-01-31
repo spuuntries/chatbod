@@ -443,6 +443,7 @@ ${arg} needs to be muted because: "`,
   response = response.replaceAll(/\(\S[^):]+$/gim, "");
   response = response.replaceAll(/\[.+\]/gim, "");
   response = modulator.transform(response);
+  logger(response);
 
   try {
     await message.reply({
