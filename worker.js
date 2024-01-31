@@ -27,6 +27,7 @@ const procenv = process.env,
   _ = require("lodash"),
   toml = require("toml"),
   fs = require("fs"),
+  modulator = require("./modulator"),
   logger = (m) => console.log(`[${new Date()}] ${m}`);
 
 /**
@@ -441,6 +442,7 @@ ${arg} needs to be muted because: "`,
   response = response.replaceAll(/\(\D*\)/gim, "");
   response = response.replaceAll(/\(\S[^):]+$/gim, "");
   response = response.replaceAll(/\[.+\]/gim, "");
+  response = modulator.transform(response);
 
   try {
     await message.reply({
