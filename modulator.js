@@ -25,6 +25,7 @@ function transform(str) {
           inter = inter
             .replaceAll("ea", "ee")
             .replaceAll("is", "iz")
+            .replaceAll(/^i$/g, "me")
             .replaceAll("ike", "iek")
             .replaceAll("but", "butt")
             .replaceAll(/oes$/g, "oez")
@@ -64,16 +65,6 @@ function transform(str) {
 
       return result;
     })()
-  );
-
-  res.pronouns().replace("i", "me");
-
-  res = nlp(
-    res
-      .text()
-      .split("\n")
-      .map((l) => (l ? l.at(0).toUpperCase() + l.slice(1) : l))
-      .join("\n")
   );
 
   return res.text();
