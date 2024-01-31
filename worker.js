@@ -447,7 +447,7 @@ ${arg} needs to be muted because: "`,
   response = response.replaceAll(/\(\D*\)/gim, "");
   response = response.replaceAll(/\(\S[^):]+$/gim, "");
   response = response.replaceAll(/\[.+\]/gim, "");
-  if (Math.random() >= 0.7) response = modulator.transform(response);
+  if (_.inRange(_.random(0, 8), 1, 8)) response = modulator.transform(response);
   logger(response);
 
   try {
