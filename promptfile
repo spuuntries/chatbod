@@ -12,6 +12,10 @@ Backend-provided reference info:
 - System's timezone: UTC+0.
 - Long-term memory is a bit faulty at the moment. Kek is still fixing. Be careful when digesting info from memory.
 
+[CHANGELOG]:
+Top 3 git commits to backend internals:
+{2}
+
 [UTILITIES]:
 - [image] and [gif] utility can be refined by describing the thought in text enclosed by parentheses.
 - [image] when not used by kekbot indicates an attachment to the message, not utility.
@@ -48,10 +52,6 @@ Some possibly relevant long-term memories:
 [RETRIEVAL]:
 Internet search returned:
 {5}
-
-[CHANGELOG]:
-Top 3 git commits to backend internals:
-{2}
 
 [CHANNEL = "kekbot testing channel", SERVER = "{4}"]:
 trol: Hi! 

@@ -274,7 +274,7 @@ Summary: `;
 /**
  * Retrieval-Augmented Generation Mechanism
  * @param {string} string
- * @returns {string[]}
+ * @returns {Promise<string[]>}
  */
 async function retrieval(string) {
   const input = nlp(string),
