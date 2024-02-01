@@ -10,6 +10,7 @@ const { exec } = require("child_process"),
   { generate } = require("./infer-petals"),
   genPaid = require("./infer-paid").generate,
   imgPaid = require("./infer-paid").generateImage,
+  _ = require("lodash"),
   { QuickDB } = require("quick.db"),
   db = new QuickDB(),
   hf = new HfInference(process.env.HF_TOKEN),
@@ -270,16 +271,49 @@ Summary: `;
   return res;
 }
 
+/**
+ * Retrieval-Augmented Generation Mechanism
+ * @param {string} string
+ * @returns {string[]}
+ */
 async function retrieval(string) {
-  const topics = nlp(string)
+  const input = nlp(string),
+    topics = input
       .toLowerCase()
       .topics()
       .normalize({ possessives: true, plurals: true })
       .out("array")
-      .map((t) => t.replaceAll(/[.?!;]$/g, "")),
-    docs = topics.length ? await wtf.fetch(topics) : null,
+      .map((t) => t.replaceAll(/[.?!;]$/g, "").replaceAll(/["']/g, "")),
+    acros = input
+      .json()[0]
+      .terms.filter((t) => t.tags.includes("Acronym")) // For some reason .acronyms() doesn't really work (?) lmao so I do it a bit more... "manually"
+      .map((t) => t.text),
+    nouns = input
+      .toLowerCase()
+      .nouns()
+      .normalize({ possessives: true, plurals: true })
+      .out("array")
+      .map((t) => t.replaceAll(/[.?!;]$/g, "").replaceAll(/["']/g, "")),
+    docs =
+      topics && acros
+        ? // Fetches relevant wikipedia documents and parses them
+          await wtf.fetch(
+            _.uniq([...(topics ?? []), ...(acros ?? []), ...(nouns ?? [])])
+              .filter((v) => !v.toLowerCase().includes("kek")) // Filter for kek, since injection success can get disrupted by this
+              .map((v) => nlp(v).toTitleCase().text()) // Ensures in title casing to ensure hits on articles
+          )
+        : null,
     results = docs
-      ? docs.filter((d) => d).map((d) => nlp(d.text()).sentences(0).text())
+      ? docs
+          .filter((d) => d)
+          .map((d) =>
+            nlp(d.text())
+              .sentences()
+              .filter((t) => !t.has("may refer to")) // For disambiguation pages
+              .slice(0, 5) // Disambiguation pages may provide multiple entries, so just to be safe, we can grab a few of the listed things then have user clarify
+              .text()
+              .replaceAll(/\n+/g, "\n")
+          )
       : [];
 
   return results;

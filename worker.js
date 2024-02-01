@@ -11,6 +11,7 @@ const procenv = process.env,
   db = new QuickDB(),
   placeholder = procenv.PLACEHOLDER,
   {
+    retrieval,
     runPrompt,
     generateImage,
     getTopMatchingGif,
@@ -276,6 +277,9 @@ parentPort.on("message", async (event) => {
         ? "\n" + context.map((c) => `- ${c}`).join("\n")
         : "No relevant long-term memory found.",
       message.guild.name,
+      retrieval(message.cleanContent)
+        .map((s, i) => `${i + 1}.) ${s}`)
+        .join("\n"),
     ]),
     dialog = `${history.length ? "\n" + history : ""}
 kekbot:`,
