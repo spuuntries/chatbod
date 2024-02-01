@@ -1,5 +1,9 @@
 require("dotenv").config();
 const { exec } = require("child_process"),
+  compromise = require("compromise"),
+  /** @type {compromise.default} */
+  nlp = require("compromise"),
+  wtf = require("wtf_wikipedia"),
   { HfInference } = require("@huggingface/inference"),
   axios = require("axios"),
   { python } = require("pythonia"),
@@ -266,10 +270,26 @@ Summary: `;
   return res;
 }
 
+async function retrieval(string) {
+  const topics = nlp(string)
+      .toLowerCase()
+      .topics()
+      .normalize({ possessives: true, plurals: true })
+      .out("array")
+      .map((t) => t.replaceAll(/[.?!;]$/g, "")),
+    docs = topics.length ? await wtf.fetch(topics) : null,
+    results = docs
+      ? docs.filter((d) => d).map((d) => nlp(d.text()).sentences(0).text())
+      : [];
+
+  return results;
+}
+
 module.exports = {
   runPrompt,
   runAux,
   keyword,
+  retrieval,
   getCaption,
   getTopMatchingGif,
   nsfwProcess,
