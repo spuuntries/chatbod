@@ -14,7 +14,7 @@ function transform(str) {
       const matches = res.text().match(/(\w+)|(\s+)|([!-\/:-@[-`{-~])/gi);
       for (let i = 0; i < matches.length; i++) {
         if (matches[i].trim() !== "") {
-          if (_.inRange(_.random(1, 15), 1, 12)) {
+          if (_.inRange(_.random(1, 20), 1, 19)) {
             result += matches[i];
             continue;
           }
