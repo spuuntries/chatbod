@@ -14,7 +14,7 @@ function transform(str) {
       const matches = res.text().match(/(\w+)|(\s+)|([!-\/:-@[-`{-~])/gi);
       for (let i = 0; i < matches.length; i++) {
         if (matches[i].trim() !== "") {
-          if (_.inRange(_.random(1, 20), 1, 19)) {
+          if (_.inRange(_.random(1, 20), 1, 15)) {
             result += matches[i];
             continue;
           }
@@ -22,7 +22,6 @@ function transform(str) {
             inter = nlp(matches[i].trim().toLowerCase());
           inter = inter.replace("not", "nut", { keepTags: false });
           inter = inter.text().replaceAll(/ight$/g, "ite");
-          inter = nlp(inter).soundsLike()[0][0];
           inter = inter
             .replaceAll("ea", "ee")
             .replaceAll("is", "iz")
