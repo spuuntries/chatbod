@@ -2,7 +2,6 @@ from llama_cpp import Llama, LlamaDiskCache
 from llama_cpp.llama_speculative import LlamaPromptLookupDecoding
 from dotenv import load_dotenv
 import random
-import multiprocessing
 import tomllib
 import os
 
@@ -13,8 +12,6 @@ with open(os.environ["LLMCONFIG"], "rb") as f:
 llm = Llama(
     **llm_config["init"],
     model_path=os.environ["MODELPATH"],
-    n_threads=multiprocessing.cpu_count()-1,
-    n_ctx=8192,
     seed=random.randint(1, 9999),
     draft_model=LlamaPromptLookupDecoding(num_pred_tokens=2)
 )
