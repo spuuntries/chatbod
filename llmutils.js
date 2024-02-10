@@ -22,7 +22,7 @@ var bindings, siginter;
  * Set up bindings
  */
 async function setBindings() {
-  if (!bindings) bindings = await python("./infer-bindings.py");
+  if (!bindings) bindings = await python("./infer_bindings.py");
   if (!siginter)
     siginter = process.on("SIGINT", () => {
       bindings.exit();

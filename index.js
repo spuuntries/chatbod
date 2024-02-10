@@ -85,7 +85,10 @@ client.on("messageCreate", async (message) => {
   logger(queue.toString());
 });
 
+var workerReady = false;
+
 setInterval(() => {
+  if (!workerReady) return;
   let workerObj = workers.filter((w) => !w["flag"])[0],
     worker = workerObj["worker"];
   if (workerObj["flag"] || queue.length == 0) return;
@@ -114,8 +117,10 @@ client.once("ready", () => {
           `[v${require("./package.json").version}] Worker #${i + 1} ready`
         );
         workerCounter++;
-        if (workerCounter == workers.length)
+        if (workerCounter == workers.length) {
+          workerReady = true;
           logger(`[v${require("./package.json").version}] All workers ready`);
+        }
 
         process.on("SIGTERM", async () => await warmer.terminate());
         process.on("SIGINT", async () => await warmer.terminate());
