@@ -88,10 +88,9 @@ client.on("messageCreate", async (message) => {
 var workerReady = false;
 
 setInterval(() => {
-  if (!workerReady) return;
-  let workerObj = workers.filter((w) => !w["flag"])[0],
-    worker = workerObj["worker"];
-  if (workerObj["flag"] || queue.length == 0) return;
+  let workerObj = workers.filter((w) => !w["flag"])[0];
+  if (!workerReady || !workerObj || queue.length == 0) return;
+  let worker = workerObj["worker"];
 
   worker.postMessage(queue.shift());
   workerObj["flag"] = true;
