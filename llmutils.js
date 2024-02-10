@@ -38,16 +38,14 @@ async function setBindings() {
  * @returns {Promise<string>} The output of the command.
  */
 async function runPrompt(prompt, cid) {
-  /**
   const binder = await setBindings(),
     res = await binder.generate$(prompt, { $timeout: Infinity });
   return res;
-  */
-  return await genPaid(prompt);
+  // return await genPaid(prompt);
 }
 
 /**
- * Runs a prompt through the auxilliary provider, currently petals public net.
+ * Runs a prompt through the auxilliary provider, currently replicate-based API.
  * @async
  * @param {string} prompt - Prompt to run
  * @returns {Promise<string>} The output of the command.
