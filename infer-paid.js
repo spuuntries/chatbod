@@ -55,6 +55,7 @@ async function generate(
                   prompt: prompt,
                   max_new_tokens: 256,
                   prompt_template: "{prompt}",
+                  seed: Math.floor(Math.random() * 1000000),
                   ...(generationConfig?.paid
                     ? { ...generationConfig.paid }
                     : {}),
@@ -94,6 +95,7 @@ async function generate(
                   prompt: prompt,
                   max_new_tokens: 256,
                   prompt_template: "{prompt}",
+                  seed: Math.floor(Math.random() * 1000000),
                   ...(generationConfig?.paid
                     ? { ...generationConfig.paid }
                     : {}),
@@ -112,6 +114,7 @@ async function generate(
               prompt: prompt,
               max_new_tokens: 256,
               prompt_template: "{prompt}",
+              seed: Math.floor(Math.random() * 1000000),
               ...(generationConfig?.paid ? { ...generationConfig.paid } : {}),
               ...(additional_conf ? { ...additional_conf } : {}),
             },
