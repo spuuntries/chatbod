@@ -269,7 +269,7 @@ parentPort.on("message", async (event) => {
         : ""
     }`,
     context = await searchEmbeddings(newEntry, 20),
-    persona = setPrompt([
+    prefix = setPrompt([
       message.channel.name,
       dateref.toDateString(),
       childProcess.execSync("git log -3 --pretty=%B").toString().trim(),
@@ -280,10 +280,8 @@ parentPort.on("message", async (event) => {
       (await retrieval(message.cleanContent))
         .map((s, i) => `${i + 1}.) ${s}`)
         .join("\n"),
-    ]),
-    dialog = `${history.length ? "\n" + history : ""}
-kekbot:`,
-    prefix = (persona + dialog).replace("<END>", "");
+      history.length ? "\n" + history : "", // Chat history
+    ]);
 
   logger(prefix);
   logger(context);
