@@ -38,10 +38,12 @@ async function setBindings() {
  * @returns {Promise<string>} The output of the command.
  */
 async function runPrompt(prompt, cid) {
+  /**
   const binder = await setBindings(),
     res = await binder.generate$(prompt, { $timeout: Infinity });
   return res;
-  // return await genPaid(prompt);
+  */
+  return await genPaid(prompt);
 }
 
 /**
