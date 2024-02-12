@@ -273,7 +273,7 @@ parentPort.on("message", async (event) => {
     prefix = setPrompt([
       message.channel.name,
       dateref.toDateString(),
-      childProcess.execSync("git log -3 --pretty=%B").toString().trim(),
+      childProcess.execSync("git log -3 --pretty=oneline").toString().trim(),
       context.length
         ? "\n" + context.map((c) => `- ${c}`).join("\n")
         : "No relevant long-term memory found.",
