@@ -269,6 +269,7 @@ parentPort.on("message", async (event) => {
         : ""
     }`,
     context = await searchEmbeddings(newEntry, 20),
+    dialog = `${history.length ? "\n" + history : ""}`,
     prefix = setPrompt([
       message.channel.name,
       dateref.toDateString(),
