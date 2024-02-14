@@ -218,17 +218,17 @@ async function generateImage(query) {
 
   const res = Buffer.from(
     await imgPaid(
-      `${
-        keywords
-          ? `${keywords.map((s) =>
-              s.toLowerCase().replaceAll("kekbot", "").replaceAll("kek", "")
-            )},`
-          : ""
-      } ${emotion}, ${emotion}, ${emotion},${
+      `${emotion}, ${emotion}, ${emotion}, ${
         keywords?.includes("kekbot")
           ? " portrait, catgirl, cat_ears, green_hair, petite, petite, short, slim, small, oversized_shirt, oversized_clothes, vr, head-mounted_display, virtual_reality,"
           : ""
-      } masterpiece, best_quality`,
+      } masterpiece, best_quality${
+        keywords
+          ? `, ${keywords.map((s) =>
+              s.toLowerCase().replaceAll("kekbot", "").replaceAll("kek", "")
+            )}`
+          : ""
+      }`,
       "nsfw, breasts, large_breast, boobs, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry"
     )
   );

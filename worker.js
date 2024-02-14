@@ -302,6 +302,9 @@ parentPort.on("message", async (event) => {
    * @returns
    */
   async function catchRep(resp, mIndex = 0) {
+    resp = resp.replaceAll(/\(\D*\)/gim, "");
+    resp = resp.replaceAll(/\(\S[^):]+$/gim, "");
+    resp = resp.replaceAll(/\[.+\]/gim, "");
     if (mIndex >= 2) return;
     if (
       interimHistory.find(
@@ -363,7 +366,7 @@ parentPort.on("message", async (event) => {
     response.includes("[img]")
   ) {
     img = await generateImage(
-      `${dialog.split("\n").slice(-2).join("\n")}${response}`
+      `${dialog.split("\n").slice(-1).join("\n")}${response}`
     );
     attFiles.push(
       new Discord.AttachmentBuilder(Buffer.from(img), {
