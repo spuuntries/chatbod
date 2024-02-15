@@ -366,7 +366,7 @@ parentPort.on("message", async (event) => {
     response.includes("[img]")
   ) {
     img = await generateImage(
-      `${dialog.split("\n").slice(-1).join("\n")}${response}`
+      `${dialog.split("\n").slice(-1).join("\n")}\nkekbot: ${response}`
     );
     attFiles.push(
       new Discord.AttachmentBuilder(Buffer.from(img), {
