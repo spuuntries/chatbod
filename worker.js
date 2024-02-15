@@ -458,7 +458,7 @@ ${arg} needs to be muted because: "`,
     });
   }
 
-  response = response.replaceAll(/\(\D*\)/gim, "");
+  response = response.replaceAll(/\([^_:\d]*\)/gim, "");
   response = response.replaceAll(/\(\S[^):]+$/gim, "");
   response = response.replaceAll(/\[.+\]/gim, "");
   response = response.split(/\n[\n]+/gim)[0];
