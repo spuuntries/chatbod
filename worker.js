@@ -281,7 +281,7 @@ parentPort.on("message", async (event) => {
       (await retrieval(message.cleanContent))
         .map((s, i) => `${i + 1}.) ${s}`)
         .join("\n"),
-      history.length ? "\n" + history : "", // Chat history
+      history.length ? history : "", // Chat history
       [...new Set(emojis.map((e) => `:${e.name}:`))]
         .sort(() => Math.random() - 0.5)
         .slice(0, 30)
