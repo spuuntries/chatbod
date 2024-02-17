@@ -14,6 +14,7 @@ const { exec } = require("child_process"),
   { QuickDB } = require("quick.db"),
   db = new QuickDB(),
   hf = new HfInference(process.env.HF_TOKEN),
+  DDG = require("duck-duck-scrape"),
   { randomInt } = require("crypto");
 
 var bindings, siginter;
@@ -277,6 +278,46 @@ Summary: `;
  * @returns {Promise<string[]>}
  */
 async function retrieval(string) {
+  /**
+   * @param {string} query
+   */
+  async function searchWrapper(query) {
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        const searchResults = await DDG.search(query, {
+          safeSearch: DDG.SafeSearchType.STRICT,
+        });
+        const results = searchResults.results
+          .slice(0, 5)
+          .map((e) =>
+            e.description
+              .replace(/<\/?[^>]+(>|$)/g, "")
+              .split(".")
+              .slice(0, 2)
+              .join(".")
+          )
+          .filter(
+            (e) =>
+              e.split(/ +/gim).length > 1 &&
+              e &&
+              !["http:", "https:"].filter((p) => e.includes(p)).length
+          );
+        return results;
+      } catch (error) {
+        console.log(`[${new Date()}] DDG search failed: ${error}`);
+        retries--;
+        if (retries === 0) {
+          console.log(
+            `[${new Date()}] DDG search retry limit reached, returning fallback value`
+          );
+          return [];
+        }
+        await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait for  5 seconds before retrying
+      }
+    }
+  }
+
   const input = nlp(string),
     topics = input
       .toLowerCase()
@@ -294,27 +335,34 @@ async function retrieval(string) {
       .normalize({ possessives: true, plurals: true })
       .out("array")
       .map((t) => t.replaceAll(/[.?!;]$/g, "").replaceAll(/["']/g, "")),
+    queries = _.uniq([...(topics ?? []), ...(acros ?? []), ...(nouns ?? [])])
+      .filter((v) => !v.toLowerCase().includes("kek")) // Filter for kek, since injection success can get disrupted by this
+      .map((v) => nlp(v).toTitleCase().text()), // Ensures in title casing to ensure hits on articles
     docs =
       topics && acros
         ? // Fetches relevant wikipedia documents and parses them
-          await wtf.fetch(
-            _.uniq([...(topics ?? []), ...(acros ?? []), ...(nouns ?? [])])
-              .filter((v) => !v.toLowerCase().includes("kek")) // Filter for kek, since injection success can get disrupted by this
-              .map((v) => nlp(v).toTitleCase().text()) // Ensures in title casing to ensure hits on articles
-          )
+          await wtf.fetch(queries)
         : null,
-    results = docs
-      ? docs
-          .filter((d) => d)
-          .map((d) =>
-            nlp(d.text())
-              .sentences()
-              .filter((t) => !t.has("may refer to")) // For disambiguation pages
-              .slice(0, 5) // Disambiguation pages may provide multiple entries, so just to be safe, we can grab a few of the listed things then have user clarify
-              .text()
-              .replaceAll(/\n+/g, "\n")
-          )
-      : [];
+    search =
+      topics && acros
+        ? (
+            await Promise.all(queries.map(async (q) => await searchWrapper(q)))
+          ).flat()
+        : [],
+    results = (
+      docs
+        ? docs
+            .filter((d) => d)
+            .map((d) =>
+              nlp(d.text())
+                .sentences()
+                .filter((t) => !t.has("may refer to")) // For disambiguation pages
+                .slice(0, 5) // Disambiguation pages may provide multiple entries, so just to be safe, we can grab a few of the listed things then have user clarify
+                .text()
+                .replaceAll(/\n+/g, "\n")
+            )
+        : []
+    ).concat(search ? search : []);
 
   return results;
 }
