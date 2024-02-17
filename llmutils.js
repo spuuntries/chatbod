@@ -220,7 +220,7 @@ async function generateImage(query) {
   const res = Buffer.from(
     await imgPaid(
       `${emotion}, ${emotion}, ${emotion}, ${
-        keywords?.includes("kekbot")
+        keywords?.map((s) => s.toLowerCase()).includes("kekbot")
           ? " portrait, catgirl, cat_ears, green_hair, petite, petite, short, slim, small, oversized_shirt, oversized_clothes, vr, head-mounted_display, virtual_reality,"
           : ""
       } masterpiece, best_quality${

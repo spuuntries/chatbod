@@ -281,7 +281,7 @@ parentPort.on("message", async (event) => {
       (await retrieval(message.cleanContent))
         .map((s, i) => `${i + 1}.) ${s}`)
         .join("\n"),
-      history.length ? "\n" + history : "", // Chat history
+      history.length ? history : "", // Chat history
       [...new Set(emojis.map((e) => `:${e.name}:`))]
         .sort(() => Math.random() - 0.5)
         .slice(0, 30)
@@ -366,7 +366,7 @@ parentPort.on("message", async (event) => {
     response.includes("[img]")
   ) {
     img = await generateImage(
-      `${dialog.split("\n").slice(-1).join("\n")}${response}`
+      `${dialog.split("\n").slice(-1).join("\n")}\nkekbot: ${response}`
     );
     attFiles.push(
       new Discord.AttachmentBuilder(Buffer.from(img), {
@@ -458,7 +458,7 @@ ${arg} needs to be muted because: "`,
     });
   }
 
-  response = response.replaceAll(/\([^_:\d]*\)/gim, "");
+  response = response.replaceAll(/\([^_:?~`|\d]*\)/gim, "");
   response = response.replaceAll(/\(\S[^):]+$/gim, "");
   response = response.replaceAll(/\[.+\]/gim, "");
   response = response.split(/[\n]+/gim)[0];
