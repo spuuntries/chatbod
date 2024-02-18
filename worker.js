@@ -282,12 +282,7 @@ parentPort.on("message", async (event) => {
       (
         await reranker(
           message.cleanContent,
-          await retrieval(
-            interimHistory
-              .slice(-2)
-              .map((m) => m.cleanContent)
-              .join("\n")
-          )
+          await retrieval(message.cleanContent)
         )
       )
         .map((s) => s[0])
