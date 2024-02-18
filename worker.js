@@ -16,6 +16,7 @@ const procenv = process.env,
     generateImage,
     getTopMatchingGif,
     getCaption,
+    reranker,
     getClosestQA,
     getSummary,
     nsfwProcess,
@@ -278,7 +279,19 @@ parentPort.on("message", async (event) => {
         ? "\n" + context.map((c) => `- ${c}`).join("\n")
         : "No relevant long-term memory found.",
       message.guild.name,
-      (await retrieval(message.cleanContent))
+      (
+        await reranker(
+          message.cleanContent,
+          await retrieval(
+            interimHistory
+              .slice(-2)
+              .map((m) => m.cleanContent)
+              .join("\n")
+          )
+        )
+      )
+        .filter((s) => s[1] >= 0.6)
+        .map((s) => s[0])
         .map((s, i) => `${i + 1}.) ${s}`)
         .join("\n"),
       history.length ? history : "", // Chat history

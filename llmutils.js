@@ -15,6 +15,7 @@ const { exec } = require("child_process"),
   db = new QuickDB(),
   hf = new HfInference(process.env.HF_TOKEN),
   DDG = require("duck-duck-scrape"),
+  { EmbeddingModel, FlagEmbedding } = require("fastembed"),
   { randomInt } = require("crypto");
 
 var bindings, siginter;
@@ -59,6 +60,32 @@ async function runAux(prompt) {
   return res;
   */
   return await genPaid(prompt);
+}
+
+/**
+ * Reranks the strings based on relevancy to query
+ * @param {string} query
+ * @param {string[]} strings
+ */
+async function reranker(query, strings) {
+  query = query.replaceAll(/\(\D*\)/gim, "");
+  query = query.replaceAll(/\(\S[^):]+$/gim, "");
+  query = query.replaceAll(/\[.+\]/gim, "");
+  query = query.replaceAll(/:[\w\d ]+:/gim, "");
+  const embeddingModel = await FlagEmbedding.init({
+      model: EmbeddingModel.BGEBaseENV15,
+    }),
+    /** @type {number[][]} */
+    docs = (await embeddingModel.passageEmbed(strings).next()).value,
+    queryEnc = await embeddingModel.queryEmbed(query),
+    embeds = docs.map((v, i) => [strings[i], v]),
+    scores = embeds.map((v) => [
+      v[0],
+      _.sum(queryEnc.map((q, i) => q * v[1][i])),
+    ]),
+    res = scores.sort((a, b) => b[1] - a[1]);
+
+  return res;
 }
 
 async function getCaption(img) {
@@ -278,6 +305,10 @@ Summary: `;
  * @returns {Promise<string[]>}
  */
 async function retrieval(string) {
+  string = string.replaceAll(/\(\D*\)/gim, "");
+  string = string.replaceAll(/\(\S[^):]+$/gim, "");
+  string = string.replaceAll(/\[.+\]/gim, "");
+  string = string.replaceAll(/:[\w\d ]+:/gim, "");
   /**
    * @param {string} query
    */
@@ -372,6 +403,7 @@ module.exports = {
   runAux,
   keyword,
   retrieval,
+  reranker,
   getCaption,
   getTopMatchingGif,
   nsfwProcess,
