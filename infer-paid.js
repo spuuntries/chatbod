@@ -49,7 +49,7 @@ async function generate(
         case "replicate":
           return (
             await replicate.run(
-              "spuuntries/miqumaid-v1-70b-gguf:a96238fcd221a71cedbaf76b254030f16575146c3bc59344ec7fc923e13deb31",
+              "spuuntries/miqumaid-v2-2x70b-dpo-gguf:30698eb03a6b2b2b9b569eb9633fd0e71f9a74ea690ca61de2a81a66e33c7be6",
               {
                 input: {
                   prompt: prompt,
@@ -89,7 +89,7 @@ async function generate(
         default:
           return (
             await replicate.run(
-              "spuuntries/miqumaid-v1-70b-gguf:a96238fcd221a71cedbaf76b254030f16575146c3bc59344ec7fc923e13deb31",
+              "spuuntries/miqumaid-v2-2x70b-dpo-gguf:30698eb03a6b2b2b9b569eb9633fd0e71f9a74ea690ca61de2a81a66e33c7be6",
               {
                 input: {
                   prompt: prompt,
@@ -108,7 +108,7 @@ async function generate(
     } else {
       return (
         await replicate.run(
-          "spuuntries/miqumaid-v1-70b-gguf:a96238fcd221a71cedbaf76b254030f16575146c3bc59344ec7fc923e13deb31",
+          "spuuntries/miqumaid-v2-2x70b-dpo-gguf:30698eb03a6b2b2b9b569eb9633fd0e71f9a74ea690ca61de2a81a66e33c7be6",
           {
             input: {
               prompt: prompt,
