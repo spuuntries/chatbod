@@ -281,6 +281,7 @@ parentPort.on("message", async (event) => {
       message.guild.name,
       (
         await reranker(
+          message.cleanContent,
           _.uniq(
             (
               await Promise.all(
