@@ -293,7 +293,6 @@ parentPort.on("message", async (event) => {
           )
         )
       )
-        .filter((s) => s[1] >= 0.6)
         .map((s) => s[0])
         .map((s, i) => `${i + 1}.) ${s}`)
         .join("\n"),
