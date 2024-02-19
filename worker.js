@@ -287,7 +287,12 @@ parentPort.on("message", async (event) => {
               await Promise.all(
                 interimHistory
                   .slice(-4)
-                  .map(async (m) => await retrieval(m.cleanContent))
+                  .map(
+                    async (m) => (
+                      await new Promise((resolve) => setTimeout(resolve, 5000)),
+                      await retrieval(m.cleanContent)
+                    )
+                  )
               )
             ).flat()
           )
