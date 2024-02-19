@@ -324,6 +324,7 @@ parentPort.on("message", async (event) => {
     if (
       interimHistory.find(
         (m) =>
+          resp.length >= 5 &&
           levDis.DamerauLevenshteinDistanceSearch(resp, m.cleanContent)
             .distance < 5
       )
