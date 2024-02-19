@@ -320,7 +320,7 @@ async function retrieval(string) {
           safeSearch: DDG.SafeSearchType.STRICT,
         });
         const results = searchResults.results
-          .slice(0, 5)
+          .slice(0, 6)
           .map((e) =>
             e.description
               .replace(/<\/?[^>]+(>|$)/g, "")
@@ -374,12 +374,7 @@ async function retrieval(string) {
         ? // Fetches relevant wikipedia documents and parses them
           await wtf.fetch(queries)
         : null,
-    search =
-      topics && acros
-        ? (
-            await Promise.all(queries.map(async (q) => await searchWrapper(q)))
-          ).flat()
-        : [],
+    search = topics && acros ? await searchWrapper(string) : [],
     results = (
       docs
         ? docs

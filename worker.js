@@ -281,10 +281,18 @@ parentPort.on("message", async (event) => {
       message.guild.name,
       (
         await reranker(
-          message.cleanContent,
-          await retrieval(message.cleanContent)
+          _.uniq(
+            (
+              await Promise.all(
+                interimHistory
+                  .slice(-4)
+                  .map(async (m) => await retrieval(m.cleanContent))
+              )
+            ).flat()
+          )
         )
       )
+        .filter((s) => s[1] >= 0.6)
         .map((s) => s[0])
         .map((s, i) => `${i + 1}.) ${s}`)
         .join("\n"),
