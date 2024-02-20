@@ -28,6 +28,8 @@ function transform(str) {
             .replaceAll("ike", "iek")
             .replaceAll("but", "butt")
             .replaceAll(/^i$/g, "me")
+            .replaceAll(/([\w]*)oes([\w]+)/g, "$1ose$2")
+            .replaceAll(/([\w]+)oes([\w]*)/g, "$1ose$2")
             .replaceAll(/oes$/g, "oez")
             .replaceAll(/ork$/g, "oek")
             .replaceAll("that", "dat")
@@ -35,7 +37,13 @@ function transform(str) {
             .replaceAll(/^the$/g, "da")
             .replaceAll(/([a])the/g, "$1thu")
             .replaceAll(/([io])the/g, "$1de")
-            .replaceAll(/a[l]+$/g, "ol");
+            .replaceAll(/a[l]+$/g, "ol")
+            .replaceAll(/([^aiueo])y$/g, "$1i")
+            .replaceAll(/tion$/g, "shun")
+            .replaceAll(/cer([\w]+)/g, "sur$1")
+            .replaceAll(/nce$/g, "ns")
+            .replaceAll("and", "n")
+            .replaceAll(/^g([e])/g, "j$1");
           if (inter.split("").filter((char) => char == "e").length > 1) {
             /** @type {string} */
             let eswap = inter;
@@ -46,15 +54,13 @@ function transform(str) {
               )
               .join("");
           }
-          if (old.match(/[^aiueo]+y$/gi)) inter += "i";
           if (old.match(/[aiueo]+y$/gi)) inter += "e";
           if (old.match(/day$/gi))
-            inter = inter.slice(0, inter.length - 3) + "dae";
+            inter = inter.slice(0, inter.length - 4) + "dae";
           if (old.match(/[aiueo]ve$/gi))
             inter = inter.slice(0, inter.length - 2) + "be";
           if (old.match(/[y]+s$/gi))
-            inter = inter.slice(0, inter.length - 1) + "es";
-          if (old == "does") inter = "doez";
+            inter = inter.slice(0, inter.length - 2) + "es";
           if (old.at(0).toUpperCase() == old.at(0) && inter)
             inter = inter.at(0).toUpperCase() + inter.slice(1);
           result += inter;
