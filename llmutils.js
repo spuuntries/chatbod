@@ -73,7 +73,7 @@ async function reranker(query, strings) {
   query = query.replaceAll(/\[.+\]/gim, "");
   query = query.replaceAll(/:[\w\d ]+:/gim, "");
 
-  if (!strings) return [];
+  if (strings.length < 1) return [];
 
   const embeddingModel = await FlagEmbedding.init({
       model: EmbeddingModel.BGEBaseENV15,
