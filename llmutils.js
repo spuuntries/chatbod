@@ -313,7 +313,8 @@ async function retrieval(string) {
    * @param {string} query
    */
   async function searchWrapper(query) {
-    let retries = 3;
+    let retries = 3,
+      waitTime = 5000;
     while (retries > 0) {
       try {
         const searchResults = await DDG.search(query, {
@@ -344,7 +345,8 @@ async function retrieval(string) {
           );
           return [];
         }
-        await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait for  5 seconds before retrying
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
+        waitTime *= 2;
       }
     }
   }

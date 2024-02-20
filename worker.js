@@ -288,9 +288,15 @@ parentPort.on("message", async (event) => {
                 interimHistory
                   .slice(-4)
                   .map(
-                    async (m) => (
-                      await new Promise((resolve) => setTimeout(resolve, 5000)),
-                      await retrieval(m.cleanContent)
+                    async (m, i) => (
+                      await new Promise((resolve) =>
+                        setTimeout(resolve, 5000 * i)
+                      ),
+                      await retrieval(
+                        m.cleanContent
+                          .replaceAll(/kekbot/gim, "")
+                          .replaceAll(/kek/gim, "")
+                      )
                     )
                   )
               )
