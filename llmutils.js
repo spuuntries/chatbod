@@ -309,6 +309,7 @@ async function retrieval(string) {
   string = string.replaceAll(/\(\S[^):]+$/gim, "");
   string = string.replaceAll(/\[.+\]/gim, "");
   string = string.replaceAll(/:[\w\d ]+:/gim, "");
+  if (!string) return [];
   /**
    * @param {string} query
    */
