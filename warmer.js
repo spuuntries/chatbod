@@ -3,7 +3,6 @@ require("dotenv").config();
 
 const logger = (m) => console.log(`[${new Date()}] ${m}`),
   { HfInference } = require("@huggingface/inference"),
-  { generate } = require("./infer-paid"),
   hf = new HfInference(process.env.HF_TOKEN),
   niceware = require("niceware");
 
@@ -68,18 +67,5 @@ setInterval(async () => {
     );
   }
 }, 1800000);
-
-setInterval(async () => {
-  try {
-    var stage = 0;
-    await generate("Pogchamp is", 0, { max_tokens: 1 });
-
-    stage = 0;
-  } catch (e) {
-    logger(
-      `Failed to warm up models, (${e.message}) [${["replicate"][stage]}]`
-    );
-  }
-}, 480000);
 
 logger("Warmer worker is running...");
