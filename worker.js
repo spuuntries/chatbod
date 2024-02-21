@@ -289,9 +289,7 @@ parentPort.on("message", async (event) => {
                   .slice(-4)
                   .map(
                     async (m, i) => (
-                      await new Promise((resolve) =>
-                        setTimeout(resolve, 5000 * i)
-                      ),
+                      await new Promise((resolve) => setTimeout(resolve, 7000)),
                       await retrieval(
                         m.cleanContent
                           .replaceAll(/kekbot/gim, "")
