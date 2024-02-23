@@ -12,9 +12,10 @@ function transform(str) {
       let result = "";
 
       const matches = res.text().match(/(\w+)|(\s+)|([!-\/:-@[-`{-~])/gi);
+      if (!matches?.length) return nlp(res.text());
       for (let i = 0; i < matches.length; i++) {
         if (matches[i].trim() !== "") {
-          if (_.inRange(_.random(1, 20), 1, 11)) {
+          if (_.inRange(_.random(1, 20), 1, 6)) {
             result += matches[i];
             continue;
           }
