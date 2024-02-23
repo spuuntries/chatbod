@@ -86,6 +86,36 @@ async function generate(
             ).json()
           ).choices[0].text;
 
+        case "modal":
+          return (
+            await (
+              await fetch(
+                "https://spuuntries--lcpp-miqumaid-handle-req.modal.run",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    prompt: prompt,
+                    gen_config: {
+                      max_tokens: 256,
+                      prompt_template: "{prompt}",
+                      ...(generationConfig?.paid
+                        ? (({ models, route, ...rest }) => rest)(
+                            generationConfig.paid
+                          )
+                        : {}),
+                      ...(additional_conf
+                        ? (({ backend, ...rest }) => rest)(additional_conf)
+                        : {}),
+                    },
+                  }),
+                }
+              )
+            ).json()
+          )["res"];
+
         default:
           return (
             await replicate.run(
