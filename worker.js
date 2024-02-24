@@ -285,18 +285,15 @@ parentPort.on("message", async (event) => {
           _.uniq(
             (
               await Promise.all(
-                interimHistory
-                  .slice(-4)
-                  .map(
-                    async (m, i) => (
-                      await new Promise((resolve) => setTimeout(resolve, 7000)),
-                      await retrieval(
-                        m.cleanContent
-                          .replaceAll(/kekbot/gim, "")
-                          .replaceAll(/kek/gim, "")
-                      )
+                interimHistory.slice(-4).map(
+                  async (m, i) =>
+                    // await new Promise((resolve) => setTimeout(resolve, 7000)),
+                    await retrieval(
+                      m.cleanContent
+                        .replaceAll(/kekbot/gim, "")
+                        .replaceAll(/kek/gim, "")
                     )
-                  )
+                )
               )
             ).flat()
           )
