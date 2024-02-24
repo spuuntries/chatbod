@@ -362,7 +362,7 @@ async function retrieval(string) {
     try {
       let res = await (
         await fetch(
-          `https://untitled-r270kzwjuz4q.runkit.sh/${encodeURIComponent(
+          `https://untitled-zcuwlsr9c8rb.runkit.sh/${encodeURIComponent(
             string
           )}`
         )
