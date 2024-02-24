@@ -364,8 +364,7 @@ async function retrieval(string) {
         await fetch(`https://untitled-r270kzwjuz4q.runkit.sh/${string}`)
       ).json();
 
-      searchRes = Array.prototype.slice
-        .call(res.results, 0, 6)
+      searchRes = res.results
         .slice(0, 6)
         .map((e) =>
           e.description
