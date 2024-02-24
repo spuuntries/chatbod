@@ -355,6 +355,46 @@ async function retrieval(string) {
     }
   }
 
+  var searchRes,
+    endpointRetries = 3,
+    epWaitTime = 3000;
+  while (endpointRetries > 0) {
+    try {
+      let res = await (
+        await fetch(`https://untitled-r270kzwjuz4q.runkit.sh/${string}`)
+      ).json();
+
+      searchRes = Array.prototype.slice
+        .call(res.results, 0, 6)
+        .slice(0, 6)
+        .map((e) =>
+          e.description
+            .replace(/<\/?[^>]+(>|$)/g, "")
+            .split(".")
+            .slice(0, 2)
+            .join(".")
+        )
+        .filter(
+          (e) =>
+            e.split(/ +/gim).length > 1 &&
+            e &&
+            !["http:", "https:"].filter((p) => e.includes(p)).length
+        );
+
+      break;
+    } catch (error) {
+      console.log(`[${new Date()}] DDG endpoint failed: ${error}`);
+      endpointRetries--;
+      if (endpointRetries === 0) {
+        console.log(
+          `[${new Date()}] DDG endpoint retry limit reached, trying local`
+        );
+        searchRes = await searchWrapper(string);
+      }
+      await new Promise((resolve) => setTimeout(resolve, epWaitTime));
+    }
+  }
+
   const input = nlp(string),
     topics = input
       .toLowerCase()
@@ -380,7 +420,6 @@ async function retrieval(string) {
         ? // Fetches relevant wikipedia documents and parses them
           await wtf.fetch(queries)
         : null,
-    search = topics && acros ? await searchWrapper(string) : [],
     results = (
       docs
         ? docs
@@ -394,7 +433,7 @@ async function retrieval(string) {
                 .replaceAll(/\n+/g, "\n")
             )
         : []
-    ).concat(search ? search : []);
+    ).concat(searchRes ? searchRes : []);
 
   return results;
 }
