@@ -361,7 +361,11 @@ async function retrieval(string) {
   while (endpointRetries > 0) {
     try {
       let res = await (
-        await fetch(`https://untitled-r270kzwjuz4q.runkit.sh/${string}`)
+        await fetch(
+          `https://untitled-r270kzwjuz4q.runkit.sh/${encodeURIComponent(
+            string
+          )}`
+        )
       ).json();
 
       searchRes = res.results
