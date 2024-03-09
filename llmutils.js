@@ -5,6 +5,8 @@ const { exec } = require("child_process"),
   nlp = require("compromise"),
   wtf = require("wtf_wikipedia"),
   { HfInference } = require("@huggingface/inference"),
+  axiosTypes = require("axios").default,
+  /** @type {axiosTypes} */
   axios = require("axios"),
   { python } = require("pythonia"),
   { generate } = require("./infer-petals"),
@@ -360,10 +362,10 @@ async function retrieval(string) {
     epWaitTime = 3000;
   while (endpointRetries > 0) {
     try {
-      let res = await (
-        await fetch(
+      let res = (
+        await axios.get(
           `https://untitled-w1croj0uqsxe.runkit.sh/${encodeURIComponent(
-            string.length > 200 ? string.slice(0, 200) + "..." : string
+            string.length > 200 ? string.slice(0, 250) + "..." : string
           )}`,
           {
             headers: {
@@ -371,7 +373,7 @@ async function retrieval(string) {
             },
           }
         )
-      ).json();
+      ).data;
 
       searchRes = res
         .slice(0, 6)
