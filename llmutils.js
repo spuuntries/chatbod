@@ -363,7 +363,7 @@ async function retrieval(string) {
       let res = await (
         await fetch(
           `https://untitled-w1croj0uqsxe.runkit.sh/${encodeURIComponent(
-            string
+            string.length > 200 ? string.slice(0, 200) + "..." : string
           )}`,
           {
             headers: {
