@@ -355,53 +355,53 @@ async function retrieval(string) {
     }
   }
 
-  // var searchRes,
-  //   endpointRetries = 3,
-  //   epWaitTime = 3000;
-  // while (endpointRetries > 0) {
-  //   try {
-  //     let res = await (
-  //       await fetch(
-  //         `https://d31333ab-d422-49e9-ad83-d5ef51180c7d-00-31set1h25mk0.janeway.replit.dev/${encodeURIComponent(
-  //           string
-  //         )}`,
-  //         {
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //         }
-  //       )
-  //     ).json();
-  //
-  //     searchRes = res.results
-  //       .slice(0, 6)
-  //       .map((e) =>
-  //         e.description
-  //           .replace(/<\/?[^>]+(>|$)/g, "")
-  //           .split(".")
-  //           .slice(0, 2)
-  //           .join(".")
-  //       )
-  //       .filter(
-  //         (e) =>
-  //           e.split(/ +/gim).length > 1 &&
-  //           e &&
-  //           !["http:", "https:"].filter((p) => e.includes(p)).length
-  //       );
-  //
-  //     break;
-  //   } catch (error) {
-  //     console.log(`[${new Date()}] DDG endpoint failed: ${error}`);
-  //     endpointRetries--;
-  //     if (endpointRetries === 0) {
-  //       console.log(
-  //         `[${new Date()}] DDG endpoint retry limit reached, trying local`
-  //       );
-  //       searchRes = await searchWrapper(string);
-  //     }
-  //     await new Promise((resolve) => setTimeout(resolve, epWaitTime));
-  //   }
-  // }
+  var searchRes,
+    endpointRetries = 3,
+    epWaitTime = 3000;
+  while (endpointRetries > 0) {
+    try {
+      let res = await (
+        await fetch(
+          `https://untitled-w1croj0uqsxe.runkit.sh/${encodeURIComponent(
+            string
+          )}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+      ).json();
+
+      searchRes = res.results
+        .slice(0, 6)
+        .map((e) =>
+          e.description
+            .replace(/<\/?[^>]+(>|$)/g, "")
+            .split(".")
+            .slice(0, 2)
+            .join(".")
+        )
+        .filter(
+          (e) =>
+            e.split(/ +/gim).length > 1 &&
+            e &&
+            !["http:", "https:"].filter((p) => e.includes(p)).length
+        );
+
+      break;
+    } catch (error) {
+      console.log(`[${new Date()}] endpoint failed: ${error}`);
+      endpointRetries--;
+      if (endpointRetries === 0) {
+        console.log(
+          `[${new Date()}] endpoint retry limit reached, trying local`
+        );
+        searchRes = await searchWrapper(string);
+      }
+      await new Promise((resolve) => setTimeout(resolve, epWaitTime));
+    }
+  }
 
   const input = nlp(string),
     topics = input
@@ -428,18 +428,20 @@ async function retrieval(string) {
         ? // Fetches relevant wikipedia documents and parses them
           await wtf.fetch(queries)
         : null,
-    results = docs
-      ? docs
-          .filter((d) => d)
-          .map((d) =>
-            nlp(d.text())
-              .sentences()
-              .filter((t) => !t.has("may refer to")) // For disambiguation pages
-              .slice(0, 5) // Disambiguation pages may provide multiple entries, so just to be safe, we can grab a few of the listed things then have user clarify
-              .text()
-              .replaceAll(/\n+/g, "\n")
-          )
-      : []; //.concat(searchRes ? searchRes : []);
+    results = (
+      docs
+        ? docs
+            .filter((d) => d)
+            .map((d) =>
+              nlp(d.text())
+                .sentences()
+                .filter((t) => !t.has("may refer to")) // For disambiguation pages
+                .slice(0, 5) // Disambiguation pages may provide multiple entries, so just to be safe, we can grab a few of the listed things then have user clarify
+                .text()
+                .replaceAll(/\n+/g, "\n")
+            )
+        : []
+    ).concat(searchRes ? searchRes : []);
 
   return results;
 }
