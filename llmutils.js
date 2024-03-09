@@ -373,7 +373,7 @@ async function retrieval(string) {
         )
       ).json();
 
-      searchRes = res.results
+      searchRes = res
         .slice(0, 6)
         .map((e) =>
           e.description
